@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Label 102x30 mm</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap');
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      display: block;
+      width: 106mm;
+    }
+    .sticker {
+      width: 106mm;
+      height: 30mm;
+      display: flex;
+      flex-direction: row;
+      background: white;
+      box-sizing: border-box;
+      margin-bottom: 0;
+    }
+    .label {
+      width: 53mm;
+      height: 30mm;
+      box-sizing: border-box;
+      padding: 1mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 0.5px solid #ccc;
+    }
+    .label:last-child {
+      border-right: none;
+    }
+    .row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 1mm;
+    }
+    .qr {
+      width: 12.5mm;
+      height: 12.5mm;
+      margin-right: 5mm;
+      margin-left: 3mm;
+    }
+    .material {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: left;
+      margin: 0;
+      line-height: 1;
+    }
+    .technician {
+      font-size: 10px;
+      text-align: left;
+      margin: 0;
+      margin-right: 2mm;
+      line-height: 1.2;
+    }
+    .department {
+      font-size: 10px;
+      text-align: left;
+      margin: 0;
+      margin-right: 2mm;
+      line-height: 1.2;
+    }
+    .description {
+      font-size: 10px;
+      font-weight: bold;
+      text-align: left;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-wrap: break-word;
+      margin: 0;
+      margin-left: 2mm;
+    }
+    .location {
+      font-size: 12px;
+      font-weight: bold;
+      text-align: left;
+      margin-top: 1px;
+      margin-bottom: 0;
+      line-height: 1.1;
+      margin-left: 2mm;
+    }
+    .lot-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 0;
+      line-height: 1.1;
+      margin-left: 2mm;
+      margin-right: 1mm;
+    }
+    .lot {
+      font-size: 8px;
+      text-align: left;
+      line-height: 1;
+      margin: 0;
+    }
+    .print-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .print-button:hover {
+      background-color: #45a049;
+    }
+    /* Spinner Styles */
+    .spinner-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @media print {
+      .print-button, .spinner-container {
+        display: none;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 102mm;
+        margin: 0;
+      }
+      .sticker {
+        page-break-inside: avoid;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-button" onclick="window.print()">Print Preview</button>
+  <div class="spinner-container" id="spinner">
+    <div class="spinner"></div>
+  </div>
+  <div id="app">
+    <p style="text-align:center;">กำลังโหลดข้อมูล...</p>
+  </div>
+
+  <script>
+    const sheetID = "1Fe39m1Zn788PT_f_of5DskZB44AJHcO93u8ABOwjECM";
+    const sheetName = "Data_Serial";
+    const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+
+    async function loadAndRender() {
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const cleanedData = data.map(row => ({
+          Material: row['Material'] || '',
+          QtyPrint: row['QtyPrint'] || '',
+          จำนวน: parseInt(row['จำนวน']) || 1,
+          Pack: row['Pack'] || '',
+          IDช่าง: row['IDช่าง'] || '',
+          Serial: row['Serial'] || '',
+          Description: row['Description'] || '',
+          Storagebin: row['Storagebin'] || '',
+          ชื่อช่าง: row['ชื่อช่าง'] || '',
+          Unit: row['Unit'] || '',
+          แผนก: row['แผนก'] || ''
+        }));
+
+        // Ensure spinner is shown for at least 3 seconds
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 3000));
+        await Promise.all([minLoadingTime, Promise.resolve()]);
+
+        // Hide spinner
+        document.getElementById('spinner').style.display = 'none';
+
+        renderLabels(cleanedData);
+      } catch (err) {
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('app').innerHTML = '<p style="color:red;">โหลดข้อมูลล้มเหลว</p>';
+        console.error(err);
+      }
+    }
+
+    function renderLabels(data) {
+      const app = document.getElementById('app');
+      app.innerHTML = '<div class="container"></div>';
+      const container = app.querySelector('.container');
+
+      // Filter data to include only rows with non-empty Material and Serial = true
+      const validData = data.filter(row => row.Material && row.Material.trim() !== '' && row.Serial === 'TRUE');
+      
+      validData.sort((a, b) => a.Material.localeCompare(b.Material));
+
+      const expandedData = [];
+      validData.forEach(row => {
+        const qty = Math.max(1, row.จำนวน);
+        for (let i = 0; i < qty; i++) {
+          expandedData.push({ ...row });
+        }
+      });
+
+      for (let i = 0; i < expandedData.length; i += 2) {
+        const sticker = document.createElement('div');
+        sticker.className = 'sticker';
+
+        const label1 = createLabel(expandedData[i]);
+        sticker.appendChild(label1);
+
+        if (i + 1 < expandedData.length) {
+          const label2 = createLabel(expandedData[i + 1]);
+          sticker.appendChild(label2);
+        } else {
+          const emptyLabel = document.createElement('div');
+          emptyLabel.className = 'label';
+          emptyLabel.innerHTML = '<div class="description">ไม่มีข้อมูล</div>';
+          sticker.appendChild(emptyLabel);
+        }
+
+        container.appendChild(sticker);
+      }
+    }
+
+    function createLabel(row) {
+      const label = document.createElement('div');
+      label.className = 'label';
+
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'row';
+
+      const qrCanvas = document.createElement('canvas');
+      qrCanvas.className = 'qr';
+      rowDiv.appendChild(qrCanvas);
+
+      const textContainer = document.createElement('div');
+      textContainer.style.display = 'flex';
+      textContainer.style.flexDirection = 'column';
+
+      const materialDiv = document.createElement('div');
+      materialDiv.className = 'material';
+      materialDiv.textContent = row.Material;
+      textContainer.appendChild(materialDiv);
+
+      const technicianDiv = document.createElement('div');
+      technicianDiv.className = 'technician';
+      technicianDiv.textContent = row.ชื่อช่าง;
+      textContainer.appendChild(technicianDiv);
+
+      const departmentDiv = document.createElement('div');
+      departmentDiv.className = 'department';
+      departmentDiv.textContent = row.แผนก;
+      textContainer.appendChild(departmentDiv);
+
+      rowDiv.appendChild(textContainer);
+      label.appendChild(rowDiv);
+
+      const desc = document.createElement('div');
+      desc.className = 'description';
+      desc.textContent = row.Description;
+      label.appendChild(desc);
+
+      const loc = document.createElement('div');
+      loc.className = 'location';
+      loc.textContent = `Location: ${row.Storagebin}`;
+      label.appendChild(loc);
+
+      const now = new Date();
+      const formattedDate = `${now.getFullYear().toString().slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+
+      const lot = document.createElement('div');
+      lot.className = 'lot-line';
+      lot.innerHTML = `
+        <span>Lot: ${formattedDate} (${row.จำนวน}) ${row.Pack} ${row.Unit}</span>
+      `;
+      label.appendChild(lot);
+
+      if (typeof QRCode !== 'undefined') {
+        QRCode.toCanvas(qrCanvas, row.Material || 'N/A', {
+          width: 50,
+          height: 50,
+          margin: 0,
+          errorCorrectionLevel: 'L'
+        }, err => {
+          if (err) console.error('QR Error:', err);
+        });
+      }
+
+      return label;
+    }
+
+    loadAndRender();
+  </script>
+</body>
+</html>
