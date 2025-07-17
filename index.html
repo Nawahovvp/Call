@@ -392,7 +392,7 @@
     .detail-table th, .detail-table td {
       padding: 8px;
       border: 1px solid #ccc;
-      text-align: left;
+      text-align: center;
     }
     .detail-table th {
       background-color: #007bff;
@@ -401,8 +401,17 @@
     .detail-table tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+    .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
+      width: 80px; /* Fixed width for Total and ค้างหน่วยงาน columns */
+      min-width: 80px;
+      max-width: 80px;
+    }
+    .detail-table th:first-child, .detail-table td:first-child {
+      width: auto; /* Flexible width for ศูนย์พื้นที่ column */
+      min-width: 120px;
+    }
     @media print {
-      .report-title, .close, .print-button, #printTableButton, #searchButton, #graphButton, #excelButton, #searchInput, .pagination, #searchContainer, .modal, .table-container {
+      .report-title, .close, .print-button, #printTableButton, #searchButton, #graphButton, #excelButton, #summaryButton, #searchInput, .pagination, #searchContainer, .modal, .table-container {
         display: none;
       }
       .modal-content {
@@ -455,6 +464,18 @@
         margin: 0;
         padding: 0;
       }
+      .detail-table th, .detail-table td {
+        text-align: center;
+      }
+      .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
+        width: 80px;
+        min-width: 80px;
+        max-width: 80px;
+      }
+      .detail-table th:first-child, .detail-table td:first-child {
+        width: auto;
+        min-width: 120px;
+      }
     }
   </style>
 </head>
@@ -485,6 +506,7 @@
       <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
       <button id="graphButton" class="action-button"><i class="fas fa-chart-line"></i> กราฟ</button>
       <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
+      <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
     </div>
   </div>
   <div class="table-container">
@@ -531,6 +553,18 @@
     </div>
   </div>
 
+  <div id="summaryModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeSummaryModal">×</span>
+      <button class="print-button" onclick="printSummaryContent()">
+        <i class="fas fa-print"></i>
+        <span>พิมพ์สรุป</span>
+      </button>
+      <h2>สรุปข้อมูล Call ค้าง</h2>
+      <div id="summaryContent"></div>
+    </div>
+  </div>
+
   <div class="pagination">
     <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
     <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
@@ -554,9 +588,11 @@
 
     const modal = document.getElementById("detailModal");
     const graphModal = document.getElementById("graphModal");
+    const summaryModal = document.getElementById("summaryModal");
     const modalContent = document.getElementById("modalContent");
     const closeModal = document.getElementById("closeModal");
     const closeGraphModal = document.getElementById("closeGraphModal");
+    const closeSummaryModal = document.getElementById("closeSummaryModal");
     const employeeFilter = document.getElementById("employeeFilter");
     const pendingFilter = document.getElementById("pendingFilter");
     const searchInput = document.getElementById("searchInput");
@@ -564,6 +600,7 @@
     const printTableButton = document.getElementById("printTableButton");
     const graphButton = document.getElementById("graphButton");
     const excelButton = document.getElementById("excelButton");
+    const summaryButton = document.getElementById("summaryButton");
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
     const firstPageButton = document.getElementById("firstPage");
@@ -572,6 +609,7 @@
     const lastPageButton = document.getElementById("lastPage");
     const itemsPerPageSelect = document.getElementById("itemsPerPage");
     const graphWarning = document.getElementById("graphWarning");
+    const summaryContent = document.getElementById("summaryContent");
 
     let allData = [];
     let currentPage = 1;
@@ -687,219 +725,219 @@
     }
 
     function printModalContent() {
-  if (!currentTicketNumber) {
-    alert("ไม่พบ Ticket Number สำหรับการพิมพ์");
-    return;
-  }
-  const modalData = allData.find(row => row["Ticket Number"] === currentTicketNumber);
-  if (!modalData) {
-    alert("ไม่พบข้อมูลสำหรับ Ticket Number: " + currentTicketNumber);
-    return;
-  }
+      if (!currentTicketNumber) {
+        alert("ไม่พบ Ticket Number สำหรับการพิมพ์");
+        return;
+      }
+      const modalData = allData.find(row => row["Ticket Number"] === currentTicketNumber);
+      if (!modalData) {
+        alert("ไม่พบข้อมูลสำหรับ Ticket Number: " + currentTicketNumber);
+        return;
+      }
 
-  let stickerContent = `
-    <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
-    <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
-    <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
-    <div><span class="label">DateTime:</span> <span class="value">${modalData["DateTime"] || "-"}</span></div>
-    <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
-    <div><span class="label">TeamPlant:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
-    <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
-    <div class="description"><span class="label">Description:</span> <span class="value">${modalData["Description"] || "-"}</span></div>
-  `;
+      let stickerContent = `
+        <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
+        <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
+        <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
+        <div><span class="label">DateTime:</span> <span class="value">${modalData["DateTime"] || "-"}</span></div>
+        <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
+        <div><span class="label">TeamPlant:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
+        <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
+        <div class="description"><span class="label">Description:</span> <span class="value">${modalData["Description"] || "-"}</span></div>
+      `;
 
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>พิมพ์รายละเอียด</title>
-        <style>
-          body {
-            font-family: 'Prompt', sans-serif;
-            margin: 0;
-            padding: 0;
-          }
-          .sticker {
-            width: 80mm;
-            height: 100mm;
-            border: 1px solid #000;
-            padding: 2mm;
-            box-sizing: border-box;
-            font-size: 13pt;
-            line-height: 1.3;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            page-break-after: always;
-          }
-          .sticker div {
-            margin-bottom: 1.5mm;
-            overflow-wrap: break-word;
-          }
-          .sticker div.description {
-            flex: 1;
-          }
-          .sticker .label {
-            font-weight: bold;
-            color: #000;
-            font-size: 14pt;
-          }
-          .sticker .value {
-            color: #000;
-          }
-          .sticker .value.team-brand {
-            font-size: 20pt;
-            font-weight: bold;
-          }
-          h2 {
-            font-size: 14pt;
-            color: #000;
-            margin: 1.5mm 0;
-          }
-          @media print {
-            body {
-              margin: 0;
-            }
-            @page {
-              size: 80mm 100mm;
-              margin: 0;
-            }
-          }
-        </style>
-      </head>
-      <body onload="window.print()">
-        <div class="sticker">
-          <h2>รายละเอียด</h2>
-          ${stickerContent}
-        </div>
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
-}
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์รายละเอียด</title>
+            <style>
+              body {
+                font-family: 'Prompt', sans-serif;
+                margin: 0;
+                padding: 0;
+              }
+              .sticker {
+                width: 80mm;
+                height: 100mm;
+                border: 1px solid #000;
+                padding: 2mm;
+                box-sizing: border-box;
+                font-size: 13pt;
+                line-height: 1.3;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                page-break-after: always;
+              }
+              .sticker div {
+                margin-bottom: 1.5mm;
+                overflow-wrap: break-word;
+              }
+              .sticker div.description {
+                flex: 1;
+              }
+              .sticker .label {
+                font-weight: bold;
+                color: #000;
+                font-size: 14pt;
+              }
+              .sticker .value {
+                color: #000;
+              }
+              .sticker .value.team-brand {
+                font-size: 20pt;
+                font-weight: bold;
+              }
+              h2 {
+                font-size: 14pt;
+                color: #000;
+                margin: 1.5mm 0;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                }
+                @page {
+                  size: 80mm 100mm;
+                  margin: 0;
+                }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <div class="sticker">
+              <h2>รายละเอียด</h2>
+              ${stickerContent}
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
 
-   function printTable() {
-  const selectedTeamPlant = employeeFilter.value;
-  const selectedPending = pendingFilter.value;
-  const keyword = searchInput.value.toLowerCase().trim();
+    function printTable() {
+      const selectedTeamPlant = employeeFilter.value;
+      const selectedPending = pendingFilter.value;
+      const keyword = searchInput.value.toLowerCase().trim();
 
-  let filteredData = allData.filter(row => {
-    if (!row) return false;
-    return (
-      (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
-      (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
-      (!keyword ||
-        (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
-        (row["DateTime"] || "").toLowerCase().includes(keyword) ||
-        (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
-        (row["Brand"] || "").toLowerCase().includes(keyword) ||
-        (row["Team"] || "").toLowerCase().includes(keyword) ||
-        (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
-        (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
-        (row["Material"] || "").toLowerCase().includes(keyword) ||
-        (row["Description"] || "").toLowerCase().includes(keyword) ||
-        (row["Nawa"] || "").toLowerCase().includes(keyword) ||
-        (row["AnswerX"] || "").toLowerCase().includes(keyword)
-      )
-    );
-  });
+      let filteredData = allData.filter(row => {
+        if (!row) return false;
+        return (
+          (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
+          (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!keyword ||
+            (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
+            (row["DateTime"] || "").toLowerCase().includes(keyword) ||
+            (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
+            (row["Brand"] || "").toLowerCase().includes(keyword) ||
+            (row["Team"] || "").toLowerCase().includes(keyword) ||
+            (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
+            (row["ค้างหนี้หน่วยงาน"] || "").toLowerCase().includes(keyword) ||
+            (row["Material"] || "").toLowerCase().includes(keyword) ||
+            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+          )
+        );
+      });
 
-  if (filteredData.length === 0) {
-    alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา");
-    return;
-  }
+      if (filteredData.length === 0) {
+        alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา");
+        return;
+      }
 
-  filteredData.sort((a, b) => {
-    let dayA = parseFloat(a["DayRepair"]) || 0;
-    let dayB = parseFloat(b["DayRepair"]) || 0;
-    let ticketA = a["Ticket Number"] || "";
-    let ticketB = b["Ticket Number"] || "";
-    if (dayA !== dayB) return dayB - dayA;
-    return ticketA.localeCompare(ticketB);
-  });
+      filteredData.sort((a, b) => {
+        let dayA = parseFloat(a["DayRepair"]) || 0;
+        let dayB = parseFloat(b["DayRepair"]) || 0;
+        let ticketA = a["Ticket Number"] || "";
+        let ticketB = b["Ticket Number"] || "";
+        if (dayA !== dayB) return dayB - dayA;
+        return ticketA.localeCompare(ticketB);
+      });
 
-  const startIdx = (currentPage - 1) * itemsPerPage;
-  const endIdx = startIdx + itemsPerPage;
-  const paginatedData = filteredData.slice(startIdx, endIdx);
+      const startIdx = (currentPage - 1) * itemsPerPage;
+      const endIdx = startIdx + itemsPerPage;
+      const paginatedData = filteredData.slice(startIdx, endIdx);
 
-  const stickersHtml = paginatedData.map(row => {
-    return `
-      <div class="sticker">
-        <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
-        <div><span class="label">Team:</span> <span class="value team-brand">${row["Team"] || "-"}</span></div>
-        <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
-        <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
-        <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
-        <div><span class="label">TeamPlant:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
-        <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
-        <div class="description"><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
-      </div>
-    `;
-  }).join('');
+      const stickersHtml = paginatedData.map(row => {
+        return `
+          <div class="sticker">
+            <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
+            <div><span class="label">Team:</span> <span class="value team-brand">${row["Team"] || "-"}</span></div>
+            <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
+            <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
+            <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
+            <div><span class="label">TeamPlant:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
+            <div class="description"><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
+          </div>
+        `;
+      }).join('');
 
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>พิมพ์สติ๊กเกอร์</title>
-        <style>
-          body {
-            font-family: 'Prompt', sans-serif;
-            margin: 0;
-            padding: 0;
-          }
-          .sticker {
-            width: 80mm;
-            height: 100mm;
-            border: 1px solid #000;
-            padding: 2mm;
-            box-sizing: border-box;
-            font-size: 13pt;
-            line-height: 1.3;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            page-break-after: always;
-          }
-          .sticker div {
-            margin-bottom: 1.5mm;
-            overflow-wrap: break-word;
-          }
-          .sticker div.description {
-            flex: 1;
-          }
-          .sticker .label {
-            font-weight: bold;
-            color: #000;
-            font-size: 14pt;
-          }
-          .sticker .value {
-            color: #000;
-          }
-          .sticker .value.team-brand {
-            font-size: 16pt;
-            font-weight: bold;
-          }
-          @media print {
-            body {
-              margin: 0;
-            }
-            @page {
-              size: 80mm 100mm;
-              margin: 0;
-            }
-          }
-        </style>
-      </head>
-      <body onload="window.print()">
-        ${stickersHtml}
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
-}
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สติ๊กเกอร์</title>
+            <style>
+              body {
+                font-family: 'Prompt', sans-serif;
+                margin: 0;
+                padding: 0;
+              }
+              .sticker {
+                width: 80mm;
+                height: 100mm;
+                border: 1px solid #000;
+                padding: 2mm;
+                box-sizing: border-box;
+                font-size: 13pt;
+                line-height: 1.3;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                page-break-after: always;
+              }
+              .sticker div {
+                margin-bottom: 1.5mm;
+                overflow-wrap: break-word;
+              }
+              .sticker div.description {
+                flex: 1;
+              }
+              .sticker .label {
+                font-weight: bold;
+                color: #000;
+                font-size: 14pt;
+              }
+              .sticker .value {
+                color: #000;
+              }
+              .sticker .value.team-brand {
+                font-size: 16pt;
+                font-weight: bold;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                }
+                @page {
+                  size: 80mm 100mm;
+                  margin: 0;
+                }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            ${stickersHtml}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
 
     function showGraph() {
       const selectedTeamPlant = employeeFilter.value;
@@ -1011,21 +1049,198 @@
       graphModal.style.display = "block";
     }
 
+    function showSummary() {
+      const selectedTeamPlant = employeeFilter.value;
+      const selectedPending = pendingFilter.value;
+      const keyword = searchInput.value.toLowerCase().trim();
+
+      let filteredData = allData.filter(row => {
+        if (!row) return false;
+        return (
+          (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
+          (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!keyword ||
+            (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
+            (row["DateTime"] || "").toLowerCase().includes(keyword) ||
+            (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
+            (row["Brand"] || "").toLowerCase().includes(keyword) ||
+            (row["Team"] || "").toLowerCase().includes(keyword) ||
+            (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
+            (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
+            (row["Material"] || "").toLowerCase().includes(keyword) ||
+            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+          )
+        );
+      });
+
+      const totalCalls = filteredData.length;
+      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
+
+      // Create pivot table data
+      const pivotData = {};
+      const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
+
+      // Initialize pivot table
+      teamPlants.forEach(teamPlant => {
+        pivotData[teamPlant] = {};
+        pendingUnits.forEach(pending => {
+          pivotData[teamPlant][pending] = 0;
+        });
+      });
+
+      // Count calls for each TeamPlant and Pending Status combination
+      filteredData.forEach(row => {
+        const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+        const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+        pivotData[teamPlant][pending]++;
+      });
+
+      // Calculate total calls per TeamPlant for sorting
+      const teamPlantTotals = teamPlants.map(teamPlant => ({
+        teamPlant,
+        total: Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0)
+      })).sort((a, b) => b.total - a.total);
+
+      // Process pendingUnits to remove "Stock" from column headers
+      const cleanedPendingUnits = pendingUnits.map(pending => pending.replace(/^Stock\s*/i, ''));
+
+      // Generate pivot table HTML with Total as the second column
+      let pivotTableHtml = `
+        <table class='detail-table'>
+          <thead>
+            <tr>
+              <th>ศูนย์พื้นที่</th>
+              <th class='fixed-width'>รวม</th>
+              ${cleanedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${teamPlantTotals.map(({ teamPlant, total }) => `
+              <tr>
+                <td>${teamPlant}</td>
+                <td class='fixed-width'>${total || '-'}</td>
+                ${pendingUnits.map(pending => `
+                  <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
+                `).join('')}
+              </tr>
+            `).join('')}
+            <tr>
+              <td><strong>รวม</strong></td>
+              <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
+              ${pendingUnits.map(pending => {
+                const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
+                return `<td class='fixed-width'><strong>${totalPending === 0 ? '-' : totalPending}</strong></td>`;
+              }).join('')}
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      let summaryHtml = `
+        <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
+        <div><span class='label'>จำนวน Ticket ที่ไม่ซ้ำ:</span> <span class='value'>${uniqueTickets} Ticket</span></div>
+        <h3>จำนวน Call ค้างตามศูนย์พื้นที่และค้างหน่วยงาน</h3>
+        ${pivotTableHtml}
+      `;
+
+      summaryContent.innerHTML = summaryHtml;
+      summaryModal.style.display = "block";
+    }
+
+    function printSummaryContent() {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สรุปข้อมูล</title>
+            <style>
+              body {
+                font-family: 'Prompt', sans-serif;
+                margin: 10mm;
+                padding: 0;
+              }
+              h2, h3 {
+                color: #000;
+                margin: 10px 0;
+              }
+              .detail-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              .detail-table th, .detail-table td {
+                padding: 8px;
+                border: 1px solid #ccc;
+                text-align: center;
+              }
+              .detail-table th {
+                background-color: #007bff;
+                color: white;
+              }
+              .detail-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+              }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
+                width: 80px;
+                min-width: 80px;
+                max-width: 80px;
+              }
+              .detail-table th:first-child, .detail-table td:first-child {
+                width: auto;
+                min-width: 120px;
+              }
+              .label {
+                font-weight: bold;
+                color: #007bff;
+              }
+              .value {
+                color: #000;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                }
+                @page {
+                  margin: 10mm;
+                }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <h2>สรุปข้อมูล Call ค้าง</h2>
+            ${summaryContent.innerHTML}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
     closeModal.onclick = () => {
       modal.style.display = "none";
       currentTicketNumber = null;
     };
     closeGraphModal.onclick = () => graphModal.style.display = "none";
+    closeSummaryModal.onclick = () => summaryModal.style.display = "none";
+
     window.onclick = event => {
       if (event.target == modal) {
         modal.style.display = "none";
         currentTicketNumber = null;
       }
-      if (event.target == graphModal) graphModal.style.display = "none";
+      if (event.target == graphModal) {
+        graphModal.style.display = "none";
+      }
+      if (event.target == summaryModal) {
+        summaryModal.style.display = "none";
+      }
     };
 
     graphButton.addEventListener("click", showGraph);
     excelButton.addEventListener("click", exportToCSV);
+    summaryButton.addEventListener("click", showSummary);
 
     itemsPerPageSelect.addEventListener("change", (e) => {
       itemsPerPage = parseInt(e.target.value);
