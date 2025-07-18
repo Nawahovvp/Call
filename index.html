@@ -402,12 +402,12 @@
       background-color: #f9f9f9;
     }
     .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
-      width: 80px; /* Fixed width for Total and ค้างหน่วยงาน columns */
+      width: 80px;
       min-width: 80px;
       max-width: 80px;
     }
     .detail-table th:first-child, .detail-table td:first-child {
-      width: auto; /* Flexible width for ศูนย์พื้นที่ column */
+      width: auto;
       min-width: 120px;
     }
     @media print {
@@ -834,7 +834,7 @@
             (row["Brand"] || "").toLowerCase().includes(keyword) ||
             (row["Team"] || "").toLowerCase().includes(keyword) ||
             (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
-            (row["ค้างหนี้หน่วยงาน"] || "").toLowerCase().includes(keyword) ||
+            (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
@@ -1075,8 +1075,8 @@
         );
       });
 
-      const totalCalls = filteredData.length;
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
+      const totalCalls = uniqueTickets; // Use uniqueTickets as totalCalls
 
       // Create pivot table data
       const pivotData = {};
@@ -1091,11 +1091,16 @@
         });
       });
 
-      // Count calls for each TeamPlant and Pending Status combination
+      // Count unique tickets for each TeamPlant and Pending Status combination
+      const ticketCounts = {};
       filteredData.forEach(row => {
-        const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
-        const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
-        pivotData[teamPlant][pending]++;
+        const ticket = row["Ticket Number"];
+        if (!ticketCounts[ticket]) {
+          const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+          const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+          pivotData[teamPlant][pending]++;
+          ticketCounts[ticket] = true;
+        }
       });
 
       // Calculate total calls per TeamPlant for sorting
@@ -1121,7 +1126,7 @@
             ${teamPlantTotals.map(({ teamPlant, total }) => `
               <tr>
                 <td>${teamPlant}</td>
-                <td class='fixed-width'>${total || '-'}</td>
+                <td class='fixed-width'>${total === 0 ? '-' : total}</td>
                 ${pendingUnits.map(pending => `
                   <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
                 `).join('')}
@@ -1141,7 +1146,6 @@
 
       let summaryHtml = `
         <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
-        <div><span class='label'>จำนวน Ticket ที่ไม่ซ้ำ:</span> <span class='value'>${uniqueTickets} Ticket</span></div>
         <h3>จำนวน Call ค้างตามศูนย์พื้นที่และค้างหน่วยงาน</h3>
         ${pivotTableHtml}
       `;
@@ -1162,7 +1166,8 @@
                 margin: 10mm;
                 padding: 0;
               }
-              h2, h3 {
+              h2,consumption: 1.21 tokens per second.
+h3 {
                 color: #000;
                 margin: 10px 0;
               }
@@ -1405,7 +1410,7 @@
     pendingFilter.addEventListener("change", filterAndRenderTable);
 
     function updateCallCount(data) {
-      const count = data.length;
+      const count = [...new Set(data.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const callCountValue = document.getElementById("callCountValue");
       callCountValue.textContent = count;
     }
