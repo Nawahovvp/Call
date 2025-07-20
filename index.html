@@ -1076,12 +1076,13 @@
       });
 
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
-      const totalCalls = uniqueTickets; // Use uniqueTickets as totalCalls
+      const totalCalls = uniqueTickets;
 
       // Create pivot table data
       const pivotData = {};
       const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
+      const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit)); // Only include NEC_ยกเลิกผลิต if present in data
 
       // Initialize pivot table
       teamPlants.forEach(teamPlant => {
@@ -1103,31 +1104,35 @@
         }
       });
 
-      // Calculate total calls per TeamPlant for sorting
-      const teamPlantTotals = teamPlants.map(teamPlant => ({
-        teamPlant,
-        total: Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0)
-      })).sort((a, b) => b.total - a.total);
+      // Calculate total calls and Call column (Total - NEC_ยกเลิกผลิต) per TeamPlant for sorting
+      const teamPlantTotals = teamPlants.map(teamPlant => {
+        const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0);
+        const necCount = pivotData[teamPlant]["NEC_ยกเลิกผลิต"] || 0;
+        const callCount = total - necCount;
+        return { teamPlant, total, callCount };
+      }).sort((a, b) => b.total - a.total);
 
       // Process pendingUnits to remove "Stock" from column headers
-      const cleanedPendingUnits = pendingUnits.map(pending => pending.replace(/^Stock\s*/i, ''));
+      const cleanedPendingUnits = orderedPendingUnits.map(pending => pending.replace(/^Stock\s*/i, ''));
 
-      // Generate pivot table HTML with Total as the second column
+      // Generate pivot table HTML with Total, Call, and NEC_ยกเลิกผลิต columns
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
             <tr>
               <th>ศูนย์พื้นที่</th>
               <th class='fixed-width'>รวม</th>
+              <th class='fixed-width'>Call</th>
               ${cleanedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
-            ${teamPlantTotals.map(({ teamPlant, total }) => `
+            ${teamPlantTotals.map(({ teamPlant, total, callCount }) => `
               <tr>
                 <td>${teamPlant}</td>
                 <td class='fixed-width'>${total === 0 ? '-' : total}</td>
-                ${pendingUnits.map(pending => `
+                <td class='fixed-width'>${callCount === 0 ? '-' : callCount}</td>
+                ${orderedPendingUnits.map(pending => `
                   <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
                 `).join('')}
               </tr>
@@ -1135,7 +1140,14 @@
             <tr>
               <td><strong>รวม</strong></td>
               <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
-              ${pendingUnits.map(pending => {
+              <td class='fixed-width'><strong>${
+                orderedPendingUnits.includes("NEC_ยกเลิกผลิต") 
+                  ? (totalCalls - teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["NEC_ยกเลิกผลิต"], 0) === 0 
+                    ? '-' 
+                    : totalCalls - teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["NEC_ยกเลิกผลิต"], 0))
+                  : '-'
+              }</strong></td>
+              ${orderedPendingUnits.map(pending => {
                 const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
                 return `<td class='fixed-width'><strong>${totalPending === 0 ? '-' : totalPending}</strong></td>`;
               }).join('')}
@@ -1166,8 +1178,7 @@
                 margin: 10mm;
                 padding: 0;
               }
-              h2,consumption: 1.21 tokens per second.
-h3 {
+              h2, h3 {
                 color: #000;
                 margin: 10px 0;
               }
