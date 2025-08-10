@@ -1095,15 +1095,15 @@
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
 
-      // Initialize pivot table
+      // Initialize pivot table with "รอตอบ" and "ตอบแล้ว"
       teamPlants.forEach(teamPlant => {
-        pivotData[teamPlant] = { "รอตอบ": 0 };
+        pivotData[teamPlant] = { "รอตอบ": 0, "ตอบแล้ว": 0 };
         pendingUnits.forEach(pending => {
           pivotData[teamPlant][pending] = 0;
         });
       });
 
-      // Count unique tickets for each TeamPlant and Pending Status combination, and for คลังตอบ = "-"
+      // Count unique tickets for each TeamPlant, Pending Status, and "ตอบแล้ว" (where คลังตอบ = "Stock")
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1115,6 +1115,9 @@
           if (stockAns === "-") {
             pivotData[teamPlant]["รอตอบ"]++;
           }
+          if (stockAns.toLowerCase() === "stock") {
+            pivotData[teamPlant]["ตอบแล้ว"]++;
+          }
           ticketCounts[ticket] = true;
         }
       });
@@ -1122,13 +1125,14 @@
       // Debugging: Log pivotData to verify counts
       console.log("Pivot data:", pivotData);
 
-      // Calculate total calls, Call column (Total - NEC_ยกเลิกผลิต), and รอตอบ per TeamPlant for sorting
+      // Calculate total calls, ตอบแล้ว, and รอตอบ per TeamPlant for sorting
       const teamPlantTotals = teamPlants.map(teamPlant => {
-        const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0) - pivotData[teamPlant]["รอตอบ"];
-        const necCount = pivotData[teamPlant]["NEC_ยกเลิกผลิต"] || 0;
-        const callCount = total - necCount;
+        const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0) - 
+                      pivotData[teamPlant]["รอตอบ"] - 
+                      pivotData[teamPlant]["ตอบแล้ว"];
+        const answeredCount = pivotData[teamPlant]["ตอบแล้ว"] || 0;
         const waitAnsCount = pivotData[teamPlant]["รอตอบ"] || 0;
-        return { teamPlant, total, callCount, waitAnsCount };
+        return { teamPlant, total, answeredCount, waitAnsCount };
       }).sort((a, b) => b.total - a.total);
 
       // Debugging: Log teamPlantTotals
@@ -1137,24 +1141,24 @@
       // Process pendingUnits to remove "Stock" from column headers
       const cleanedPendingUnits = orderedPendingUnits.map(pending => pending.replace(/^Stock\s*/i, ''));
 
-      // Generate pivot table HTML with Total, Call, รอตอบ, and NEC_ยกเลิกผลิต columns
+      // Generate pivot table HTML with Total, ตอบแล้ว, รอตอบ, and NEC_ยกเลิกผลิต columns
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
             <tr>
               <th>ศูนย์พื้นที่</th>
               <th class='fixed-width'>รวม</th>
-              <th class='fixed-width'>Call</th>
+              <th class='fixed-width'>ตอบแล้ว</th>
               <th class='fixed-width'>รอตอบ</th>
               ${cleanedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
-            ${teamPlantTotals.map(({ teamPlant, total, callCount, waitAnsCount }) => `
+            ${teamPlantTotals.map(({ teamPlant, total, answeredCount, waitAnsCount }) => `
               <tr>
                 <td>${teamPlant}</td>
                 <td class='fixed-width'>${total === 0 ? '-' : total}</td>
-                <td class='fixed-width'>${callCount === 0 ? '-' : callCount}</td>
+                <td class='fixed-width'>${answeredCount === 0 ? '-' : answeredCount}</td>
                 <td class='fixed-width'>${waitAnsCount === 0 ? '-' : waitAnsCount}</td>
                 ${orderedPendingUnits.map(pending => `
                   <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
@@ -1165,11 +1169,9 @@
               <td><strong>รวม</strong></td>
               <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
               <td class='fixed-width'><strong>${
-                orderedPendingUnits.includes("NEC_ยกเลิกผลิต") 
-                  ? (totalCalls - teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["NEC_ยกเลิกผลิต"], 0) === 0 
-                    ? '-' 
-                    : totalCalls - teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["NEC_ยกเลิกผลิต"], 0))
-                  : '-'
+                teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["ตอบแล้ว"], 0) === 0 
+                  ? '-' 
+                  : teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["ตอบแล้ว"], 0)
               }</strong></td>
               <td class='fixed-width'><strong>${
                 teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตอบ"], 0) === 0 
