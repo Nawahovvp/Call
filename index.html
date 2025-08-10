@@ -501,7 +501,7 @@
       </div>
     </div>
     <div class="search-row">
-      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa..." />
+      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ..." />
       <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
       <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
       <button id="graphButton" class="action-button"><i class="fas fa-chart-line"></i> กราฟ</button>
@@ -524,6 +524,7 @@
           <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
           <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
           <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
+          <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
           <th>ดูรายละเอียด</th>
         </tr>
@@ -656,6 +657,7 @@
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword)
           )
         );
@@ -838,6 +840,7 @@
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword)
           )
         );
@@ -959,6 +962,7 @@
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword)
           )
         );
@@ -1054,6 +1058,7 @@
       const selectedPending = pendingFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
 
+      // Filter data based on user input
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1070,10 +1075,16 @@
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword)
           )
         );
       });
+
+      // Debugging: Log filtered data and check for คลังตอบ values
+      console.log("Filtered data length:", filteredData.length);
+      console.log("Sample filtered data (first 2 rows):", filteredData.slice(0, 2));
+      console.log("Unique คลังตอบ values:", [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(val => val))]);
 
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const totalCalls = uniqueTickets;
@@ -1082,40 +1093,51 @@
       const pivotData = {};
       const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
-      const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit)); // Only include NEC_ยกเลิกผลิต if present in data
+      const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
 
       // Initialize pivot table
       teamPlants.forEach(teamPlant => {
-        pivotData[teamPlant] = {};
+        pivotData[teamPlant] = { "รอตอบ": 0 };
         pendingUnits.forEach(pending => {
           pivotData[teamPlant][pending] = 0;
         });
       });
 
-      // Count unique tickets for each TeamPlant and Pending Status combination
+      // Count unique tickets for each TeamPlant and Pending Status combination, and for คลังตอบ = "-"
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
         if (!ticketCounts[ticket]) {
           const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
           const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+          const stockAns = (row["คลังตอบ"] || "").trim();
           pivotData[teamPlant][pending]++;
+          if (stockAns === "-") {
+            pivotData[teamPlant]["รอตอบ"]++;
+          }
           ticketCounts[ticket] = true;
         }
       });
 
-      // Calculate total calls and Call column (Total - NEC_ยกเลิกผลิต) per TeamPlant for sorting
+      // Debugging: Log pivotData to verify counts
+      console.log("Pivot data:", pivotData);
+
+      // Calculate total calls, Call column (Total - NEC_ยกเลิกผลิต), and รอตอบ per TeamPlant for sorting
       const teamPlantTotals = teamPlants.map(teamPlant => {
-        const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0);
+        const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0) - pivotData[teamPlant]["รอตอบ"];
         const necCount = pivotData[teamPlant]["NEC_ยกเลิกผลิต"] || 0;
         const callCount = total - necCount;
-        return { teamPlant, total, callCount };
+        const waitAnsCount = pivotData[teamPlant]["รอตอบ"] || 0;
+        return { teamPlant, total, callCount, waitAnsCount };
       }).sort((a, b) => b.total - a.total);
+
+      // Debugging: Log teamPlantTotals
+      console.log("TeamPlant totals:", teamPlantTotals);
 
       // Process pendingUnits to remove "Stock" from column headers
       const cleanedPendingUnits = orderedPendingUnits.map(pending => pending.replace(/^Stock\s*/i, ''));
 
-      // Generate pivot table HTML with Total, Call, and NEC_ยกเลิกผลิต columns
+      // Generate pivot table HTML with Total, Call, รอตอบ, and NEC_ยกเลิกผลิต columns
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -1123,15 +1145,17 @@
               <th>ศูนย์พื้นที่</th>
               <th class='fixed-width'>รวม</th>
               <th class='fixed-width'>Call</th>
+              <th class='fixed-width'>รอตอบ</th>
               ${cleanedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
-            ${teamPlantTotals.map(({ teamPlant, total, callCount }) => `
+            ${teamPlantTotals.map(({ teamPlant, total, callCount, waitAnsCount }) => `
               <tr>
                 <td>${teamPlant}</td>
                 <td class='fixed-width'>${total === 0 ? '-' : total}</td>
                 <td class='fixed-width'>${callCount === 0 ? '-' : callCount}</td>
+                <td class='fixed-width'>${waitAnsCount === 0 ? '-' : waitAnsCount}</td>
                 ${orderedPendingUnits.map(pending => `
                   <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
                 `).join('')}
@@ -1146,6 +1170,11 @@
                     ? '-' 
                     : totalCalls - teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["NEC_ยกเลิกผลิต"], 0))
                   : '-'
+              }</strong></td>
+              <td class='fixed-width'><strong>${
+                teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตอบ"], 0) === 0 
+                  ? '-' 
+                  : teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตอบ"], 0)
               }</strong></td>
               ${orderedPendingUnits.map(pending => {
                 const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
@@ -1164,6 +1193,9 @@
 
       summaryContent.innerHTML = summaryHtml;
       summaryModal.style.display = "block";
+
+      // Debugging: Log the generated HTML
+      console.log("Generated pivot table HTML:", pivotTableHtml);
     }
 
     function printSummaryContent() {
@@ -1363,6 +1395,7 @@
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword)
           )
         );
@@ -1429,7 +1462,7 @@
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="13">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="14">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
         console.warn("No data to render in table");
         return;
       }
@@ -1459,7 +1492,7 @@
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
 
-        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "AnswerX"];
+        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "คลังตอบ", "AnswerX"];
         const displayColumns = {
           "DayRepair": "ผ่านมา",
           "DateTime": "DateTime",
@@ -1472,6 +1505,7 @@
           "Description": "Description",
           "Nawa": "Nawa",
           "Vipa": "Vipa",
+          "คลังตอบ": "คลังตอบ",
           "AnswerX": "ผู้ตอบ"
         };
         columns.forEach(col => {
@@ -1491,7 +1525,7 @@
         btn.className = "detail-button";
         btn.onclick = () => {
           currentTicketNumber = row["Ticket Number"];
-          const modalColumns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "AnswerX"];
+          const modalColumns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "คลังตอบ", "AnswerX"];
           const modalDisplayColumns = {
             "DayRepair": "ผ่านมา",
             "DateTime": "DateTime",
@@ -1502,6 +1536,9 @@
             "ค้างหน่วยงาน": "ค้างหน่วยงาน",
             "Material": "Material",
             "Description": "Description",
+            "Nawa": "Nawa",
+            "Vipa": "Vipa",
+            "คลังตอบ": "คลังตอบ",
             "AnswerX": "ผู้ตอบ"
           };
           let modalHtml = modalColumns.map(col => {
@@ -1591,6 +1628,7 @@
               (row["Material"] || "").toLowerCase().includes(keyword) ||
               (row["Description"] || "").toLowerCase().includes(keyword) ||
               (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+              (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
               (row["AnswerX"] || "").toLowerCase().includes(keyword)
             )
           );
@@ -1623,6 +1661,7 @@
               (row["Material"] || "").toLowerCase().includes(keyword) ||
               (row["Description"] || "").toLowerCase().includes(keyword) ||
               (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+              (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
               (row["AnswerX"] || "").toLowerCase().includes(keyword)
             )
           );
@@ -1641,7 +1680,7 @@
       .then(data => {
         if (!data || data.length === 0) {
           console.error("No data received from Google Sheets");
-          tableBody.innerHTML = '<tr><td colspan="13">ไม่มีข้อมูลจาก Google Sheets</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="14">ไม่มีข้อมูลจาก Google Sheets</td></tr>';
           return;
         }
         allData = data;
@@ -1656,7 +1695,7 @@
       })
       .catch(error => {
         console.error("ไม่สามารถโหลดข้อมูลได้:", error);
-        tableBody.innerHTML = '<tr><td colspan="13">เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="14">เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '</td></tr>';
       });
   </script>
 </body>
