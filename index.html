@@ -483,6 +483,26 @@
     .red-text {
       color: red;
     }
+    /* Added styles for timeline table */
+    .timeline-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .timeline-table th, .timeline-table td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: left;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .timeline-table th {
+      background-color: #007bff;
+      color: white;
+    }
+    .timeline-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
   </style>
 </head>
 <body>
@@ -1583,41 +1603,55 @@
         btn.className = "detail-button";
         btn.onclick = () => {
           currentTicketNumber = row["Ticket Number"];
-          const modalColumns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "คลังตอบ", "AnswerX"];
-          const modalDisplayColumns = {
-            "DayRepair": "ผ่านมา",
-            "DateTime": "DateTime",
-            "Ticket Number": "Ticket Number",
-            "Brand": "Brand",
-            "Team": "Team",
-            "TeamPlant": "TeamPlant",
-            "ค้างหน่วยงาน": "ค้างหน่วยงาน",
-            "Material": "Material",
-            "Description": "Description",
-            "Nawa": "Nawa",
-            "Vipa": "Vipa",
-            "คลังตอบ": "คลังตอบ",
-            "AnswerX": "ผู้ตอบ"
-          };
-          let modalHtml = modalColumns.map(col => {
-            let value = row[col] || "-";
-            let displayValue = value;
-            let style = '';
-            if (col === "DayRepair") {
-              displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
-            } else if (col === "คลังตอบ") {
-              if (value === "Stock") {
-                displayValue = "ดำเนินการแล้ว";
-                style = ' style="color: green;"';
-              } else if (value === "-") {
-                displayValue = "รอตรวจสอบ";
-                style = ' style="color: red;"';
+          const timeline = row["TimeLine"] || "";
+          let timelineHtml = '<table class="timeline-table"><thead><tr><th>วันที่</th><th>ผู้แจ้ง</th><th>สถานะ</th><th>รายละเอียด</th></tr></thead><tbody>';
+          if (timeline) {
+            const events = timeline.split('|');
+            events.forEach(event => {
+              let eventTrim = event.trim();
+              if (eventTrim) {
+                let date = '';
+                let person = '';
+                let status = '';
+                let details = '';
+                const dateMatch = eventTrim.match(/^(\d{2}\.\d{2})\s/);
+                if (dateMatch) {
+                  date = dateMatch[1];
+                  eventTrim = eventTrim.slice(dateMatch[0].length);
+                }
+                if (eventTrim.startsWith('Backlog ')) {
+                  person = 'Backlog';
+                  eventTrim = eventTrim.slice(8);
+                } else if (eventTrim.startsWith('คุณ')) {
+                  const personEnd = eventTrim.indexOf(' ', 3); // Assuming 'คุณ' + name
+                  if (personEnd > -1) {
+                    person = eventTrim.slice(0, personEnd);
+                    eventTrim = eventTrim.slice(personEnd + 1);
+                  } else {
+                    person = eventTrim;
+                    eventTrim = '';
+                  }
+                }
+                if (eventTrim.startsWith('แจ้งค้าง_')) {
+                  const statusEnd = eventTrim.indexOf(' ', 9);
+                  if (statusEnd > -1) {
+                    status = eventTrim.slice(0, statusEnd);
+                    details = eventTrim.slice(statusEnd + 1);
+                  } else {
+                    status = eventTrim;
+                  }
+                } else {
+                  details = eventTrim;
+                }
+                timelineHtml += `<tr><td>${date}</td><td>${person}</td><td>${status}</td><td>${details}</td></tr>`;
               }
-            }
-            return `<div><span class='label'>${modalDisplayColumns[col]}:</span> <span class='value'${style}>${displayValue}</span></div>`;
-          }).join('');
+            });
+          } else {
+            timelineHtml += '<tr><td colspan="4">ไม่มีข้อมูล Timeline</td></tr>';
+          }
+          timelineHtml += '</tbody></table>';
           
-          modalContent.innerHTML = modalHtml;
+          modalContent.innerHTML = timelineHtml;
           modal.style.display = "block";
           console.log("Modal data for Ticket Number:", currentTicketNumber, row);
         };
