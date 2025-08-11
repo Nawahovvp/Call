@@ -49,11 +49,11 @@
       flex-wrap: wrap;
       margin-top: 10px;
     }
-    #employeeFilterLabel, #pendingFilterLabel {
+    #employeeFilterLabel, #pendingFilterLabel, #stockFilterLabel {
       font-size: 16px;
       color: #333;
     }
-    #employeeFilter, #pendingFilter {
+    #employeeFilter, #pendingFilter, #stockFilter {
       margin-left: 5px;
       padding: 10px;
       border-radius: 8px;
@@ -63,7 +63,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    #employeeFilter:hover, #pendingFilter:hover {
+    #employeeFilter:hover, #pendingFilter:hover, #stockFilter:hover {
       border-color: #2980b9;
     }
     #searchInput {
@@ -500,6 +500,12 @@
         จำนวนรายการ <span id="callCountValue">0</span> รายการ
       </div>
     </div>
+    <div class="filter-row">
+      <label id="stockFilterLabel" for="stockFilter" class="modern-label">คลังตอบ</label>
+      <select id="stockFilter">
+        <option value="">ทั้งหมด</option>
+      </select>
+    </div>
     <div class="search-row">
       <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ..." />
       <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
@@ -596,6 +602,7 @@
     const closeSummaryModal = document.getElementById("closeSummaryModal");
     const employeeFilter = document.getElementById("employeeFilter");
     const pendingFilter = document.getElementById("pendingFilter");
+    const stockFilter = document.getElementById("stockFilter");
     const searchInput = document.getElementById("searchInput");
     const searchButton = document.getElementById("searchButton");
     const printTableButton = document.getElementById("printTableButton");
@@ -638,14 +645,16 @@
 
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-      console.log("Filters applied:", { selectedTeamPlant, selectedPending, keyword });
+      console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, keyword });
 
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -672,7 +681,8 @@
         console.warn("No data to export to CSV after filtering");
         alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง (TeamPlant: " + 
               (selectedTeamPlant || "ทั้งหมด") + ", ค้างหน่วยงาน: " + 
-              (selectedPending || "ทั้งหมด") + ", Keyword: " + 
+              (selectedPending || "ทั้งหมด") + ", คลังตอบ: " + 
+              (selectedStock || "ทั้งหมด") + ", Keyword: " + 
               (keyword || "ไม่มี") + ")");
         return;
       }
@@ -822,6 +832,7 @@
     function printTable() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
 
       let filteredData = allData.filter(row => {
@@ -829,6 +840,7 @@
         return (
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -945,12 +957,14 @@
     function showGraph() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1056,14 +1070,15 @@
     function showSummary() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
 
-      // Filter data based on user input
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1081,7 +1096,6 @@
         );
       });
 
-      // Debugging: Log filtered data and check for คลังตอบ values
       console.log("Filtered data length:", filteredData.length);
       console.log("Sample filtered data (first 2 rows):", filteredData.slice(0, 2));
       console.log("Unique คลังตอบ values:", [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(val => val))]);
@@ -1089,13 +1103,11 @@
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const totalCalls = uniqueTickets;
 
-      // Create pivot table data
       const pivotData = {};
       const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
 
-      // Initialize pivot table with "รอตอบ" and "ตอบแล้ว"
       teamPlants.forEach(teamPlant => {
         pivotData[teamPlant] = { "รอตอบ": 0, "ตอบแล้ว": 0 };
         pendingUnits.forEach(pending => {
@@ -1103,7 +1115,6 @@
         });
       });
 
-      // Count unique tickets for each TeamPlant, Pending Status, and "ตอบแล้ว" (where คลังตอบ = "Stock")
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1122,10 +1133,8 @@
         }
       });
 
-      // Debugging: Log pivotData to verify counts
       console.log("Pivot data:", pivotData);
 
-      // Calculate total calls, ตอบแล้ว, and รอตอบ per TeamPlant for sorting
       const teamPlantTotals = teamPlants.map(teamPlant => {
         const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0) - 
                       pivotData[teamPlant]["รอตอบ"] - 
@@ -1135,13 +1144,10 @@
         return { teamPlant, total, answeredCount, waitAnsCount };
       }).sort((a, b) => b.total - a.total);
 
-      // Debugging: Log teamPlantTotals
       console.log("TeamPlant totals:", teamPlantTotals);
 
-      // Process pendingUnits to remove "Stock" from column headers
       const cleanedPendingUnits = orderedPendingUnits.map(pending => pending.replace(/^Stock\s*/i, ''));
 
-      // Generate pivot table HTML with Total, ตอบแล้ว, รอตอบ, and NEC_ยกเลิกผลิต columns
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -1196,7 +1202,6 @@
       summaryContent.innerHTML = summaryHtml;
       summaryModal.style.display = "block";
 
-      // Debugging: Log the generated HTML
       console.log("Generated pivot table HTML:", pivotTableHtml);
     }
 
@@ -1345,6 +1350,35 @@
       } else {
         pendingFilter.value = "";
       }
+      updateStockFilter(data, selectedTeamPlant, pendingFilter.value);
+    }
+
+    function updateStockFilter(data, selectedTeamPlant, selectedPending) {
+      if (!data || data.length === 0) {
+        console.warn("No data to populate Stock filter");
+        return;
+      }
+      const currentStockValue = stockFilter.value;
+      let filteredData = data;
+      if (selectedTeamPlant) {
+        filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      }
+      if (selectedPending) {
+        filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
+      }
+      const stockResponses = [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(stock => stock))].sort();
+      stockFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+      stockResponses.forEach(stock => {
+        const option = document.createElement("option");
+        option.value = stock;
+        option.textContent = stock;
+        stockFilter.appendChild(option);
+      });
+      if (currentStockValue && stockResponses.includes(currentStockValue)) {
+        stockFilter.value = currentStockValue;
+      } else {
+        stockFilter.value = "";
+      }
     }
 
     function addSortListeners() {
@@ -1380,12 +1414,14 @@
     function filterAndRenderTable() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1406,6 +1442,7 @@
       console.log("Filtered data:", filteredData.length, filteredData);
 
       updatePendingFilter(allData, selectedTeamPlant);
+      updateStockFilter(allData, selectedTeamPlant, selectedPending);
 
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const ticketCountValue = document.getElementById("ticketCountValue");
@@ -1453,7 +1490,11 @@
       filterAndRenderTable();
     });
 
-    pendingFilter.addEventListener("change", filterAndRenderTable);
+    pendingFilter.addEventListener("change", () => {
+      filterAndRenderTable();
+    });
+
+    stockFilter.addEventListener("change", filterAndRenderTable);
 
     function updateCallCount(data) {
       const count = [...new Set(data.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
@@ -1615,10 +1656,12 @@
           if (!row) return false;
           const selectedTeamPlant = employeeFilter.value;
           const selectedPending = pendingFilter.value;
+          const selectedStock = stockFilter.value;
           const keyword = searchInput.value.toLowerCase().trim();
           return (
             (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
             (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+            (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
             (!keyword ||
               (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
               (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1648,10 +1691,12 @@
           if (!row) return false;
           const selectedTeamPlant = employeeFilter.value;
           const selectedPending = pendingFilter.value;
+          const selectedStock = stockFilter.value;
           const keyword = searchInput.value.toLowerCase().trim();
           return (
             (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
             (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+            (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
             (!keyword ||
               (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
               (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1691,6 +1736,7 @@
         console.log("Column names in data:", Object.keys(allData[0] || {}));
         populateTeamPlantFilter(allData);
         updatePendingFilter(allData, "");
+        updateStockFilter(allData, "", "");
         addSortListeners();
         updateSortArrows();
         filterAndRenderTable();
