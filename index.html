@@ -477,6 +477,12 @@
         min-width: 120px;
       }
     }
+    .green-text {
+      color: green;
+    }
+    .red-text {
+      color: red;
+    }
   </style>
 </head>
 <body>
@@ -1109,7 +1115,7 @@
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
 
       teamPlants.forEach(teamPlant => {
-        pivotData[teamPlant] = { "รอตอบ": 0, "ตอบแล้ว": 0 };
+        pivotData[teamPlant] = { "ดำเนินการแล้ว": 0, "รอตรวจสอบ": 0 };
         pendingUnits.forEach(pending => {
           pivotData[teamPlant][pending] = 0;
         });
@@ -1121,13 +1127,13 @@
         if (!ticketCounts[ticket]) {
           const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
           const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
-          const stockAns = (row["คลังตอบ"] || "").trim();
+          const stockAns = (row["คลังตอบ"] || "").trim().toLowerCase();
           pivotData[teamPlant][pending]++;
-          if (stockAns === "-") {
-            pivotData[teamPlant]["รอตอบ"]++;
+          if (stockAns === "รอตรวจสอบ") {
+            pivotData[teamPlant]["รอตรวจสอบ"]++;
           }
-          if (stockAns.toLowerCase() === "stock") {
-            pivotData[teamPlant]["ตอบแล้ว"]++;
+          if (stockAns === "ดำเนินการแล้ว") {
+            pivotData[teamPlant]["ดำเนินการแล้ว"]++;
           }
           ticketCounts[ticket] = true;
         }
@@ -1137,10 +1143,10 @@
 
       const teamPlantTotals = teamPlants.map(teamPlant => {
         const total = Object.values(pivotData[teamPlant]).reduce((sum, count) => sum + count, 0) - 
-                      pivotData[teamPlant]["รอตอบ"] - 
-                      pivotData[teamPlant]["ตอบแล้ว"];
-        const answeredCount = pivotData[teamPlant]["ตอบแล้ว"] || 0;
-        const waitAnsCount = pivotData[teamPlant]["รอตอบ"] || 0;
+                      pivotData[teamPlant]["รอตรวจสอบ"] - 
+                      pivotData[teamPlant]["ดำเนินการแล้ว"];
+        const answeredCount = pivotData[teamPlant]["ดำเนินการแล้ว"] || 0;
+        const waitAnsCount = pivotData[teamPlant]["รอตรวจสอบ"] || 0;
         return { teamPlant, total, answeredCount, waitAnsCount };
       }).sort((a, b) => b.total - a.total);
 
@@ -1154,8 +1160,8 @@
             <tr>
               <th>ศูนย์พื้นที่</th>
               <th class='fixed-width'>รวม</th>
-              <th class='fixed-width'>ตอบแล้ว</th>
-              <th class='fixed-width'>รอตอบ</th>
+              <th class='fixed-width'>ดำเนินการแล้ว</th>
+              <th class='fixed-width'>รอตรวจสอบ</th>
               ${cleanedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
             </tr>
           </thead>
@@ -1175,14 +1181,14 @@
               <td><strong>รวม</strong></td>
               <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
               <td class='fixed-width'><strong>${
-                teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["ตอบแล้ว"], 0) === 0 
+                teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["ดำเนินการแล้ว"], 0) === 0 
                   ? '-' 
-                  : teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["ตอบแล้ว"], 0)
+                  : teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["ดำเนินการแล้ว"], 0)
               }</strong></td>
               <td class='fixed-width'><strong>${
-                teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตอบ"], 0) === 0 
+                teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตรวจสอบ"], 0) === 0 
                   ? '-' 
-                  : teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตอบ"], 0)
+                  : teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant]["รอตรวจสอบ"], 0)
               }</strong></td>
               ${orderedPendingUnits.map(pending => {
                 const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
@@ -1554,10 +1560,19 @@
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = row[col] || "-";
+          let displayValue = cellValue;
           if (col === "DayRepair") {
-            cellValue = isNaN(parseFloat(cellValue)) ? "-" : parseFloat(cellValue).toFixed(0);
+            displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
+          } else if (col === "คลังตอบ") {
+            if (cellValue === "Stock") {
+              displayValue = "ดำเนินการแล้ว";
+              td.classList.add("green-text");
+            } else if (cellValue === "-") {
+              displayValue = "รอตรวจสอบ";
+              td.classList.add("red-text");
+            }
           }
-          td.textContent = cellValue;
+          td.textContent = displayValue;
           td.classList.add("text-left");
           tr.appendChild(td);
         });
@@ -1586,10 +1601,20 @@
           };
           let modalHtml = modalColumns.map(col => {
             let value = row[col] || "-";
+            let displayValue = value;
+            let style = '';
             if (col === "DayRepair") {
-              value = isNaN(parseFloat(value)) ? "-" : parseFloat(value).toFixed(0);
+              displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
+            } else if (col === "คลังตอบ") {
+              if (value === "Stock") {
+                displayValue = "ดำเนินการแล้ว";
+                style = ' style="color: green;"';
+              } else if (value === "-") {
+                displayValue = "รอตรวจสอบ";
+                style = ' style="color: red;"';
+              }
             }
-            return `<div><span class='label'>${modalDisplayColumns[col]}:</span> <span class='value'>${value}</span></div>`;
+            return `<div><span class='label'>${modalDisplayColumns[col]}:</span> <span class='value'${style}>${displayValue}</span></div>`;
           }).join('');
           
           modalContent.innerHTML = modalHtml;
