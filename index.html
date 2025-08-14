@@ -1584,10 +1584,10 @@
           if (col === "DayRepair") {
             displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
           } else if (col === "คลังตอบ") {
-            if (cellValue === "Stock") {
+            if (cellValue === "ดำเนินการแล้ว") {
               displayValue = "ดำเนินการแล้ว";
               td.classList.add("green-text");
-            } else if (cellValue === "-") {
+            } else if (cellValue === "รอตรวจสอบ") {
               displayValue = "รอตรวจสอบ";
               td.classList.add("red-text");
             }
