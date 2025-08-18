@@ -49,11 +49,11 @@
       flex-wrap: wrap;
       margin-top: 10px;
     }
-    #employeeFilterLabel, #pendingFilterLabel, #stockFilterLabel {
+    #employeeFilterLabel, #pendingFilterLabel, #stockFilterLabel, #statusCallFilterLabel {
       font-size: 16px;
       color: #333;
     }
-    #employeeFilter, #pendingFilter, #stockFilter {
+    #employeeFilter, #pendingFilter, #stockFilter, #statusCallFilter {
       margin-left: 5px;
       padding: 10px;
       border-radius: 8px;
@@ -63,7 +63,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    #employeeFilter:hover, #pendingFilter:hover, #stockFilter:hover {
+    #employeeFilter:hover, #pendingFilter:hover, #stockFilter:hover, #statusCallFilter:hover {
       border-color: #2980b9;
     }
     #searchInput {
@@ -177,6 +177,9 @@
       animation: zoomIn 0.4s ease;
       overflow-x: auto;
       position: relative;
+    }
+    #spareSummaryModal .modal-content {
+      max-width: 95%;
     }
     .graph-modal-content {
       background-color: #fff;
@@ -411,7 +414,7 @@
       min-width: 120px;
     }
     @media print {
-      .report-title, .close, .print-button, #printTableButton, #searchButton, #graphButton, #excelButton, #summaryButton, #searchInput, .pagination, #searchContainer, .modal, .table-container {
+      .report-title, .close, .print-button, #printTableButton, #searchButton, #graphButton, #excelButton, #summaryButton, #spareSummaryButton, #searchInput, .pagination, #searchContainer, .modal, .table-container {
         display: none;
       }
       .modal-content {
@@ -483,7 +486,6 @@
     .red-text {
       color: red;
     }
-    /* Added styles for timeline table */
     .timeline-table {
       width: 100%;
       border-collapse: collapse;
@@ -503,6 +505,31 @@
     .timeline-table tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+        .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
+  width: 20%;
+  min-width: 50px;
+  max-width: 80px;
+  white-space: normal;
+}
+.detail-table th:nth-child(2), .detail-table td:nth-child(2) {
+  width: 40%;
+  min-width: 200px;
+  max-width: 350px;
+  white-space: normal;
+  text-align: left; /* ทำให้ Description ชิดซ้าย */
+}
+.detail-table th:nth-child(3), .detail-table td:nth-child(3) {
+  width: 10%;
+  min-width: 80px;
+  max-width: 100px;
+  text-align: center;
+}
+.detail-table th:nth-child(n+4), .detail-table td:nth-child(n+4) {
+  width: 10%;
+  min-width: 80px;
+  max-width: 100px;
+  text-align: center;
+}
   </style>
 </head>
 <body>
@@ -532,13 +559,20 @@
         <option value="">ทั้งหมด</option>
       </select>
     </div>
+    <div class="filter-row">
+      <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">สถานะ Call</label>
+      <select id="statusCallFilter">
+        <option value="">ทั้งหมด</option>
+      </select>
+    </div>
     <div class="search-row">
-      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ..." />
+      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ, StatusCall..." />
       <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
       <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
       <button id="graphButton" class="action-button"><i class="fas fa-chart-line"></i> กราฟ</button>
       <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
       <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
+      <button id="spareSummaryButton" class="action-button"><i class="fas fa-list-alt"></i> สรุปอะไหล่</button>
     </div>
   </div>
   <div class="table-container">
@@ -557,6 +591,7 @@
           <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
           <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
           <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
+          <th class="sortable" data-column="StatusCall">สถานะ Call <span class="arrow"></span></th>
           <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
           <th>ดูรายละเอียด</th>
         </tr>
@@ -598,6 +633,18 @@
     </div>
   </div>
 
+  <div id="spareSummaryModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeSpareSummaryModal">×</span>
+      <button class="print-button" onclick="printSpareSummaryContent()">
+        <i class="fas fa-print"></i>
+        <span>พิมพ์สรุปอะไหล่</span>
+      </button>
+      <h2>สรุปอะไหล่ (รอของเข้า)</h2>
+      <div id="spareSummaryContent"></div>
+    </div>
+  </div>
+
   <div class="pagination">
     <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
     <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
@@ -622,19 +669,23 @@
     const modal = document.getElementById("detailModal");
     const graphModal = document.getElementById("graphModal");
     const summaryModal = document.getElementById("summaryModal");
+    const spareSummaryModal = document.getElementById("spareSummaryModal");
     const modalContent = document.getElementById("modalContent");
     const closeModal = document.getElementById("closeModal");
     const closeGraphModal = document.getElementById("closeGraphModal");
     const closeSummaryModal = document.getElementById("closeSummaryModal");
+    const closeSpareSummaryModal = document.getElementById("closeSpareSummaryModal");
     const employeeFilter = document.getElementById("employeeFilter");
     const pendingFilter = document.getElementById("pendingFilter");
     const stockFilter = document.getElementById("stockFilter");
+    const statusCallFilter = document.getElementById("statusCallFilter");
     const searchInput = document.getElementById("searchInput");
     const searchButton = document.getElementById("searchButton");
     const printTableButton = document.getElementById("printTableButton");
     const graphButton = document.getElementById("graphButton");
     const excelButton = document.getElementById("excelButton");
     const summaryButton = document.getElementById("summaryButton");
+    const spareSummaryButton = document.getElementById("spareSummaryButton");
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
     const firstPageButton = document.getElementById("firstPage");
@@ -644,6 +695,7 @@
     const itemsPerPageSelect = document.getElementById("itemsPerPage");
     const graphWarning = document.getElementById("graphWarning");
     const summaryContent = document.getElementById("summaryContent");
+    const spareSummaryContent = document.getElementById("spareSummaryContent");
 
     let allData = [];
     let currentPage = 1;
@@ -672,8 +724,9 @@
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-      console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, keyword });
+      console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, selectedStatusCall, keyword });
 
       let filteredData = allData.filter(row => {
         if (!row) return false;
@@ -681,6 +734,7 @@
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
           (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -693,7 +747,8 @@
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
       });
@@ -708,7 +763,8 @@
         alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง (TeamPlant: " + 
               (selectedTeamPlant || "ทั้งหมด") + ", ค้างหน่วยงาน: " + 
               (selectedPending || "ทั้งหมด") + ", คลังตอบ: " + 
-              (selectedStock || "ทั้งหมด") + ", Keyword: " + 
+              (selectedStock || "ทั้งหมด") + ", สถานะ Call: " + 
+              (selectedStatusCall || "ทั้งหมด") + ", Keyword: " + 
               (keyword || "ไม่มี") + ")");
         return;
       }
@@ -859,6 +915,7 @@
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
 
       let filteredData = allData.filter(row => {
@@ -867,6 +924,7 @@
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
           (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -879,7 +937,8 @@
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
       });
@@ -984,6 +1043,7 @@
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
       let filteredData = allData.filter(row => {
         if (!row) return false;
@@ -991,6 +1051,7 @@
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
           (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1003,7 +1064,8 @@
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
       });
@@ -1097,6 +1159,7 @@
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
 
       let filteredData = allData.filter(row => {
@@ -1105,6 +1168,7 @@
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
           (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1117,7 +1181,8 @@
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
       });
@@ -1231,6 +1296,74 @@
       console.log("Generated pivot table HTML:", pivotTableHtml);
     }
 
+    function showSpareSummary() {
+  let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
+
+  if (filteredData.length === 0) {
+    spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
+    spareSummaryModal.style.display = "block";
+    return;
+  }
+
+  const pivotData = {};
+  const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
+  const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
+
+  materials.forEach(matDesc => {
+    const [material, description] = matDesc.split('|');
+    pivotData[matDesc] = { total: 0 };
+    pendingUnits.forEach(pending => {
+      pivotData[matDesc][pending] = 0;
+    });
+  });
+
+  filteredData.forEach(row => {
+    const matDesc = row["Material"] + '|' + row["Description"];
+    const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+    if (pivotData[matDesc]) {
+      pivotData[matDesc].total++;
+      pivotData[matDesc][pending]++;
+    }
+  });
+
+  // เรียง materials ตาม total จากมากไปน้อย
+  const sortedMaterials = materials.sort((a, b) => {
+    const totalA = pivotData[a].total;
+    const totalB = pivotData[b].total;
+    return totalB - totalA; // เรียงจากมากไปน้อย
+  });
+
+  let pivotTableHtml = `
+    <table class='detail-table'>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Description</th>
+          <th class='fixed-width'>จำนวนรวม</th>
+          ${pendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${sortedMaterials.map(matDesc => {
+          const [material, description] = matDesc.split('|');
+          const data = pivotData[matDesc];
+          return `
+            <tr>
+              <td>${material}</td>
+              <td>${description}</td>
+              <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
+              ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  spareSummaryContent.innerHTML = pivotTableHtml;
+  spareSummaryModal.style.display = "block";
+}
+
     function printSummaryContent() {
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
@@ -1299,12 +1432,74 @@
       printWindow.document.close();
     }
 
+    function printSpareSummaryContent() {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สรุปอะไหล่</title>
+            <style>
+              body {
+                font-family: 'Prompt', sans-serif;
+                margin: 10mm;
+                padding: 0;
+              }
+              h2, h3 {
+                color: #000;
+                margin: 10px 0;
+              }
+              .detail-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              .detail-table th, .detail-table td {
+                padding: 8px;
+                border: 1px solid #ccc;
+                text-align: center;
+              }
+              .detail-table th {
+                background-color: #007bff;
+                color: white;
+              }
+              .detail-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+              }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
+                width: 80px;
+                min-width: 80px;
+                max-width: 80px;
+              }
+              .detail-table th:first-child, .detail-table td:first-child {
+                width: auto;
+                min-width: 120px;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                }
+                @page {
+                  margin: 10mm;
+                }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <h2>สรุปอะไหล่ (รอของเข้า)</h2>
+            ${spareSummaryContent.innerHTML}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
     closeModal.onclick = () => {
       modal.style.display = "none";
       currentTicketNumber = null;
     };
     closeGraphModal.onclick = () => graphModal.style.display = "none";
     closeSummaryModal.onclick = () => summaryModal.style.display = "none";
+    closeSpareSummaryModal.onclick = () => spareSummaryModal.style.display = "none";
 
     window.onclick = event => {
       if (event.target == modal) {
@@ -1317,11 +1512,15 @@
       if (event.target == summaryModal) {
         summaryModal.style.display = "none";
       }
+      if (event.target == spareSummaryModal) {
+        spareSummaryModal.style.display = "none";
+      }
     };
 
     graphButton.addEventListener("click", showGraph);
     excelButton.addEventListener("click", exportToCSV);
     summaryButton.addEventListener("click", showSummary);
+    spareSummaryButton.addEventListener("click", showSpareSummary);
 
     itemsPerPageSelect.addEventListener("change", (e) => {
       itemsPerPage = parseInt(e.target.value);
@@ -1377,6 +1576,7 @@
         pendingFilter.value = "";
       }
       updateStockFilter(data, selectedTeamPlant, pendingFilter.value);
+      updateStatusCallFilter(data, selectedTeamPlant, pendingFilter.value);
     }
 
     function updateStockFilter(data, selectedTeamPlant, selectedPending) {
@@ -1404,6 +1604,34 @@
         stockFilter.value = currentStockValue;
       } else {
         stockFilter.value = "";
+      }
+    }
+
+    function updateStatusCallFilter(data, selectedTeamPlant, selectedPending) {
+      if (!data || data.length === 0) {
+        console.warn("No data to populate StatusCall filter");
+        return;
+      }
+      const currentStatusCallValue = statusCallFilter.value;
+      let filteredData = data;
+      if (selectedTeamPlant) {
+        filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      }
+      if (selectedPending) {
+        filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
+      }
+      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"]).filter(status => status))].sort();
+      statusCallFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+      statusCalls.forEach(status => {
+        const option = document.createElement("option");
+        option.value = status;
+        option.textContent = status;
+        statusCallFilter.appendChild(option);
+      });
+      if (currentStatusCallValue && statusCalls.includes(currentStatusCallValue)) {
+        statusCallFilter.value = currentStatusCallValue;
+      } else {
+        statusCallFilter.value = "";
       }
     }
 
@@ -1441,6 +1669,7 @@
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
       let filteredData = allData.filter(row => {
         if (!row) return false;
@@ -1448,6 +1677,7 @@
           (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
           (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
           (!keyword ||
             (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1459,8 +1689,10 @@
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-            (row["AnswerX"] || "").toLowerCase().includes(keyword)
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
       });
@@ -1469,6 +1701,7 @@
 
       updatePendingFilter(allData, selectedTeamPlant);
       updateStockFilter(allData, selectedTeamPlant, selectedPending);
+      updateStatusCallFilter(allData, selectedTeamPlant, selectedPending);
 
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const ticketCountValue = document.getElementById("ticketCountValue");
@@ -1521,6 +1754,7 @@
     });
 
     stockFilter.addEventListener("change", filterAndRenderTable);
+    statusCallFilter.addEventListener("change", filterAndRenderTable);
 
     function updateCallCount(data) {
       const count = [...new Set(data.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
@@ -1531,7 +1765,7 @@
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="14">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="15">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
         console.warn("No data to render in table");
         return;
       }
@@ -1561,22 +1795,7 @@
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
 
-        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "คลังตอบ", "AnswerX"];
-        const displayColumns = {
-          "DayRepair": "ผ่านมา",
-          "DateTime": "DateTime",
-          "Ticket Number": "Ticket Number",
-          "Brand": "Brand",
-          "Team": "Team",
-          "TeamPlant": "TeamPlant",
-          "ค้างหน่วยงาน": "ค้างหน่วยงาน",
-          "Material": "Material",
-          "Description": "Description",
-          "Nawa": "Nawa",
-          "Vipa": "Vipa",
-          "คลังตอบ": "คลังตอบ",
-          "AnswerX": "ผู้ตอบ"
-        };
+        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "คลังตอบ", "StatusCall", "AnswerX"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = row[col] || "-";
@@ -1716,11 +1935,13 @@
           const selectedTeamPlant = employeeFilter.value;
           const selectedPending = pendingFilter.value;
           const selectedStock = stockFilter.value;
+          const selectedStatusCall = statusCallFilter.value;
           const keyword = searchInput.value.toLowerCase().trim();
           return (
             (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
             (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
             (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+            (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
             (!keyword ||
               (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
               (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1732,8 +1953,10 @@
               (row["Material"] || "").toLowerCase().includes(keyword) ||
               (row["Description"] || "").toLowerCase().includes(keyword) ||
               (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+              (row["Vipa"] || "").toLowerCase().includes(keyword) ||
               (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-              (row["AnswerX"] || "").toLowerCase().includes(keyword)
+              (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+              (row["StatusCall"] || "").toLowerCase().includes(keyword)
             )
           );
         }).length / itemsPerPage
@@ -1751,11 +1974,13 @@
           const selectedTeamPlant = employeeFilter.value;
           const selectedPending = pendingFilter.value;
           const selectedStock = stockFilter.value;
+          const selectedStatusCall = statusCallFilter.value;
           const keyword = searchInput.value.toLowerCase().trim();
           return (
             (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
             (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
             (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+            (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
             (!keyword ||
               (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
               (row["DateTime"] || "").toLowerCase().includes(keyword) ||
@@ -1767,8 +1992,10 @@
               (row["Material"] || "").toLowerCase().includes(keyword) ||
               (row["Description"] || "").toLowerCase().includes(keyword) ||
               (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+              (row["Vipa"] || "").toLowerCase().includes(keyword) ||
               (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-              (row["AnswerX"] || "").toLowerCase().includes(keyword)
+              (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+              (row["StatusCall"] || "").toLowerCase().includes(keyword)
             )
           );
         }).length / itemsPerPage
@@ -1786,7 +2013,7 @@
       .then(data => {
         if (!data || data.length === 0) {
           console.error("No data received from Google Sheets");
-          tableBody.innerHTML = '<tr><td colspan="14">ไม่มีข้อมูลจาก Google Sheets</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="15">ไม่มีข้อมูลจาก Google Sheets</td></tr>';
           return;
         }
         allData = data;
@@ -1796,13 +2023,14 @@
         populateTeamPlantFilter(allData);
         updatePendingFilter(allData, "");
         updateStockFilter(allData, "", "");
+        updateStatusCallFilter(allData, "", "");
         addSortListeners();
         updateSortArrows();
         filterAndRenderTable();
       })
       .catch(error => {
         console.error("ไม่สามารถโหลดข้อมูลได้:", error);
-        tableBody.innerHTML = '<tr><td colspan="14">เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="15">เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '</td></tr>';
       });
   </script>
 </body>
