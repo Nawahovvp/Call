@@ -505,31 +505,31 @@
     .timeline-table tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-        .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
-  width: 20%;
-  min-width: 50px;
-  max-width: 80px;
-  white-space: normal;
-}
-.detail-table th:nth-child(2), .detail-table td:nth-child(2) {
-  width: 40%;
-  min-width: 200px;
-  max-width: 350px;
-  white-space: normal;
-  text-align: left; /* ทำให้ Description ชิดซ้าย */
-}
-.detail-table th:nth-child(3), .detail-table td:nth-child(3) {
-  width: 10%;
-  min-width: 80px;
-  max-width: 100px;
-  text-align: center;
-}
-.detail-table th:nth-child(n+4), .detail-table td:nth-child(n+4) {
-  width: 10%;
-  min-width: 80px;
-  max-width: 100px;
-  text-align: center;
-}
+    .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
+      width: 20%;
+      min-width: 50px;
+      max-width: 80px;
+      white-space: normal;
+    }
+    .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
+      width: 40%;
+      min-width: 200px;
+      max-width: 350px;
+      white-space: normal;
+      text-align: left;
+    }
+    .detail-table th:nth-child(3), .detail-table td:nth-child(3) {
+      width: 10%;
+      min-width: 80px;
+      max-width: 100px;
+      text-align: center;
+    }
+    .detail-table th:nth-child(n+4), .detail-table td:nth-child(n+4) {
+      width: 10%;
+      min-width: 80px;
+      max-width: 100px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -716,7 +716,7 @@
     function exportToCSV() {
       console.log("Starting exportToCSV, allData length:", allData.length);
       if (!allData || allData.length === 0) {
-        console.error("No data in allData for CSV export");
+        console.error("No data in Celebrating 20 years of innovation allData for CSV export");
         alert("ไม่มีข้อมูลในระบบสำหรับการส่งออก CSV");
         return;
       }
@@ -1156,195 +1156,197 @@
     }
 
     function showSummary() {
-  const selectedTeamPlant = employeeFilter.value;
-  const selectedPending = pendingFilter.value;
-  const selectedStock = stockFilter.value;
-  const selectedStatusCall = statusCallFilter.value;
-  const keyword = searchInput.value.toLowerCase().trim();
+      const selectedTeamPlant = employeeFilter.value;
+      const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
+      const keyword = searchInput.value.toLowerCase().trim();
 
-  let filteredData = allData.filter(row => {
-    if (!row) return false;
-    return (
-      (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
-      (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
-      (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
-      (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
-      (!keyword ||
-        (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
-        (row["DateTime"] || "").toLowerCase().includes(keyword) ||
-        (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
-        (row["Brand"] || "").toLowerCase().includes(keyword) ||
-        (row["Team"] || "").toLowerCase().includes(keyword) ||
-        (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
-        (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
-        (row["Material"] || "").toLowerCase().includes(keyword) ||
-        (row["Description"] || "").toLowerCase().includes(keyword) ||
-        (row["Nawa"] || "").toLowerCase().includes(keyword) ||
-        (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-        (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
-        (row["StatusCall"] || "").toLowerCase().includes(keyword)
-      )
-    );
-  });
+      let filteredData = allData.filter(row => {
+        if (!row) return false;
+        return (
+          (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
+          (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
+          (!keyword ||
+            (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
+            (row["DateTime"] || "").toLowerCase().includes(keyword) ||
+            (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
+            (row["Brand"] || "").toLowerCase().includes(keyword) ||
+            (row["Team"] || "").toLowerCase().includes(keyword) ||
+            (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
+            (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
+            (row["Material"] || "").toLowerCase().includes(keyword) ||
+            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
+          )
+        );
+      });
 
-  const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
-  const totalCalls = uniqueTickets;
+      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
+      const totalCalls = uniqueTickets;
 
-  const pivotData = {};
-  const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
-  const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
-  const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
-  const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
+      const pivotData = {};
+      const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
+      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
+      const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
 
-  teamPlants.forEach(teamPlant => {
-    pivotData[teamPlant] = {};
-    statusCalls.forEach(status => {
-      pivotData[teamPlant][status] = 0;
-    });
-    pendingUnits.forEach(pending => {
-      pivotData[teamPlant][pending] = 0;
-    });
-  });
+      teamPlants.forEach(teamPlant => {
+        pivotData[teamPlant] = {};
+        statusCalls.forEach(status => {
+          pivotData[teamPlant][status] = 0;
+        });
+        pendingUnits.forEach(pending => {
+          pivotData[teamPlant][pending] = 0;
+        });
+      });
 
-  const ticketCounts = {};
-  filteredData.forEach(row => {
-    const ticket = row["Ticket Number"];
-    if (!ticketCounts[ticket]) {
-      const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
-      const status = row["StatusCall"] || "ไม่ระบุ";
-      const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
-      pivotData[teamPlant][status]++;
-      pivotData[teamPlant][pending]++;
-      ticketCounts[ticket] = true;
+      const ticketCounts = {};
+      filteredData.forEach(row => {
+        const ticket = row["Ticket Number"];
+        if (!ticketCounts[ticket]) {
+          const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+          const status = row["StatusCall"] || "ไม่ระบุ";
+          const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+          pivotData[teamPlant][status]++;
+          pivotData[teamPlant][pending]++;
+          ticketCounts[ticket] = true;
+        }
+      });
+
+      const teamPlantTotals = teamPlants.map(teamPlant => {
+        const total = Object.keys(pivotData[teamPlant]).reduce((sum, key) => {
+          if (statusCalls.includes(key)) {
+            return sum + pivotData[teamPlant][key];
+          }
+          return sum;
+        }, 0);
+        return { teamPlant, total, ...pivotData[teamPlant] };
+      }).sort((a, b) => b.total - a.total);
+
+      let pivotTableHtml = `
+        <table class='detail-table'>
+          <thead>
+            <tr>
+              <th>ศูนย์พื้นที่</th>
+              <th class='fixed-width'>รวม</th>
+              ${statusCalls.map(status => `<th class='fixed-width'>${status}</th>`).join('')}
+              ${orderedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${teamPlantTotals.map(({ teamPlant, total }) => `
+              <tr>
+                <td>${teamPlant}</td>
+                <td class='fixed-width'>${total === 0 ? '-' : total}</td>
+                ${statusCalls.map(status => `
+                  <td class='fixed-width'>${pivotData[teamPlant][status] === 0 ? '-' : pivotData[teamPlant][status]}</td>
+                `).join('')}
+                ${orderedPendingUnits.map(pending => `
+                  <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
+                `).join('')}
+              </tr>
+            `).join('')}
+            <tr>
+              <td><strong>รวม</strong></td>
+              <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
+              ${statusCalls.map(status => {
+                const totalStatus = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][status], 0);
+                return `<td class='fixed-width'><strong>${totalStatus === 0 ? '-' : totalStatus}</strong></td>`;
+              }).join('')}
+              ${orderedPendingUnits.map(pending => {
+                const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
+                return `<td class='fixed-width'><strong>${totalPending === 0 ? '-' : totalPending}</strong></td>`;
+              }).join('')}
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      let summaryHtml = `
+        <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
+        <h3>จำนวน Call ค้างตามศูนย์พื้นที่และสถานะ Call</h3>
+        ${pivotTableHtml}
+      `;
+
+      summaryContent.innerHTML = summaryHtml;
+      summaryModal.style.display = "block";
     }
-  });
-
-  const teamPlantTotals = teamPlants.map(teamPlant => {
-    const total = Object.keys(pivotData[teamPlant]).reduce((sum, key) => {
-      if (statusCalls.includes(key)) {
-        return sum + pivotData[teamPlant][key];
-      }
-      return sum;
-    }, 0);
-    return { teamPlant, total, ...pivotData[teamPlant] };
-  }).sort((a, b) => b.total - a.total);
-
-  let pivotTableHtml = `
-    <table class='detail-table'>
-      <thead>
-        <tr>
-          <th>ศูนย์พื้นที่</th>
-          <th class='fixed-width'>รวม</th>
-          ${statusCalls.map(status => `<th class='fixed-width'>${status}</th>`).join('')}
-          ${orderedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>
-        ${teamPlantTotals.map(({ teamPlant, total }) => `
-          <tr>
-            <td>${teamPlant}</td>
-            <td class='fixed-width'>${total === 0 ? '-' : total}</td>
-            ${statusCalls.map(status => `
-              <td class='fixed-width'>${pivotData[teamPlant][status] === 0 ? '-' : pivotData[teamPlant][status]}</td>
-            `).join('')}
-            ${orderedPendingUnits.map(pending => `
-              <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
-            `).join('')}
-          </tr>
-        `).join('')}
-        <tr>
-          <td><strong>รวม</strong></td>
-          <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
-          ${statusCalls.map(status => {
-            const totalStatus = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][status], 0);
-            return `<td class='fixed-width'><strong>${totalStatus === 0 ? '-' : totalStatus}</strong></td>`;
-          }).join('')}
-          ${orderedPendingUnits.map(pending => {
-            const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
-            return `<td class='fixed-width'><strong>${totalPending === 0 ? '-' : totalPending}</strong></td>`;
-          }).join('')}
-        </tr>
-      </tbody>
-    </table>
-  `;
-
-  let summaryHtml = `
-    <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
-    <h3>จำนวน Call ค้างตามศูนย์พื้นที่และสถานะ Call</h3>
-    ${pivotTableHtml}
-  `;
-
-  summaryContent.innerHTML = summaryHtml;
-  summaryModal.style.display = "block";
-}
 
     function showSpareSummary() {
-  let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
+      let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
 
-  if (filteredData.length === 0) {
-    spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
-    spareSummaryModal.style.display = "block";
-    return;
-  }
+      if (filteredData.length === 0) {
+        spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
+        spareSummaryModal.style.display = "block";
+        return;
+      }
 
-  const pivotData = {};
-  const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
-  const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
+      const pivotData = {};
+      const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
+        .map(unit => unit.replace(/Stock\s*/gi, '').trim())
+        .filter(unit => unit)
+        .sort();
 
-  materials.forEach(matDesc => {
-    const [material, description] = matDesc.split('|');
-    pivotData[matDesc] = { total: 0 };
-    pendingUnits.forEach(pending => {
-      pivotData[matDesc][pending] = 0;
-    });
-  });
+      materials.forEach(matDesc => {
+        const [material, description] = matDesc.split('|');
+        pivotData[matDesc] = { total: 0 };
+        pendingUnits.forEach(pending => {
+          pivotData[matDesc][pending] = 0;
+        });
+      });
 
-  filteredData.forEach(row => {
-    const matDesc = row["Material"] + '|' + row["Description"];
-    const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
-    if (pivotData[matDesc]) {
-      pivotData[matDesc].total++;
-      pivotData[matDesc][pending]++;
-    }
-  });
+      filteredData.forEach(row => {
+        const matDesc = row["Material"] + '|' + row["Description"];
+        const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
+        if (pivotData[matDesc] && pending) {
+          pivotData[matDesc].total++;
+          pivotData[matDesc][pending]++;
+        }
+      });
 
-  // เรียง materials ตาม total จากมากไปน้อย
-  const sortedMaterials = materials.sort((a, b) => {
-    const totalA = pivotData[a].total;
-    const totalB = pivotData[b].total;
-    return totalB - totalA; // เรียงจากมากไปน้อย
-  });
+      const sortedMaterials = materials.sort((a, b) => {
+        const totalA = pivotData[a].total;
+        const totalB = pivotData[b].total;
+        return totalB - totalA;
+      });
 
-  let pivotTableHtml = `
-    <table class='detail-table'>
-      <thead>
-        <tr>
-          <th>Material</th>
-          <th>Description</th>
-          <th class='fixed-width'>จำนวนรวม</th>
-          ${pendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>
-        ${sortedMaterials.map(matDesc => {
-          const [material, description] = matDesc.split('|');
-          const data = pivotData[matDesc];
-          return `
+      let pivotTableHtml = `
+        <table class='detail-table'>
+          <thead>
             <tr>
-              <td>${material}</td>
-              <td>${description}</td>
-              <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
-              ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
+              <th>Material</th>
+              <th>Description</th>
+              <th class='fixed-width'>จำนวนรวม</th>
+              ${pendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
             </tr>
-          `;
-        }).join('')}
-      </tbody>
-    </table>
-  `;
+          </thead>
+          <tbody>
+            ${sortedMaterials.map(matDesc => {
+              const [material, description] = matDesc.split('|');
+              const data = pivotData[matDesc];
+              return `
+                <tr>
+                  <td>${material}</td>
+                  <td>${description}</td>
+                  <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
+                  ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
 
-  spareSummaryContent.innerHTML = pivotTableHtml;
-  spareSummaryModal.style.display = "block";
-}
+      spareSummaryContent.innerHTML = pivotTableHtml;
+      spareSummaryModal.style.display = "block";
+    }
 
     function printSummaryContent() {
       const printWindow = window.open('', '_blank');
@@ -1743,8 +1745,7 @@
       const callCountValue = document.getElementById("callCountValue");
       callCountValue.textContent = count;
     }
-
-    function renderTable(data) {
+      function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="15">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
@@ -1824,7 +1825,7 @@
                   person = 'Backlog';
                   eventTrim = eventTrim.slice(8);
                 } else if (eventTrim.startsWith('คุณ')) {
-                  const personEnd = eventTrim.indexOf(' ', 3); // Assuming 'คุณ' + name
+                  const personEnd = eventTrim.indexOf(' ', 3);
                   if (personEnd > -1) {
                     person = eventTrim.slice(0, personEnd);
                     eventTrim = eventTrim.slice(personEnd + 1);
@@ -1840,180 +1841,244 @@
                     details = eventTrim.slice(statusEnd + 1);
                   } else {
                     status = eventTrim;
+                    details = '';
                   }
                 } else {
-                  details = eventTrim;
+                  status = eventTrim;
+                  details = '';
                 }
-                timelineHtml += `<tr><td>${date}</td><td>${person}</td><td>${status}</td><td>${details}</td></tr>`;
+                timelineHtml += `<tr><td>${date || '-'}</td><td>${person || '-'}</td><td>${status || '-'}</td><td>${details || '-'}</td></tr>`;
               }
             });
-          } else {
-            timelineHtml += '<tr><td colspan="4">ไม่มีข้อมูล Timeline</td></tr>';
           }
           timelineHtml += '</tbody></table>';
-          
-          modalContent.innerHTML = timelineHtml;
+
+          modalContent.innerHTML = `
+            <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
+            <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
+            <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
+            <div><span class="label">Brand:</span> <span class="value">${row["Brand"] || "-"}</span></div>
+            <div><span class="label">Team:</span> <span class="value">${row["Team"] || "-"}</span></div>
+            <div><span class="label">TeamPlant:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
+            <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
+            <div><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
+            <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
+            <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
+            <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
+            <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
+            <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
+            <h3>ประวัติ Timeline</h3>
+            ${timelineHtml}
+          `;
           modal.style.display = "block";
-          console.log("Modal data for Ticket Number:", currentTicketNumber, row);
         };
         detailTd.appendChild(btn);
         tr.appendChild(detailTd);
-
         tableBody.appendChild(tr);
       });
-      updatePagination(data);
+
+      updatePagination(data.length);
     }
 
-    function updatePagination(data) {
-      const totalPages = Math.ceil(data.length / itemsPerPage);
+    function updatePagination(totalItems) {
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      currentPage = Math.min(currentPage, totalPages);
+      if (currentPage < 1) currentPage = 1;
       pageNumbersContainer.innerHTML = '';
 
-      if (currentPage > totalPages) {
-        currentPage = totalPages || 1;
-      }
+      const maxPageButtons = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-      const maxPagesToShow = 4;
-      const halfPages = Math.floor(maxPagesToShow / 2);
-      let startPage = Math.max(1, currentPage - halfPages);
-      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-
-      if (endPage - startPage < maxPagesToShow - 1) {
-        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+      if (endPage - startPage + 1 < maxPageButtons) {
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
       }
 
       for (let i = startPage; i <= endPage; i++) {
-        const pageNumberButton = document.createElement("button");
-        pageNumberButton.className = `page-number ${i === currentPage ? 'active' : ''}`;
-        pageNumberButton.textContent = i;
-        pageNumberButton.onclick = () => {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = "page-number";
+        if (i === currentPage) {
+          btn.classList.add("active");
+        }
+        btn.addEventListener("click", () => {
           currentPage = i;
           filterAndRenderTable();
-        };
-        pageNumbersContainer.appendChild(pageNumberButton);
+        });
+        pageNumbersContainer.appendChild(btn);
       }
 
       firstPageButton.disabled = currentPage === 1;
       prevPageButton.disabled = currentPage === 1;
       nextPageButton.disabled = currentPage === totalPages;
       lastPageButton.disabled = currentPage === totalPages;
+
+      firstPageButton.onclick = () => {
+        currentPage = 1;
+        filterAndRenderTable();
+      };
+      prevPageButton.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          filterAndRenderTable();
+        }
+      };
+      nextPageButton.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          filterAndRenderTable();
+        }
+      };
+      lastPageButton.onclick = () => {
+        currentPage = totalPages;
+        filterAndRenderTable();
+      };
     }
 
-    firstPageButton.onclick = () => {
-      currentPage = 1;
-      filterAndRenderTable();
-    };
+    function showSpareSummary() {
+      let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
 
-    prevPageButton.onclick = () => {
-      if (currentPage > 1) {
-        currentPage--;
-        filterAndRenderTable();
+      if (filteredData.length === 0) {
+        spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
+        spareSummaryModal.style.display = "block";
+        return;
       }
-    };
 
-    nextPageButton.onclick = () => {
-      const totalPages = Math.ceil(
-        allData.filter(row => {
-          if (!row) return false;
-          const selectedTeamPlant = employeeFilter.value;
-          const selectedPending = pendingFilter.value;
-          const selectedStock = stockFilter.value;
-          const selectedStatusCall = statusCallFilter.value;
-          const keyword = searchInput.value.toLowerCase().trim();
-          return (
-            (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
-            (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
-            (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
-            (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
-            (!keyword ||
-              (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
-              (row["DateTime"] || "").toLowerCase().includes(keyword) ||
-              (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
-              (row["Brand"] || "").toLowerCase().includes(keyword) ||
-              (row["Team"] || "").toLowerCase().includes(keyword) ||
-              (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
-              (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
-              (row["Material"] || "").toLowerCase().includes(keyword) ||
-              (row["Description"] || "").toLowerCase().includes(keyword) ||
-              (row["Nawa"] || "").toLowerCase().includes(keyword) ||
-              (row["Vipa"] || "").toLowerCase().includes(keyword) ||
-              (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-              (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
-              (row["StatusCall"] || "").toLowerCase().includes(keyword)
-            )
-          );
-        }).length / itemsPerPage
-      );
-      if (currentPage < totalPages) {
-        currentPage++;
-        filterAndRenderTable();
-      }
-    };
+      const pivotData = {};
+      const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
+        .map(unit => unit.replace(/Stock\s*/gi, '').trim())
+        .filter(unit => unit)
+        .sort();
 
-    lastPageButton.onclick = () => {
-      currentPage = Math.ceil(
-        allData.filter(row => {
-          if (!row) return false;
-          const selectedTeamPlant = employeeFilter.value;
-          const selectedPending = pendingFilter.value;
-          const selectedStock = stockFilter.value;
-          const selectedStatusCall = statusCallFilter.value;
-          const keyword = searchInput.value.toLowerCase().trim();
-          return (
-            (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
-            (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
-            (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
-            (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
-            (!keyword ||
-              (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
-              (row["DateTime"] || "").toLowerCase().includes(keyword) ||
-              (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
-              (row["Brand"] || "").toLowerCase().includes(keyword) ||
-              (row["Team"] || "").toLowerCase().includes(keyword) ||
-              (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
-              (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
-              (row["Material"] || "").toLowerCase().includes(keyword) ||
-              (row["Description"] || "").toLowerCase().includes(keyword) ||
-              (row["Nawa"] || "").toLowerCase().includes(keyword) ||
-              (row["Vipa"] || "").toLowerCase().includes(keyword) ||
-              (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-              (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
-              (row["StatusCall"] || "").toLowerCase().includes(keyword)
-            )
-          );
-        }).length / itemsPerPage
-      );
-      filterAndRenderTable();
-    };
+      materials.forEach(matDesc => {
+        const [material, description] = matDesc.split('|');
+        pivotData[matDesc] = { total: 0 };
+        pendingUnits.forEach(pending => {
+          pivotData[matDesc][pending] = 0;
+        });
+      });
+
+      filteredData.forEach(row => {
+        const matDesc = row["Material"] + '|' + row["Description"];
+        const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
+        if (pivotData[matDesc] && pending) {
+          pivotData[matDesc].total++;
+          pivotData[matDesc][pending]++;
+        }
+      });
+
+      const sortedMaterials = materials.sort((a, b) => {
+        const totalA = pivotData[a].total;
+        const totalB = pivotData[b].total;
+        return totalB - totalA;
+      });
+
+      let pivotTableHtml = `
+        <table class='detail-table'>
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Description</th>
+              <th class='fixed-width'>จำนวนรวม</th>
+              ${pendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedMaterials.map(matDesc => {
+              const [material, description] = matDesc.split('|');
+              const data = pivotData[matDesc];
+              return `
+                <tr>
+                  <td>${material}</td>
+                  <td>${description}</td>
+                  <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
+                  ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+
+      spareSummaryContent.innerHTML = pivotTableHtml;
+      spareSummaryModal.style.display = "block";
+    }
+
+    function printSpareSummaryContent() {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สรุปอะไหล่</title>
+            <style>
+              body {
+                font-family: 'Prompt', sans-serif;
+                margin: 10mm;
+                padding: 0;
+              }
+              h2, h3 {
+                color: #000;
+                margin: 10px 0;
+              }
+              .detail-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              .detail-table th, .detail-table td {
+                padding: 8px;
+                border: 1px solid #ccc;
+                text-align: center;
+              }
+              .detail-table th {
+                background-color: #007bff;
+                color: white;
+              }
+              .detail-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+              }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
+                width: 80px;
+                min-width: 80px;
+                max-width: 80px;
+              }
+              .detail-table th:first-child, .detail-table td:first-child {
+                width: auto;
+                min-width: 120px;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                }
+                @page {
+                  margin: 10mm;
+                }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <h2>สรุปอะไหล่ (รอของเข้า)</h2>
+            ${spareSummaryContent.innerHTML}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
 
     fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        if (!data || data.length === 0) {
-          console.error("No data received from Google Sheets");
-          tableBody.innerHTML = '<tr><td colspan="15">ไม่มีข้อมูลจาก Google Sheets</td></tr>';
-          return;
-        }
         allData = data;
-        console.log("Data loaded from Google Sheets:", allData.length, "rows");
-        console.log("Sample data:", allData.slice(0, 2));
-        console.log("Column names in data:", Object.keys(allData[0] || {}));
-        populateTeamPlantFilter(allData);
-        updatePendingFilter(allData, "");
-        updateStockFilter(allData, "", "");
-        updateStatusCallFilter(allData, "", "");
-        addSortListeners();
-        updateSortArrows();
+        populateTeamPlantFilter(data);
+        updatePendingFilter(data, employeeFilter.value);
+        updateStockFilter(data, employeeFilter.value, pendingFilter.value);
+        updateStatusCallFilter(data, employeeFilter.value, pendingFilter.value);
         filterAndRenderTable();
+        addSortListeners();
       })
-      .catch(error => {
-        console.error("ไม่สามารถโหลดข้อมูลได้:", error);
-        tableBody.innerHTML = '<tr><td colspan="15">เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '</td></tr>';
-      });
+      .catch(error => console.error('Error fetching data:', error));
   </script>
 </body>
 </html>
