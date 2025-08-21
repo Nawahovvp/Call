@@ -531,7 +531,7 @@
       text-align: center;
     }
 
-    /* ตั้งความกว้างให้เท่ากันสำหรับคอลัมน์ นวนคร, วิภาวดี, นอกรอบ, คลังพื้นที่ */
+    /* ตั้งความกว้างให้เท่ากันสำหรับคอลัมน์ นวนคร, วิภาวดี, นอกรอบ, ศูนย์พื้นที่ */
     th:nth-child(10), td:nth-child(10),
     th:nth-child(11), td:nth-child(11),
     th:nth-child(12), td:nth-child(12),
@@ -542,7 +542,7 @@
       text-align: center;
     }
 
-    /* รูปแบบเฉพาะสำหรับ นอกรอบ และ คลังพื้นที่ */
+    /* รูปแบบเฉพาะสำหรับ นอกรอบ และ ศูนย์พื้นที่ */
     th:nth-child(12), td:nth-child(12) {
       font-weight: bold;
       color: #c00;
@@ -605,14 +605,14 @@
           <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
           <th class="sortable" data-column="Brand">Brand <span class="arrow"></span></th>
           <th class="sortable" data-column="Team">Team <span class="arrow"></span></th>
-          <th class="sortable" data-column="TeamPlant">ทีมพื้นที่ <span class="arrow"></span></th>
+          <th class="sortable" data-column="TeamPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="ค้างหน่วยงาน">ค้างหน่วยงาน <span class="arrow"></span></th>
           <th class="sortable" data-column="Material">Material <span class="arrow"></span></th>
           <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
           <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
           <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
           <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
-          <th class="sortable" data-column="QtyPlant">คลังพื้นที่ <span class="arrow"></span></th>
+          <th class="sortable" data-column="QtyPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="StatusCall">Status <span class="arrow"></span></th>
           <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
@@ -794,7 +794,7 @@
         "Ticket Number": "Ticket Number",
         "Brand": "Brand",
         "Team": "Team",
-        "TeamPlant": "ทีมพื้นที่",
+        "TeamPlant": "ศูนย์พื้นที่",
         "ค้างหน่วยงาน": "ค้างหน่วยงาน",
         "Material": "Material",
         "Description": "Description"
@@ -969,7 +969,7 @@
             <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
             <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
-            <div><span class="label">ทีมพื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div class="description"><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
           </div>
@@ -1850,14 +1850,14 @@
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
             <div><span class="label">Brand:</span> <span class="value">${row["Brand"] || "-"}</span></div>
             <div><span class="label">Team:</span> <span class="value">${row["Team"] || "-"}</span></div>
-            <div><span class="label">ทีมพื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
             <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
             <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
             <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
             <div><span class="label">Request:</span> <span class="value">${row["Request"] || "-"}</span></div>
-            <div><span class="label">คลังพื้นที่:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
             <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
             <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
             <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
