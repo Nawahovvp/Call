@@ -531,18 +531,18 @@
       text-align: center;
     }
 
-    /* ปรับความกว้างให้เท่ากันสำหรับคอลัมน์ นวนคร, วิภาวดี, นอกรอบ, QtyPlant */
+    /* ตั้งความกว้างให้เท่ากันสำหรับคอลัมน์ นวนคร, วิภาวดี, นอกรอบ, คลังพื้นที่ */
     th:nth-child(10), td:nth-child(10),
     th:nth-child(11), td:nth-child(11),
     th:nth-child(12), td:nth-child(12),
     th:nth-child(13), td:nth-child(13) {
-      min-width: 50px;
-      width: 50px;
-      max-width: 60px;
+      min-width: 80px;
+      width: 80px;
+      max-width: 80px;
       text-align: center;
     }
 
-    /* รูปแบบเฉพาะสำหรับ นอกรอบ และ QtyPlant */
+    /* รูปแบบเฉพาะสำหรับ นอกรอบ และ คลังพื้นที่ */
     th:nth-child(12), td:nth-child(12) {
       font-weight: bold;
       color: #c00;
@@ -581,7 +581,7 @@
       </select>
     </div>
     <div class="filter-row">
-      <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">สถานะ Call</label>
+      <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">Status</label>
       <select id="statusCallFilter">
         <option value="">ทั้งหมด</option>
       </select>
@@ -614,7 +614,7 @@
           <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="QtyPlant">คลังพื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
-          <th class="sortable" data-column="StatusCall">สถานะ Call <span class="arrow"></span></th>
+          <th class="sortable" data-column="StatusCall">Status <span class="arrow"></span></th>
           <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
           <th>ดูรายละเอียด</th>
         </tr>
@@ -1106,7 +1106,7 @@
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
         type: 'line',
-         data: {  // ต้องมี 'data:' ตรงนี้
+        data: {  // แก้ไขตรงนี้: เพิ่ม data:
           labels: limitedTeams,
           datasets: [{
             label: 'จำนวน Call ค้าง',
@@ -1831,7 +1831,7 @@
             <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
             <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
             <div><span class="label">Request:</span> <span class="value">${row["Request"] || "-"}</span></div>
-            <div><span class="label">QtyPlant:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
+            <div><span class="label">คลังพื้นที่:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
             <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
             <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
             <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
