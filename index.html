@@ -530,6 +530,12 @@
       max-width: 100px;
       text-align: center;
     }
+
+    /* เพิ่มสไตล์สำหรับคอลัมน์ Request */
+    th[data-column="Request"], td:nth-child(12) {
+      min-width: 120px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -590,6 +596,7 @@
           <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
           <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
           <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
+          <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="StatusCall">สถานะ Call <span class="arrow"></span></th>
           <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
@@ -599,7 +606,6 @@
       <tbody></tbody>
     </table>
   </div>
-
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">×</span>
@@ -611,7 +617,6 @@
       <div id="modalContent"></div>
     </div>
   </div>
-
   <div id="graphModal" class="modal">
     <div class="graph-modal-content">
       <span class="close" id="closeGraphModal">×</span>
@@ -620,7 +625,6 @@
       <div id="graphWarning"></div>
     </div>
   </div>
-
   <div id="summaryModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeSummaryModal">×</span>
@@ -632,7 +636,6 @@
       <div id="summaryContent"></div>
     </div>
   </div>
-
   <div id="spareSummaryModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeSpareSummaryModal">×</span>
@@ -644,7 +647,6 @@
       <div id="spareSummaryContent"></div>
     </div>
   </div>
-
   <div class="pagination">
     <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
     <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
@@ -660,12 +662,10 @@
       </select>
     </div>
   </div>
-
   <script>
     const sheetID = '1dzE4Xjc7H0OtNUmne62u0jFQT-CiGsG2eBo-1v6mrZk';
     const sheetName = 'Coll_Stock';
     const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
-
     const modal = document.getElementById("detailModal");
     const graphModal = document.getElementById("graphModal");
     const summaryModal = document.getElementById("summaryModal");
@@ -696,7 +696,6 @@
     const graphWarning = document.getElementById("graphWarning");
     const summaryContent = document.getElementById("summaryContent");
     const spareSummaryContent = document.getElementById("spareSummaryContent");
-
     let allData = [];
     let currentPage = 1;
     let itemsPerPage = 20;
@@ -716,18 +715,16 @@
     function exportToCSV() {
       console.log("Starting exportToCSV, allData length:", allData.length);
       if (!allData || allData.length === 0) {
-        console.error("No data in Celebrating 20 years of innovation allData for CSV export");
+        console.error("No data in allData for CSV export");
         alert("ไม่มีข้อมูลในระบบสำหรับการส่งออก CSV");
         return;
       }
-
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
       console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, selectedStatusCall, keyword });
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -752,23 +749,15 @@
           )
         );
       });
-
       console.log("Filtered data length:", filteredData.length);
       if (filteredData.length > 0) {
         console.log("Sample filtered data:", filteredData.slice(0, 2));
       }
-
       if (filteredData.length === 0) {
         console.warn("No data to export to CSV after filtering");
-        alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง (TeamPlant: " + 
-              (selectedTeamPlant || "ทั้งหมด") + ", ค้างหน่วยงาน: " + 
-              (selectedPending || "ทั้งหมด") + ", คลังตอบ: " + 
-              (selectedStock || "ทั้งหมด") + ", สถานะ Call: " + 
-              (selectedStatusCall || "ทั้งหมด") + ", Keyword: " + 
-              (keyword || "ไม่มี") + ")");
+        alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง");
         return;
       }
-
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
         let dayB = parseFloat(b["DayRepair"]) || 0;
@@ -779,7 +768,6 @@
         }
         return ticketA.localeCompare(ticketB);
       });
-
       const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description"];
       const displayColumns = {
         "DayRepair": "ผ่านมา",
@@ -792,10 +780,8 @@
         "Material": "Material",
         "Description": "Description"
       };
-
       const csvRows = [];
       csvRows.push(columns.map(col => `"${displayColumns[col]}"`).join(','));
-
       filteredData.forEach(row => {
         const rowData = columns.map(col => {
           let value = row[col] || "-";
@@ -806,7 +792,6 @@
         });
         csvRows.push(rowData.join(','));
       });
-
       const csvContent = csvRows.join('\n');
       const bom = '\uFEFF';
       const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -828,7 +813,6 @@
         alert("ไม่พบข้อมูลสำหรับ Ticket Number: " + currentTicketNumber);
         return;
       }
-
       let stickerContent = `
         <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
         <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
@@ -839,7 +823,6 @@
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
         <div class="description"><span class="label">Description:</span> <span class="value">${modalData["Description"] || "-"}</span></div>
       `;
-
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
@@ -917,7 +900,6 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -942,12 +924,10 @@
           )
         );
       });
-
       if (filteredData.length === 0) {
         alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา");
         return;
       }
-
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
         let dayB = parseFloat(b["DayRepair"]) || 0;
@@ -956,11 +936,9 @@
         if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
-
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
       const paginatedData = filteredData.slice(startIdx, endIdx);
-
       const stickersHtml = paginatedData.map(row => {
         return `
           <div class="sticker">
@@ -975,7 +953,6 @@
           </div>
         `;
       }).join('');
-
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
@@ -1069,7 +1046,6 @@
           )
         );
       });
-
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1078,12 +1054,10 @@
           ticketCounts[ticket] = team;
         }
       });
-
       const teamCounts = {};
       Object.values(ticketCounts).forEach(team => {
         teamCounts[team] = (teamCounts[team] || 0) + 1;
       });
-
       const sortedTeams = Object.keys(teamCounts).sort((a, b) => teamCounts[b] - teamCounts[a]);
       let limitedTeams = sortedTeams;
       let warningMessage = "";
@@ -1094,20 +1068,16 @@
       const sortedCounts = limitedTeams.map(team => teamCounts[team]);
       const backgroundColors = limitedTeams.map((_, index) => index % 2 === 0 ? '#c9ffc4' : '#fce4ec');
       const borderColors = limitedTeams.map((_, index) => index % 2 === 0 ? '#4caf50' : '#f06292');
-
       graphWarning.textContent = warningMessage;
-
       if (limitedTeams.length === 0 || sortedCounts.length === 0) {
         console.warn("No data to display in chart");
         graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ";
         graphModal.style.display = "block";
         return;
       }
-
       if (teamChart) {
         teamChart.destroy();
       }
-
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
         type: 'line',
@@ -1151,7 +1121,6 @@
           }
         }
       });
-
       graphModal.style.display = "block";
     }
 
@@ -1161,7 +1130,6 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1186,16 +1154,13 @@
           )
         );
       });
-
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const totalCalls = uniqueTickets;
-
       const pivotData = {};
       const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
-
       teamPlants.forEach(teamPlant => {
         pivotData[teamPlant] = {};
         statusCalls.forEach(status => {
@@ -1205,7 +1170,6 @@
           pivotData[teamPlant][pending] = 0;
         });
       });
-
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1218,7 +1182,6 @@
           ticketCounts[ticket] = true;
         }
       });
-
       const teamPlantTotals = teamPlants.map(teamPlant => {
         const total = Object.keys(pivotData[teamPlant]).reduce((sum, key) => {
           if (statusCalls.includes(key)) {
@@ -1228,7 +1191,6 @@
         }, 0);
         return { teamPlant, total, ...pivotData[teamPlant] };
       }).sort((a, b) => b.total - a.total);
-
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -1267,33 +1229,28 @@
           </tbody>
         </table>
       `;
-
       let summaryHtml = `
         <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
         <h3>จำนวน Call ค้างตามศูนย์พื้นที่และสถานะ Call</h3>
         ${pivotTableHtml}
       `;
-
       summaryContent.innerHTML = summaryHtml;
       summaryModal.style.display = "block";
     }
 
     function showSpareSummary() {
       let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
-
       if (filteredData.length === 0) {
         spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
         spareSummaryModal.style.display = "block";
         return;
       }
-
       const pivotData = {};
       const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
         .map(unit => unit.replace(/Stock\s*/gi, '').trim())
         .filter(unit => unit)
         .sort();
-
       materials.forEach(matDesc => {
         const [material, description] = matDesc.split('|');
         pivotData[matDesc] = { total: 0 };
@@ -1301,7 +1258,6 @@
           pivotData[matDesc][pending] = 0;
         });
       });
-
       filteredData.forEach(row => {
         const matDesc = row["Material"] + '|' + row["Description"];
         const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
@@ -1310,13 +1266,11 @@
           pivotData[matDesc][pending]++;
         }
       });
-
       const sortedMaterials = materials.sort((a, b) => {
         const totalA = pivotData[a].total;
         const totalB = pivotData[b].total;
         return totalB - totalA;
       });
-
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -1343,7 +1297,6 @@
           </tbody>
         </table>
       `;
-
       spareSummaryContent.innerHTML = pivotTableHtml;
       spareSummaryModal.style.display = "block";
     }
@@ -1484,7 +1437,6 @@
     closeGraphModal.onclick = () => graphModal.style.display = "none";
     closeSummaryModal.onclick = () => summaryModal.style.display = "none";
     closeSpareSummaryModal.onclick = () => spareSummaryModal.style.display = "none";
-
     window.onclick = event => {
       if (event.target == modal) {
         modal.style.display = "none";
@@ -1505,23 +1457,19 @@
     excelButton.addEventListener("click", exportToCSV);
     summaryButton.addEventListener("click", showSummary);
     spareSummaryButton.addEventListener("click", showSpareSummary);
-
     itemsPerPageSelect.addEventListener("change", (e) => {
       itemsPerPage = parseInt(e.target.value);
       currentPage = 1;
       filterAndRenderTable();
     });
-
     searchInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         filterAndRenderTable();
       }
     });
-
     searchButton.addEventListener("click", () => {
       filterAndRenderTable();
     });
-
     printTableButton.addEventListener("click", printTable);
 
     function populateTeamPlantFilter(data) {
@@ -1674,23 +1622,19 @@
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
+            (row["Request"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
       });
-
-      console.log("Filtered data:", filteredData.length, filteredData);
-
       updatePendingFilter(allData, selectedTeamPlant);
       updateStockFilter(allData, selectedTeamPlant, selectedPending);
       updateStatusCallFilter(allData, selectedTeamPlant, selectedPending);
-
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const ticketCountValue = document.getElementById("ticketCountValue");
       ticketCountValue.textContent = uniqueTickets;
-
       if (sortConfig.column) {
         filteredData.sort((a, b) => {
           let valueA = a[sortConfig.column] || "";
@@ -1724,7 +1668,6 @@
           return ticketA.localeCompare(ticketB);
         });
       }
-
       renderTable(filteredData);
       updateCallCount(filteredData);
     }
@@ -1732,11 +1675,9 @@
     employeeFilter.addEventListener("change", () => {
       filterAndRenderTable();
     });
-
     pendingFilter.addEventListener("change", () => {
       filterAndRenderTable();
     });
-
     stockFilter.addEventListener("change", filterAndRenderTable);
     statusCallFilter.addEventListener("change", filterAndRenderTable);
 
@@ -1745,18 +1686,17 @@
       const callCountValue = document.getElementById("callCountValue");
       callCountValue.textContent = count;
     }
-      function renderTable(data) {
+
+    function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="15">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="16">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
         console.warn("No data to render in table");
         return;
       }
-
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
       const paginatedData = data.slice(startIdx, endIdx);
-
       const ticketGroups = {};
       data.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1765,20 +1705,17 @@
         }
         ticketGroups[ticket].push(row);
       });
-
       const uniqueTickets = Object.keys(ticketGroups).sort();
       const colorMap = {};
       uniqueTickets.forEach((ticket, index) => {
         colorMap[ticket] = index % 2 === 0 ? "yellow-light" : "pink-pastel";
       });
-
       paginatedData.forEach((row, i) => {
         const tr = document.createElement("tr");
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-
-        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "คลังตอบ", "StatusCall", "AnswerX"];
+        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "นอกรอบ", "คลังตอบ", "StatusCall", "AnswerX"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = row[col] || "-";
@@ -1798,7 +1735,6 @@
           td.classList.add("text-left");
           tr.appendChild(td);
         });
-
         const detailTd = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "ดูรายละเอียด";
@@ -1852,7 +1788,6 @@
             });
           }
           timelineHtml += '</tbody></table>';
-
           modalContent.innerHTML = `
             <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
             <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
@@ -1865,6 +1800,7 @@
             <div><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
             <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
             <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
+            <div><span class="label">Request:</span> <span class="value">${row["Request"] || "-"}</span></div>
             <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
             <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
             <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
@@ -1877,7 +1813,6 @@
         tr.appendChild(detailTd);
         tableBody.appendChild(tr);
       });
-
       updatePagination(data.length);
     }
 
@@ -1886,15 +1821,12 @@
       currentPage = Math.min(currentPage, totalPages);
       if (currentPage < 1) currentPage = 1;
       pageNumbersContainer.innerHTML = '';
-
       const maxPageButtons = 5;
       let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
       let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
       if (endPage - startPage + 1 < maxPageButtons) {
         startPage = Math.max(1, endPage - maxPageButtons + 1);
       }
-
       for (let i = startPage; i <= endPage; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
@@ -1908,12 +1840,10 @@
         });
         pageNumbersContainer.appendChild(btn);
       }
-
       firstPageButton.disabled = currentPage === 1;
       prevPageButton.disabled = currentPage === 1;
       nextPageButton.disabled = currentPage === totalPages;
       lastPageButton.disabled = currentPage === totalPages;
-
       firstPageButton.onclick = () => {
         currentPage = 1;
         filterAndRenderTable();
@@ -1934,137 +1864,6 @@
         currentPage = totalPages;
         filterAndRenderTable();
       };
-    }
-
-    function showSpareSummary() {
-      let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
-
-      if (filteredData.length === 0) {
-        spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
-        spareSummaryModal.style.display = "block";
-        return;
-      }
-
-      const pivotData = {};
-      const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
-      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
-        .map(unit => unit.replace(/Stock\s*/gi, '').trim())
-        .filter(unit => unit)
-        .sort();
-
-      materials.forEach(matDesc => {
-        const [material, description] = matDesc.split('|');
-        pivotData[matDesc] = { total: 0 };
-        pendingUnits.forEach(pending => {
-          pivotData[matDesc][pending] = 0;
-        });
-      });
-
-      filteredData.forEach(row => {
-        const matDesc = row["Material"] + '|' + row["Description"];
-        const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
-        if (pivotData[matDesc] && pending) {
-          pivotData[matDesc].total++;
-          pivotData[matDesc][pending]++;
-        }
-      });
-
-      const sortedMaterials = materials.sort((a, b) => {
-        const totalA = pivotData[a].total;
-        const totalB = pivotData[b].total;
-        return totalB - totalA;
-      });
-
-      let pivotTableHtml = `
-        <table class='detail-table'>
-          <thead>
-            <tr>
-              <th>Material</th>
-              <th>Description</th>
-              <th class='fixed-width'>จำนวนรวม</th>
-              ${pendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
-            </tr>
-          </thead>
-          <tbody>
-            ${sortedMaterials.map(matDesc => {
-              const [material, description] = matDesc.split('|');
-              const data = pivotData[matDesc];
-              return `
-                <tr>
-                  <td>${material}</td>
-                  <td>${description}</td>
-                  <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
-                  ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      `;
-
-      spareSummaryContent.innerHTML = pivotTableHtml;
-      spareSummaryModal.style.display = "block";
-    }
-
-    function printSpareSummaryContent() {
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>พิมพ์สรุปอะไหล่</title>
-            <style>
-              body {
-                font-family: 'Prompt', sans-serif;
-                margin: 10mm;
-                padding: 0;
-              }
-              h2, h3 {
-                color: #000;
-                margin: 10px 0;
-              }
-              .detail-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-              }
-              .detail-table th, .detail-table td {
-                padding: 8px;
-                border: 1px solid #ccc;
-                text-align: center;
-              }
-              .detail-table th {
-                background-color: #007bff;
-                color: white;
-              }
-              .detail-table tr:nth-child(even) {
-                background-color: #f9f9f9;
-              }
-              .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
-                width: 80px;
-                min-width: 80px;
-                max-width: 80px;
-              }
-              .detail-table th:first-child, .detail-table td:first-child {
-                width: auto;
-                min-width: 120px;
-              }
-              @media print {
-                body {
-                  margin: 0;
-                }
-                @page {
-                  margin: 10mm;
-                }
-              }
-            </style>
-          </head>
-          <body onload="window.print()">
-            <h2>สรุปอะไหล่ (รอของเข้า)</h2>
-            ${spareSummaryContent.innerHTML}
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
     }
 
     fetch(url)
