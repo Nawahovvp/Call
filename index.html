@@ -605,7 +605,7 @@
           <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
           <th class="sortable" data-column="Brand">Brand <span class="arrow"></span></th>
           <th class="sortable" data-column="Team">Team <span class="arrow"></span></th>
-          <th class="sortable" data-column="TeamPlant">TeamPlant <span class="arrow"></span></th>
+          <th class="sortable" data-column="TeamPlant">ทีมพื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="ค้างหน่วยงาน">ค้างหน่วยงาน <span class="arrow"></span></th>
           <th class="sortable" data-column="Material">Material <span class="arrow"></span></th>
           <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
@@ -794,7 +794,7 @@
         "Ticket Number": "Ticket Number",
         "Brand": "Brand",
         "Team": "Team",
-        "TeamPlant": "TeamPlant",
+        "TeamPlant": "ทีมพื้นที่",
         "ค้างหน่วยงาน": "ค้างหน่วยงาน",
         "Material": "Material",
         "Description": "Description"
@@ -838,7 +838,7 @@
         <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
         <div><span class="label">DateTime:</span> <span class="value">${modalData["DateTime"] || "-"}</span></div>
         <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
-        <div><span class="label">TeamPlant:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
+        <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
         <div class="description"><span class="label">Description:</span> <span class="value">${modalData["Description"] || "-"}</span></div>
       `;
@@ -969,7 +969,7 @@
             <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
             <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
-            <div><span class="label">TeamPlant:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ทีมพื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div class="description"><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
           </div>
@@ -1746,25 +1746,51 @@
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
         const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "Request", "QtyPlant", "คลังตอบ", "StatusCall", "AnswerX"];
-        columns.forEach(col => {
-          const td = document.createElement("td");
-          let cellValue = row[col] || "-";
-          let displayValue = cellValue;
-          if (col === "DayRepair") {
-            displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
-          } else if (col === "คลังตอบ") {
-            if (cellValue === "ดำเนินการแล้ว") {
-              displayValue = "ดำเนินการแล้ว";
-              td.classList.add("green-text");
-            } else if (cellValue === "รอตรวจสอบ") {
-              displayValue = "รอตรวจสอบ";
-              td.classList.add("red-text");
-            }
-          }
-          td.textContent = displayValue;
-          td.classList.add("text-left");
-          tr.appendChild(td);
-        });
+       columns.forEach(col => {
+  const td = document.createElement("td");
+  let cellValue = row[col] || "-";
+  let displayValue = cellValue;
+
+  // จัดการกับ DayRepair
+  if (col === "DayRepair") {
+    displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
+  }
+  // จัดการกับ คลังตอบ (เดิม)
+  else if (col === "คลังตอบ") {
+    if (cellValue === "ดำเนินการแล้ว") {
+      displayValue = "ดำเนินการแล้ว";
+      td.style.color = "#28a745";
+      td.style.fontWeight = "bold";
+    } else if (cellValue === "รอตรวจสอบ") {
+      displayValue = "รอตรวจสอบ";
+      td.style.color = "#dc3545";
+      td.style.fontWeight = "bold";
+    }
+  }
+  // จัดการกับ StatusCall (เพิ่มใหม่)
+  else if (col === "StatusCall") {
+    displayValue = cellValue || "-";
+    if (cellValue === "รอของเข้า") {
+      td.style.color = "#dc3545"; // แดง
+      td.style.fontWeight = "bold";
+    } else if (cellValue === "สำเร็จ") {
+      td.style.color = "#28a745"; // เขียว
+      td.style.fontWeight = "bold";
+    } else if (cellValue === "เบิกนวนคร") {
+      td.style.color = "#007bff"; // น้ำเงิน
+      td.style.fontWeight = "bold";
+    } else if (cellValue === "เบิกวิภาวดี") {
+      td.style.color = "#d4ac0d"; // เหลืองทอง
+      td.style.fontWeight = "bold";
+    } else {
+      td.style.color = "#6c757d"; // เทา (สำหรับอื่นๆ)
+    }
+  }
+
+  td.textContent = displayValue;
+  td.classList.add("text-left");
+  tr.appendChild(td);
+});
         const detailTd = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "ดูรายละเอียด";
@@ -1824,7 +1850,7 @@
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
             <div><span class="label">Brand:</span> <span class="value">${row["Brand"] || "-"}</span></div>
             <div><span class="label">Team:</span> <span class="value">${row["Team"] || "-"}</span></div>
-            <div><span class="label">TeamPlant:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ทีมพื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
             <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
