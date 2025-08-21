@@ -13,12 +13,6 @@
       margin: 0;
       padding: 20px;
     }
-        th:nth-child(12), td:nth-child(12) {
-  text-align: center;
-  font-weight: bold;
-  color: #c00;
-  min-width: 50px;
-}
     .report-title {
       font-size: 24px;
       font-weight: 700;
@@ -511,20 +505,10 @@
     .timeline-table tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-    th:nth-child(10), td:nth-child(10),
-th:nth-child(11), td:nth-child(11),
-th:nth-child(12), td:nth-child(12) {
-  min-width: 60px;
-  width: 60px;
-  max-width: 60px;
-  text-align: center;
-}
-
-}
     .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
       width: 20%;
-      min-width: 60px;
-      max-width: 60px;
+      min-width: 50px;
+      max-width: 80px;
       white-space: normal;
     }
     .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
@@ -536,21 +520,36 @@ th:nth-child(12), td:nth-child(12) {
     }
     .detail-table th:nth-child(3), .detail-table td:nth-child(3) {
       width: 10%;
-      min-width: 60px;
-      max-width: 60px;
+      min-width: 80px;
+      max-width: 100px;
       text-align: center;
     }
     .detail-table th:nth-child(n+4), .detail-table td:nth-child(n+4) {
       width: 10%;
-      min-width: 60px;
+      min-width: 80px;
+      max-width: 100px;
+      text-align: center;
+    }
+
+    /* ปรับความกว้างให้เท่ากันสำหรับคอลัมน์ นวนคร, วิภาวดี, นอกรอบ, QtyPlant */
+    th:nth-child(10), td:nth-child(10),
+    th:nth-child(11), td:nth-child(11),
+    th:nth-child(12), td:nth-child(12),
+    th:nth-child(13), td:nth-child(13) {
+      min-width: 50px;
+      width: 50px;
       max-width: 60px;
       text-align: center;
     }
 
-    /* เพิ่มสไตล์สำหรับคอลัมน์ Request */
-    th[data-column="Request"], td:nth-child(12) {
-      min-width: 60px;
-      text-align: center;
+    /* รูปแบบเฉพาะสำหรับ นอกรอบ และ QtyPlant */
+    th:nth-child(12), td:nth-child(12) {
+      font-weight: bold;
+      color: #c00;
+    }
+    th:nth-child(13), td:nth-child(13) {
+      font-weight: bold;
+      color: #000;
     }
   </style>
 </head>
@@ -613,6 +612,7 @@ th:nth-child(12), td:nth-child(12) {
           <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
           <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
           <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
+          <th class="sortable" data-column="QtyPlant">คลังพื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="StatusCall">สถานะ Call <span class="arrow"></span></th>
           <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
@@ -759,6 +759,9 @@ th:nth-child(12), td:nth-child(12) {
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["Vipa"] || "").toLowerCase().includes(keyword) ||
+            (row["Request"] || "").toLowerCase().includes(keyword) ||
+            (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
@@ -767,7 +770,7 @@ th:nth-child(12), td:nth-child(12) {
       });
       console.log("Filtered data length:", filteredData.length);
       if (filteredData.length > 0) {
-        console.log("Sample filtered data:", filteredData.slice(0, 2));
+        console.log("Sample filtered ", filteredData.slice(0, 2));
       }
       if (filteredData.length === 0) {
         console.warn("No data to export to CSV after filtering");
@@ -934,6 +937,9 @@ th:nth-child(12), td:nth-child(12) {
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["Vipa"] || "").toLowerCase().includes(keyword) ||
+            (row["Request"] || "").toLowerCase().includes(keyword) ||
+            (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
@@ -1056,6 +1062,9 @@ th:nth-child(12), td:nth-child(12) {
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["Vipa"] || "").toLowerCase().includes(keyword) ||
+            (row["Request"] || "").toLowerCase().includes(keyword) ||
+            (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
@@ -1097,7 +1106,7 @@ th:nth-child(12), td:nth-child(12) {
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
         type: 'line',
-        data: {
+         data: {  // ต้องมี 'data:' ตรงนี้
           labels: limitedTeams,
           datasets: [{
             label: 'จำนวน Call ค้าง',
@@ -1164,6 +1173,9 @@ th:nth-child(12), td:nth-child(12) {
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (row["Description"] || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["Vipa"] || "").toLowerCase().includes(keyword) ||
+            (row["Request"] || "").toLowerCase().includes(keyword) ||
+            (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
@@ -1619,6 +1631,7 @@ th:nth-child(12), td:nth-child(12) {
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
+      console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, selectedStatusCall, keyword });
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1639,6 +1652,7 @@ th:nth-child(12), td:nth-child(12) {
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["Request"] || "").toLowerCase().includes(keyword) ||
+            (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
@@ -1706,7 +1720,7 @@ th:nth-child(12), td:nth-child(12) {
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="16">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="17">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
         console.warn("No data to render in table");
         return;
       }
@@ -1731,7 +1745,7 @@ th:nth-child(12), td:nth-child(12) {
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "Request", "คลังตอบ", "StatusCall", "AnswerX"];
+        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "Request", "QtyPlant", "คลังตอบ", "StatusCall", "AnswerX"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = row[col] || "-";
@@ -1817,6 +1831,7 @@ th:nth-child(12), td:nth-child(12) {
             <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
             <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
             <div><span class="label">Request:</span> <span class="value">${row["Request"] || "-"}</span></div>
+            <div><span class="label">QtyPlant:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
             <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
             <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
             <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
