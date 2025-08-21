@@ -1715,7 +1715,7 @@
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "นอกรอบ", "คลังตอบ", "StatusCall", "AnswerX"];
+        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "Request", "คลังตอบ", "StatusCall", "AnswerX"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = row[col] || "-";
