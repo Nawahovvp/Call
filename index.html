@@ -13,6 +13,12 @@
       margin: 0;
       padding: 20px;
     }
+        th:nth-child(12), td:nth-child(12) {
+  text-align: center;
+  font-weight: bold;
+  color: #c00;
+  min-width: 50px;
+}
     .report-title {
       font-size: 24px;
       font-weight: 700;
@@ -505,10 +511,20 @@
     .timeline-table tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+    th:nth-child(10), td:nth-child(10),
+th:nth-child(11), td:nth-child(11),
+th:nth-child(12), td:nth-child(12) {
+  min-width: 60px;
+  width: 60px;
+  max-width: 60px;
+  text-align: center;
+}
+
+}
     .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
       width: 20%;
-      min-width: 50px;
-      max-width: 80px;
+      min-width: 60px;
+      max-width: 60px;
       white-space: normal;
     }
     .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
@@ -520,20 +536,20 @@
     }
     .detail-table th:nth-child(3), .detail-table td:nth-child(3) {
       width: 10%;
-      min-width: 80px;
-      max-width: 100px;
+      min-width: 60px;
+      max-width: 60px;
       text-align: center;
     }
     .detail-table th:nth-child(n+4), .detail-table td:nth-child(n+4) {
       width: 10%;
-      min-width: 80px;
-      max-width: 100px;
+      min-width: 60px;
+      max-width: 60px;
       text-align: center;
     }
 
     /* เพิ่มสไตล์สำหรับคอลัมน์ Request */
     th[data-column="Request"], td:nth-child(12) {
-      min-width: 120px;
+      min-width: 60px;
       text-align: center;
     }
   </style>
