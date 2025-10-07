@@ -7,602 +7,133 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: 'Prompt', sans-serif;
-      background-color: #f0f4f8;
-      margin: 0;
-      padding: 20px;
-    }
-    .report-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #333;
-      text-align: center;
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      transition: all 0.3s ease;
-    }
-    @media (max-width: 768px) {
-      .report-title {
-        font-size: 20px;
-        padding: 10px;
-      }
-    }
-    #searchContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .filter-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .search-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    #employeeFilterLabel, #pendingFilterLabel, #stockFilterLabel, #statusCallFilterLabel {
-      font-size: 16px;
-      color: #333;
-    }
-    #employeeFilter, #pendingFilter, #stockFilter, #statusCallFilter {
-      margin-left: 5px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      background-color: #fff;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    #employeeFilter:hover, #pendingFilter:hover, #stockFilter:hover, #statusCallFilter:hover {
-      border-color: #2980b9;
-    }
-    #searchInput {
-      width: 300px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-    #searchInput:focus {
-      border-color: #2980b9;
-      box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
-      outline: none;
-    }
-    .action-button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .action-button i {
-      font-size: 18px;
-    }
-    .action-button:hover {
-      background: linear-gradient(135deg, #2980b9, #1c6ea4);
-      transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-    .action-button:active {
-      transform: scale(0.95);
-    }
-    .table-container {
-      overflow-x: auto;
-      width: 100%;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      border-radius: 12px;
-      overflow: hidden;
-      min-width: 900px;
-    }
-    th, td {
-      padding: 8px 12px;
-      text-align: left;
-      border: 1px solid #ccc;
-      white-space: nowrap;
-    }
-    th {
-      background-color: #007bff;
-      color: white;
-    }
-    th.sortable {
-      cursor: pointer;
-    }
-    th.sortable:hover {
-      background-color: #0056b3;
-    }
-    .arrow {
-      font-size: 12px;
-      margin-left: 5px;
-    }
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-    .detail-button {
-      padding: 6px 10px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      width: 100px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .detail-button:hover {
-      background-color: #2980b9;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.5);
-    }
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 1200px;
-      animation: zoomIn 0.4s ease;
-      overflow-x: auto;
-      position: relative;
-    }
-    #spareSummaryModal .modal-content {
-      max-width: 95%;
-    }
-    .graph-modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 800px;
-      animation: zoomIn 0.4s ease;
-      position: relative;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover {
-      color: #000;
-    }
-    .print-button {
-      float: right;
-      margin-right: 10px;
-      padding: 10px 16px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 16px;
-    }
-    .print-button:hover {
-      background-color: #2980b9;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    #modalContent span.label {
-      color: #007bff;
-      font-weight: bold;
-    }
-    #modalContent span.value {
-      color: #000;
-    }
-    #graphWarning {
-      color: #d32f2f;
-      font-size: 14px;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .pagination {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      margin-top: 20px;
-    }
-    .pagination button,
-    .pagination select {
-      padding: 8px 12px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 0 5px;
-      transition: all 0.3s ease;
-    }
-    .pagination button:hover,
-    .pagination select:hover {
-      background-color: #2980b9;
-    }
-    .pagination .page-number {
-      width: 36px;
-      height: 36px;
-      background-color: #3498db;
-      color: white;
-      border-radius: 50%;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 5px;
-      cursor: pointer;
-      font-size: 16px;
-      border: none;
-      transition: all 0.3s ease;
-    }
-    .pagination .page-number:hover {
-      background-color: #2980b9;
-      transform: scale(1.1);
-    }
-    .pagination .page-number.active {
-      background-color: #e67e22;
-      color: white;
-    }
-    .items-per-page {
-      margin-left: 10px;
-      font-size: 16px;
-    }
-    tr {
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInUp 0.5s ease forwards;
-    }
-    tr:nth-child(even) {
-      animation-delay: 0.1s;
-    }
-    tr:nth-child(odd) {
-      animation-delay: 0.2s;
-    }
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    @keyframes zoomIn {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    th:nth-child(3), td:nth-child(3) {
-      width: auto;
-      min-width: 100px;
-      max-width: 150px;
-      white-space: normal;
-    }
-    th:nth-child(7), td:nth-child(7) {
-      min-width: 150px;
-    }
-    @media (max-width: 768px) {
-      th:nth-child(3), td:nth-child(3) {
-        min-width: 80px;
-        font-size: 14px;
-      }
-      #searchInput {
-        width: 100%;
-        max-width: 300px;
-      }
-      .search-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .action-button {
-        width: 100%;
-        max-width: 150px;
-        justify-content: center;
-      }
-    }
-    .yellow-light {
-      background-color: #c9ffc4;
-    }
-    .pink-pastel {
-      background-color: #fce4ec;
-    }
-    .text-left {
-      text-align: left;
-    }
-    .text-center {
-      text-align: center;
-    }
-    .call-count-box {
-      margin-left: 20px;
-      padding: 10px 16px;
-      background-color: #e6f2ff;
-      color: #007bff;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      display: inline-flex;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      transition: background-color 0.3s ease;
-    }
-    .call-count-box span {
-      color: #d63384;
-      margin: 0 4px;
-      font-size: 18px;
-    }
-    .modern-label {
-      display: inline-block;
-      padding: 10px 16px;
-      background-color: #ffffff;
-      color: #007bff;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      border: 1px solid #d0eaff;
-      transition: all 0.3s ease;
-      margin-right: 8px;
-    }
-    .modern-label:hover {
-      background-color: #e6f2ff;
-      color: #0056b3;
-    }
-    .detail-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    .detail-table th, .detail-table td {
-      padding: 8px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    .detail-table th {
-      background-color: #007bff;
-      color: white;
-    }
-    .detail-table tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
-      width: 80px;
-      min-width: 80px;
-      max-width: 80px;
-    }
-    .detail-table th:first-child, .detail-table td:first-child {
-      width: auto;
-      min-width: 120px;
-    }
-    @media print {
-      .report-title, .close, .print-button, #printTableButton, #searchButton, #graphButton, #excelButton, #summaryButton, #spareSummaryButton, #searchInput, .pagination, #searchContainer, .modal, .table-container {
-        display: none;
-      }
-      .modal-content {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        max-width: none;
-        border-radius: 0;
-        box-shadow: none;
-      }
-      .sticker {
-        width: 80mm;
-        height: 100mm;
-        border: 1px solid #000;
-        padding: 2mm;
-        box-sizing: border-box;
-        font-size: 13pt;
-        line-height: 1.3;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        page-break-after: always;
-      }
-      .sticker div {
-        margin-bottom: 1.5mm;
-        overflow-wrap: break-word;
-      }
-      .sticker div.description {
-        flex: 1;
-      }
-      .sticker .label {
-        font-weight: bold;
-        color: #000;
-        font-size: 14pt;
-      }
-      .sticker .value {
-        color: #000;
-      }
-      h2 {
-        font-size: 14pt;
-        color: #000;
-        margin: 1.5mm 0;
-      }
-      @page {
-        size: 80mm 100mm;
-        margin: 0;
-      }
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      .detail-table th, .detail-table td {
-        text-align: center;
-      }
-      .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
-        width: 80px;
-        min-width: 80px;
-        max-width: 80px;
-      }
-      .detail-table th:first-child, .detail-table td:first-child {
-        width: auto;
-        min-width: 120px;
-      }
-    }
-    .green-text {
-      color: green;
-    }
-    .red-text {
-      color: red;
-    }
-    .timeline-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    .timeline-table th, .timeline-table td {
-      padding: 8px;
-      border: 1px solid #ccc;
-      text-align: left;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .timeline-table th {
-      background-color: #007bff;
-      color: white;
-    }
-    .timeline-table tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
-      width: 20%;
-      min-width: 50px;
-      max-width: 80px;
-      white-space: normal;
-    }
-    .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
-      width: 40%;
-      min-width: 200px;
-      max-width: 350px;
-      white-space: normal;
-      text-align: left;
-    }
-    .detail-table th:nth-child(3), .detail-table td:nth-child(3) {
-      width: 10%;
-      min-width: 80px;
-      max-width: 100px;
-      text-align: center;
-    }
-    .detail-table th:nth-child(n+4), .detail-table td:nth-child(n+4) {
-      width: 10%;
-      min-width: 80px;
-      max-width: 100px;
-      text-align: center;
-    }
-
-    /* ตั้งความกว้างให้เท่ากันสำหรับคอลัมน์ นวนคร, วิภาวดี, นอกรอบ, ศูนย์พื้นที่ */
-    th:nth-child(10), td:nth-child(10),
-    th:nth-child(11), td:nth-child(11),
-    th:nth-child(12), td:nth-child(12),
-    th:nth-child(13), td:nth-child(13) {
-      min-width: 50px;
-      width: 50px;
-      max-width: 60px;
-      text-align: center;
-    }
-
-    /* รูปแบบเฉพาะสำหรับ นอกรอบ และ ศูนย์พื้นที่ */
-    th:nth-child(12), td:nth-child(12) {
-      font-weight: bold;
-      color: #c00;
-    }
-    th:nth-child(13), td:nth-child(13) {
-      font-weight: bold;
-      color: #000;
-    }
-    .date-update {
-      text-align: center;
-      background-color: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 10px;
-      font-size: 16px;
-      color: #333;
-      font-weight: 500;
-    }
-    .date-update span {
-      color: #007bff;
-      font-weight: bold;
-    }
+    body { font-family: 'Prompt', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
+    .report-title { font-size: 24px; font-weight: 700; color: #333; text-align: center; background-color: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,.1); margin-bottom: 20px; transition: all .3s ease; }
+    @media (max-width: 768px){ .report-title{ font-size:20px; padding:10px; } }
+    #searchContainer{ display:flex; flex-direction:column; align-items:flex-start; margin-bottom:20px; }
+    .filter-row{ display:flex; align-items:center; margin-bottom:10px; }
+    .search-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    #employeeFilterLabel,#pendingFilterLabel,#stockFilterLabel,#statusCallFilterLabel{ font-size:16px; color:#333; }
+    #employeeFilter,#pendingFilter,#stockFilter,#statusCallFilter{ margin-left:5px; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:16px; background:#fff; cursor:pointer; transition:all .3s ease; }
+    #employeeFilter:hover,#pendingFilter:hover,#stockFilter:hover,#statusCallFilter:hover{ border-color:#2980b9; }
+    #searchInput{ width:300px; padding:12px; border-radius:12px; border:1px solid #ccc; font-size:16px; transition:all .3s ease; }
+    #searchInput:focus{ border-color:#2980b9; box-shadow:0 0 8px rgba(41,128,185,.3); outline:none; }
+    .action-button{ display:flex; align-items:center; gap:8px; padding:10px 16px; background:linear-gradient(135deg,#3498db,#2980b9); color:#fff; border:none; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; transition:all .3s ease; box-shadow:0 4px 8px rgba(0,0,0,.1); }
+    .action-button i{ font-size:18px; }
+    .action-button:hover{ background:linear-gradient(135deg,#2980b9,#1c6ea4); transform:scale(1.05); box-shadow:0 6px 12px rgba(0,0,0,.15); }
+    .action-button:active{ transform:scale(.95); }
+    .table-container{ overflow-x:auto; width:100%; }
+    table{ width:100%; border-collapse:collapse; background:#fff; box-shadow:0 4px 6px rgba(0,0,0,.1); border-radius:12px; overflow:hidden; min-width:900px; }
+    th,td{ padding:8px 12px; text-align:left; border:1px solid #ccc; white-space:nowrap; }
+    th{ background:#007bff; color:#fff; }
+    th.sortable{ cursor:pointer; }
+    th.sortable:hover{ background:#0056b3; }
+    .arrow{ font-size:12px; margin-left:5px; }
+    tr:hover{ background:#f1f1f1; }
+    .detail-button{ padding:6px 10px; background:#3498db; color:#fff; border:none; width:100px; border-radius:6px; cursor:pointer; transition:all .3s ease; }
+    .detail-button:hover{ background:#2980b9; transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.1); }
+    .modal{ display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,.5); }
+    .modal-content{ background:#fff; margin:10% auto; padding:20px; border-radius:12px; width:90%; max-width:1200px; animation:zoomIn .4s ease; overflow-x:auto; position:relative; }
+    #spareSummaryModal .modal-content{ max-width:95%; }
+    .graph-modal-content{ background:#fff; margin:10% auto; padding:20px; border-radius:12px; width:90%; max-width:800px; animation:zoomIn .4s ease; position:relative; }
+    .close{ color:#aaa; float:right; font-size:24px; font-weight:bold; cursor:pointer; }
+    .close:hover{ color:#000; }
+    .print-button{ float:right; margin-right:10px; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; transition:all .3s ease; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:16px; }
+    .print-button:hover{ background:#2980b9; transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.1); }
+    #modalContent span.label{ color:#007bff; font-weight:bold; }
+    #modalContent span.value{ color:#000; }
+    #graphWarning{ color:#d32f2f; font-size:14px; margin-top:10px; text-align:center; }
+    .pagination{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:20px; }
+    .pagination button,.pagination select{ padding:8px 12px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; margin:0 5px; transition:all .3s ease; }
+    .pagination button:hover,.pagination select:hover{ background:#2980b9; }
+    .pagination .page-number{ width:36px; height:36px; background:#3498db; color:#fff; border-radius:50%; display:inline-flex; justify-content:center; align-items:center; margin:0 5px; cursor:pointer; font-size:16px; border:none; transition:all .3s ease; }
+    .pagination .page-number:hover{ background:#2980b9; transform:scale(1.1); }
+    .pagination .page-number.active{ background:#e67e22; color:#fff; }
+    .items-per-page{ margin-left:10px; font-size:16px; }
+    tr{ opacity:0; transform:translateY(10px); animation:fadeInUp .5s ease forwards; }
+    tr:nth-child(even){ animation-delay:.1s; }
+    tr:nth-child(odd){ animation-delay:.2s; }
+    @keyframes fadeInUp{ to{ opacity:1; transform:translateY(0); } }
+    @keyframes zoomIn{ from{ opacity:0; transform:scale(.8); } to{ opacity:1; transform:scale(1); } }
+    th:nth-child(3),td:nth-child(3){ width:auto; min-width:100px; max-width:150px; white-space:normal; }
+    th:nth-child(7),td:nth-child(7){ min-width:150px; }
+    @media (max-width: 768px){
+      th:nth-child(3),td:nth-child(3){ min-width:80px; font-size:14px; }
+      #searchInput{ width:100%; max-width:300px; }
+      .search-row{ flex-direction:column; align-items:flex-start; }
+      .action-button{ width:100%; max-width:150px; justify-content:center; }
+    }
+    .yellow-light{ background:#c9ffc4; }
+    .pink-pastel{ background:#fce4ec; }
+    .text-left{ text-align:left; }
+    .text-center{ text-align:center; }
+    .call-count-box{ margin-left:20px; padding:10px 16px; background:#e6f2ff; color:#007bff; border-radius:10px; font-size:16px; font-weight:bold; display:inline-flex; align-items:center; box-shadow:0 2px 4px rgba(0,0,0,.05); transition:background .3s ease; }
+    .call-count-box span{ color:#d63384; margin:0 4px; font-size:18px; }
+    .modern-label{ display:inline-block; padding:10px 16px; background:#fff; color:#007bff; border-radius:10px; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,.1); border:1px solid #d0eaff; transition:all .3s ease; margin-right:8px; }
+    .modern-label:hover{ background:#e6f2ff; color:#0056b3; }
+    .detail-table{ width:100%; border-collapse:collapse; margin-top:10px; }
+    .detail-table th,.detail-table td{ padding:8px; border:1px solid #ccc; text-align:center; }
+    .detail-table th{ background:#007bff; color:#fff; }
+    .detail-table tr:nth-child(even){ background:#f9f9f9; }
+    .detail-table th:not(:first-child),.detail-table td:not(:first-child){ width:80px; min-width:80px; max-width:80px; }
+    .detail-table th:first-child,.detail-table td:first-child{ width:auto; min-width:120px; }
+    @media print{
+      .report-title,.close,.print-button,#printTableButton,#searchButton,#graphButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{ display:none; }
+      .modal-content{ margin:0; padding:0; width:100%; max-width:none; border-radius:0; box-shadow:none; }
+      .sticker{ width:80mm; height:100mm; border:1px solid #000; padding:2mm; box-sizing:border-box; font-size:13pt; line-height:1.3; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; page-break-after:always; }
+      .sticker div{ margin-bottom:1.5mm; overflow-wrap:break-word; }
+      .sticker div.description{ flex:1; }
+      .sticker .label{ font-weight:bold; color:#000; font-size:14pt; }
+      .sticker .value{ color:#000; }
+      h2{ font-size:14pt; color:#000; margin:1.5mm 0; }
+      @page{ size:80mm 100mm; margin:0; }
+      body{ margin:0; padding:0; }
+      .detail-table th,.detail-table td{ text-align:center; }
+      .detail-table th:not(:first-child),.detail-table td:not(:first-child){ width:80px; min-width:80px; max-width:80px; }
+      .detail-table th:first-child,.detail-table td:first-child{ width:auto; min-width:120px; }
+    }
+    .green-text{ color:green; }
+    .red-text{ color:red; }
+    .timeline-table{ width:100%; border-collapse:collapse; margin-top:20px; }
+    .timeline-table th,.timeline-table td{ padding:8px; border:1px solid #ccc; text-align:left; white-space:pre-wrap; word-wrap:break-word; }
+    .timeline-table th{ background:#007bff; color:#fff; }
+    .timeline-table tr:nth-child(even){ background:#f9f9f9; }
+    .detail-table th:nth-child(1),.detail-table td:nth-child(1){ width:20%; min-width:50px; max-width:80px; white-space:normal; }
+    .detail-table th:nth-child(2),.detail-table td:nth-child(2){ width:40%; min-width:200px; max-width:350px; white-space:normal; text-align:left; }
+    .detail-table th:nth-child(3),.detail-table td:nth-child(3){ width:10%; min-width:80px; max-width:100px; text-align:center; }
+    .detail-table th:nth-child(n+4),.detail-table td:nth-child(n+4){ width:10%; min-width:80px; max-width:100px; text-align:center; }
+    th:nth-child(10),td:nth-child(10),
+    th:nth-child(11),td:nth-child(11),
+    th:nth-child(12),td:nth-child(12),
+    th:nth-child(13),td:nth-child(13){ min-width:50px; width:50px; max-width:60px; text-align:center; }
+    th:nth-child(12),td:nth-child(12){ font-weight:bold; color:#c00; }
+    th:nth-child(13),td:nth-child(13){ font-weight:bold; color:#000; }
+    .date-update{ text-align:center; background:#fff; padding:10px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); margin-bottom:10px; font-size:16px; color:#333; font-weight:500; }
+    .date-update span{ color:#007bff; font-weight:bold; }
   </style>
 </head>
 <body>
   <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
-  <div id="dateUpdate" class="date-update">
-    Data Update: <span id="updateValue">-</span>
-  </div>
+  <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
+
   <div id="searchContainer">
     <div class="filter-row">
       <label id="employeeFilterLabel" for="employeeFilter" class="modern-label">ศูนย์พื้นที่</label>
-      <select id="employeeFilter">
-        <option value="">ทั้งหมด</option>
-      </select>
-      <div id="ticketCountInfo" class="call-count-box">
-        จำนวน Call: <span id="ticketCountValue">0</span> Call
-      </div>
+      <select id="employeeFilter"><option value="">ทั้งหมด</option></select>
+      <div id="ticketCountInfo" class="call-count-box">จำนวน Call: <span id="ticketCountValue">0</span> Call</div>
     </div>
     <div class="filter-row">
       <label id="pendingFilterLabel" for="pendingFilter" class="modern-label">ค้างหน่วยงาน</label>
-      <select id="pendingFilter">
-        <option value="">ทั้งหมด</option>
-      </select>
-      <div id="callCountInfo" class="call-count-box">
-        จำนวนรายการ <span id="callCountValue">0</span> รายการ
-      </div>
+      <select id="pendingFilter"><option value="">ทั้งหมด</option></select>
+      <div id="callCountInfo" class="call-count-box">จำนวนรายการ <span id="callCountValue">0</span> รายการ</div>
     </div>
     <div class="filter-row">
       <label id="stockFilterLabel" for="stockFilter" class="modern-label">คลังตอบ</label>
-      <select id="stockFilter">
-        <option value="">ทั้งหมด</option>
-      </select>
+      <select id="stockFilter"><option value="">ทั้งหมด</option></select>
     </div>
     <div class="filter-row">
       <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">Status</label>
-      <select id="statusCallFilter">
-        <option value="">ทั้งหมด</option>
-      </select>
+      <select id="statusCallFilter"><option value="">ทั้งหมด</option></select>
     </div>
     <div class="search-row">
       <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ, StatusCall..." />
@@ -614,6 +145,7 @@
       <button id="spareSummaryButton" class="action-button"><i class="fas fa-list-alt"></i> สรุปอะไหล่</button>
     </div>
   </div>
+
   <div class="table-container">
     <table id="data-table">
       <thead>
@@ -640,6 +172,8 @@
       <tbody></tbody>
     </table>
   </div>
+
+  <!-- Modals -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">×</span>
@@ -651,6 +185,7 @@
       <div id="modalContent"></div>
     </div>
   </div>
+
   <div id="graphModal" class="modal">
     <div class="graph-modal-content">
       <span class="close" id="closeGraphModal">×</span>
@@ -659,6 +194,7 @@
       <div id="graphWarning"></div>
     </div>
   </div>
+
   <div id="summaryModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeSummaryModal">×</span>
@@ -670,6 +206,7 @@
       <div id="summaryContent"></div>
     </div>
   </div>
+
   <div id="spareSummaryModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeSpareSummaryModal">×</span>
@@ -681,6 +218,7 @@
       <div id="spareSummaryContent"></div>
     </div>
   </div>
+
   <div class="pagination">
     <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
     <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
@@ -696,12 +234,15 @@
       </select>
     </div>
   </div>
+
   <script>
     const sheetID = '1dzE4Xjc7H0OtNUmne62u0jFQT-CiGsG2eBo-1v6mrZk';
     const sheetName = 'Coll_Stock';
     const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+
     const updateSheetName = 'Update';
     const updateUrl = `https://opensheet.elk.sh/${sheetID}/${updateSheetName}`;
+
     const modal = document.getElementById("detailModal");
     const graphModal = document.getElementById("graphModal");
     const summaryModal = document.getElementById("summaryModal");
@@ -711,6 +252,7 @@
     const closeGraphModal = document.getElementById("closeGraphModal");
     const closeSummaryModal = document.getElementById("closeSummaryModal");
     const closeSpareSummaryModal = document.getElementById("closeSpareSummaryModal");
+
     const employeeFilter = document.getElementById("employeeFilter");
     const pendingFilter = document.getElementById("pendingFilter");
     const stockFilter = document.getElementById("stockFilter");
@@ -722,6 +264,7 @@
     const excelButton = document.getElementById("excelButton");
     const summaryButton = document.getElementById("summaryButton");
     const spareSummaryButton = document.getElementById("spareSummaryButton");
+
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
     const firstPageButton = document.getElementById("firstPage");
@@ -733,20 +276,26 @@
     const summaryContent = document.getElementById("summaryContent");
     const spareSummaryContent = document.getElementById("spareSummaryContent");
     const updateValueSpan = document.getElementById("updateValue");
+
     let allData = [];
     let currentPage = 1;
     let itemsPerPage = 20;
     let sortConfig = { column: 'DayRepair', direction: 'desc' };
     let teamChart = null;
+
     let currentTicketNumber = null;
+    let currentRowData = null; // <— สำคัญ: เก็บแถวที่เปิดรายละเอียดอยู่
+
+    /** Helper: อ่าน Description รองรับสะกดหลายแบบ */
+    function getDesc(row) {
+      return (row["Description"] ?? row["Discription"] ?? row["Discrtiption"] ?? "-");
+    }
 
     function parseDate(dateStr) {
       if (!dateStr || typeof dateStr !== 'string') return null;
-      // แก้ไข regex เพื่อรองรับ 1-2 หลักสำหรับชั่วโมง, นาที, วินาที (เช่น 9:34:30)
       const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})/);
       if (!parts) return null;
       const [, day, month, year, hour, minute, second] = parts;
-      // ใช้ parseInt เพื่อความปลอดภัยในการแปลง
       return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second));
     }
 
@@ -754,26 +303,16 @@
       fetch(updateUrl)
         .then(response => response.json())
         .then(updateData => {
-          if (!updateData || updateData.length === 0) {
-            updateValueSpan.textContent = '-';
-            return;
-          }
-          let maxDate = null;
-          let maxDateStr = '';
+          if (!updateData || updateData.length === 0) { updateValueSpan.textContent = '-'; return; }
+          let maxDate = null, maxDateStr = '';
           updateData.forEach(row => {
             const dateStr = row['Date'];
             const parsedDate = parseDate(dateStr);
-            if (parsedDate && (!maxDate || parsedDate > maxDate)) {
-              maxDate = parsedDate;
-              maxDateStr = dateStr;
-            }
+            if (parsedDate && (!maxDate || parsedDate > maxDate)) { maxDate = parsedDate; maxDateStr = dateStr; }
           });
           updateValueSpan.textContent = maxDateStr || '-';
         })
-        .catch(error => {
-          console.error('Error fetching update date:', error);
-          updateValueSpan.textContent = '-';
-        });
+        .catch(() => { updateValueSpan.textContent = '-'; });
     }
 
     function escapeCSVValue(value) {
@@ -786,18 +325,13 @@
     }
 
     function exportToCSV() {
-      console.log("Starting exportToCSV, allData length:", allData.length);
-      if (!allData || allData.length === 0) {
-        console.error("No data in allData for CSV export");
-        alert("ไม่มีข้อมูลในระบบสำหรับการส่งออก CSV");
-        return;
-      }
+      if (!allData || allData.length === 0) { alert("ไม่มีข้อมูลในระบบสำหรับการส่งออก CSV"); return; }
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-      console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, selectedStatusCall, keyword });
+
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -814,7 +348,7 @@
             (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
-            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (getDesc(row) || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["Request"] || "").toLowerCase().includes(keyword) ||
@@ -825,49 +359,34 @@
           )
         );
       });
-      console.log("Filtered data length:", filteredData.length);
-      if (filteredData.length > 0) {
-        console.log("Sample filtered ", filteredData.slice(0, 2));
-      }
-      if (filteredData.length === 0) {
-        console.warn("No data to export to CSV after filtering");
-        alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง");
-        return;
-      }
+
+      if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง"); return; }
+
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
         let dayB = parseFloat(b["DayRepair"]) || 0;
         let ticketA = a["Ticket Number"] || "";
         let ticketB = b["Ticket Number"] || "";
-        if (dayA !== dayB) {
-          return dayB - dayA;
-        }
+        if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
-      const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description"];
-      const displayColumns = {
-        "DayRepair": "ผ่านมา",
-        "DateTime": "DateTime",
-        "Ticket Number": "Ticket Number",
-        "Brand": "Brand",
-        "Team": "Team",
-        "TeamPlant": "ศูนย์พื้นที่",
-        "ค้างหน่วยงาน": "ค้างหน่วยงาน",
-        "Material": "Material",
-        "Description": "Description"
-      };
+
+      const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description"];
+      const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"DateTime","Ticket Number":"Ticket Number","Brand":"Brand","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description" };
       const csvRows = [];
       csvRows.push(columns.map(col => `"${displayColumns[col]}"`).join(','));
+
       filteredData.forEach(row => {
         const rowData = columns.map(col => {
-          let value = row[col] || "-";
-          if (col === "DayRepair") {
-            value = isNaN(parseFloat(value)) ? "-" : parseFloat(value).toFixed(0);
-          }
+          let value;
+          if (col === "Description") value = getDesc(row);
+          else value = row[col] || "-";
+          if (col === "DayRepair") value = isNaN(parseFloat(value)) ? "-" : parseFloat(value).toFixed(0);
           return escapeCSVValue(value);
         });
         csvRows.push(rowData.join(','));
       });
+
       const csvContent = csvRows.join('\n');
       const bom = '\uFEFF';
       const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -876,20 +395,15 @@
       link.download = `report_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
       link.click();
       URL.revokeObjectURL(link.href);
-      console.log("CSV file generated and downloaded");
     }
 
+    /** พิมพ์จากโมดัล: ใช้ currentRowData ให้ตรงกับรายละเอียดที่เห็น */
     function printModalContent() {
-      if (!currentTicketNumber) {
-        alert("ไม่พบ Ticket Number สำหรับการพิมพ์");
-        return;
-      }
-      const modalData = allData.find(row => row["Ticket Number"] === currentTicketNumber);
-      if (!modalData) {
-        alert("ไม่พบข้อมูลสำหรับ Ticket Number: " + currentTicketNumber);
-        return;
-      }
-      let stickerContent = `
+      if (!currentRowData) { alert("ไม่พบข้อมูลสำหรับการพิมพ์"); return; }
+      const modalData = currentRowData;
+      const desc = getDesc(modalData);
+
+      const stickerContent = `
         <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
         <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
         <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
@@ -897,65 +411,26 @@
         <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
         <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
-        <div class="description"><span class="label">Description:</span> <span class="value">${modalData["Description"] || "-"}</span></div>
+        <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
       `;
+
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
           <head>
             <title>พิมพ์รายละเอียด</title>
             <style>
-              body {
-                font-family: 'Prompt', sans-serif;
-                margin: 0;
-                padding: 0;
-              }
-              .sticker {
-                width: 80mm;
-                height: 100mm;
-                border: 1px solid #000;
-                padding: 2mm;
-                box-sizing: border-box;
-                font-size: 13pt;
-                line-height: 1.3;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                page-break-after: always;
-              }
-              .sticker div {
-                margin-bottom: 1.5mm;
-                overflow-wrap: break-word;
-              }
-              .sticker div.description {
-                flex: 1;
-              }
-              .sticker .label {
-                font-weight: bold;
-                color: #000;
-                font-size: 14pt;
-              }
-              .sticker .value {
-                color: #000;
-              }
-              .sticker .value.team-brand {
-                font-size: 20pt;
-                font-weight: bold;
-              }
-              h2 {
-                font-size: 14pt;
-                color: #000;
-                margin: 1.5mm 0;
-              }
+              body { font-family: 'Prompt', sans-serif; margin: 0; padding: 0; }
+              .sticker { width: 80mm; height: 100mm; border: 1px solid #000; padding: 2mm; box-sizing: border-box; font-size: 13pt; line-height: 1.3; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+              .sticker div { margin-bottom: 1.5mm; overflow-wrap: break-word; }
+              .sticker div.description { flex: 1; }
+              .sticker .label { font-weight: bold; color: #000; font-size: 14pt; }
+              .sticker .value { color: #000; }
+              .sticker .value.team-brand { font-size: 20pt; font-weight: bold; }
+              h2 { font-size: 14pt; color: #000; margin: 1.5mm 0; }
               @media print {
-                body {
-                  margin: 0;
-                }
-                @page {
-                  size: 80mm 100mm;
-                  margin: 0;
-                }
+                body { margin: 0; }
+                @page { size: 80mm 100mm; margin: 0; }
               }
             </style>
           </head>
@@ -970,12 +445,14 @@
       printWindow.document.close();
     }
 
+    /** พิมพ์สติ๊กเกอร์จากหน้าหลัก (ตามหน้าปัจจุบัน) */
     function printTable() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
+
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -992,7 +469,7 @@
             (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
-            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (getDesc(row) || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["Request"] || "").toLowerCase().includes(keyword) ||
@@ -1003,10 +480,9 @@
           )
         );
       });
-      if (filteredData.length === 0) {
-        alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา");
-        return;
-      }
+
+      if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา"); return; }
+
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
         let dayB = parseFloat(b["DayRepair"]) || 0;
@@ -1015,10 +491,13 @@
         if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
+
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
       const paginatedData = filteredData.slice(startIdx, endIdx);
+
       const stickersHtml = paginatedData.map(row => {
+        const desc = getDesc(row);
         return `
           <div class="sticker">
             <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
@@ -1028,62 +507,27 @@
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
-            <div class="description"><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
+            <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
           </div>
         `;
       }).join('');
+
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
           <head>
             <title>พิมพ์สติ๊กเกอร์</title>
             <style>
-              body {
-                font-family: 'Prompt', sans-serif;
-                margin: 0;
-                padding: 0;
-              }
-              .sticker {
-                width: 80mm;
-                height: 100mm;
-                border: 1px solid #000;
-                padding: 2mm;
-                box-sizing: border-box;
-                font-size: 13pt;
-                line-height: 1.3;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                page-break-after: always;
-              }
-              .sticker div {
-                margin-bottom: 1.5mm;
-                overflow-wrap: break-word;
-              }
-              .sticker div.description {
-                flex: 1;
-              }
-              .sticker .label {
-                font-weight: bold;
-                color: #000;
-                font-size: 14pt;
-              }
-              .sticker .value {
-                color: #000;
-              }
-              .sticker .value.team-brand {
-                font-size: 16pt;
-                font-weight: bold;
-              }
+              body { font-family: 'Prompt', sans-serif; margin: 0; padding: 0; }
+              .sticker { width: 80mm; height: 100mm; border: 1px solid #000; padding: 2mm; box-sizing: border-box; font-size: 13pt; line-height: 1.3; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+              .sticker div { margin-bottom: 1.5mm; overflow-wrap: break-word; }
+              .sticker div.description { flex: 1; }
+              .sticker .label { font-weight: bold; color: #000; font-size: 14pt; }
+              .sticker .value { color: #000; }
+              .sticker .value.team-brand { font-size: 16pt; font-weight: bold; }
               @media print {
-                body {
-                  margin: 0;
-                }
-                @page {
-                  size: 80mm 100mm;
-                  margin: 0;
-                }
+                body { margin: 0; }
+                @page { size: 80mm 100mm; margin: 0; }
               }
             </style>
           </head>
@@ -1101,6 +545,7 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
+
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1117,7 +562,7 @@
             (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
-            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (getDesc(row) || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["Request"] || "").toLowerCase().includes(keyword) ||
@@ -1128,42 +573,34 @@
           )
         );
       });
+
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
         const team = row["Team"] || "ไม่ระบุทีม";
-        if (ticket && !ticketCounts[ticket]) {
-          ticketCounts[ticket] = team;
-        }
+        if (ticket && !ticketCounts[ticket]) ticketCounts[ticket] = team;
       });
+
       const teamCounts = {};
-      Object.values(ticketCounts).forEach(team => {
-        teamCounts[team] = (teamCounts[team] || 0) + 1;
-      });
+      Object.values(ticketCounts).forEach(team => { teamCounts[team] = (teamCounts[team] || 0) + 1; });
+
       const sortedTeams = Object.keys(teamCounts).sort((a, b) => teamCounts[b] - teamCounts[a]);
       let limitedTeams = sortedTeams;
       let warningMessage = "";
-      if (sortedTeams.length > 50) {
-        limitedTeams = sortedTeams.slice(0, 50);
-        warningMessage = `แสดงเฉพาะ 50 ทีมแรกจากทั้งหมด ${sortedTeams.length} ทีมเนื่องจากข้อจำกัดด้านการแสดงผล`;
-      }
+      if (sortedTeams.length > 50) { limitedTeams = sortedTeams.slice(0, 50); warningMessage = `แสดงเฉพาะ 50 ทีมแรกจากทั้งหมด ${sortedTeams.length} ทีมเนื่องจากข้อจำกัดด้านการแสดงผล`; }
       const sortedCounts = limitedTeams.map(team => teamCounts[team]);
+
       const backgroundColors = limitedTeams.map((_, index) => index % 2 === 0 ? '#c9ffc4' : '#fce4ec');
       const borderColors = limitedTeams.map((_, index) => index % 2 === 0 ? '#4caf50' : '#f06292');
       graphWarning.textContent = warningMessage;
-      if (limitedTeams.length === 0 || sortedCounts.length === 0) {
-        console.warn("No data to display in chart");
-        graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ";
-        graphModal.style.display = "block";
-        return;
-      }
-      if (teamChart) {
-        teamChart.destroy();
-      }
+
+      if (limitedTeams.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
+      if (teamChart) teamChart.destroy();
+
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
         type: 'line',
-        data: {  // แก้ไขตรงนี้: เพิ่ม data:
+        data: {
           labels: limitedTeams,
           datasets: [{
             label: 'จำนวน Call ค้าง',
@@ -1180,27 +617,10 @@
         options: {
           responsive: true,
           scales: {
-            x: {
-              ticks: {
-                maxRotation: 45,
-                minRotation: 45
-              },
-              grid: {
-                display: false
-              }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 1
-              }
-            }
+            x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
           },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
+          plugins: { legend: { display: false } }
         }
       });
       graphModal.style.display = "block";
@@ -1212,6 +632,7 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
+
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1228,7 +649,7 @@
             (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
-            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (getDesc(row) || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["Request"] || "").toLowerCase().includes(keyword) ||
@@ -1239,22 +660,22 @@
           )
         );
       });
+
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
       const totalCalls = uniqueTickets;
+
       const pivotData = {};
       const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
+
       teamPlants.forEach(teamPlant => {
         pivotData[teamPlant] = {};
-        statusCalls.forEach(status => {
-          pivotData[teamPlant][status] = 0;
-        });
-        pendingUnits.forEach(pending => {
-          pivotData[teamPlant][pending] = 0;
-        });
+        statusCalls.forEach(status => { pivotData[teamPlant][status] = 0; });
+        pendingUnits.forEach(pending => { pivotData[teamPlant][pending] = 0; });
       });
+
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1267,15 +688,15 @@
           ticketCounts[ticket] = true;
         }
       });
+
       const teamPlantTotals = teamPlants.map(teamPlant => {
         const total = Object.keys(pivotData[teamPlant]).reduce((sum, key) => {
-          if (statusCalls.includes(key)) {
-            return sum + pivotData[teamPlant][key];
-          }
+          if (statusCalls.includes(key)) return sum + pivotData[teamPlant][key];
           return sum;
         }, 0);
         return { teamPlant, total, ...pivotData[teamPlant] };
       }).sort((a, b) => b.total - a.total);
+
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -1291,12 +712,8 @@
               <tr>
                 <td>${teamPlant}</td>
                 <td class='fixed-width'>${total === 0 ? '-' : total}</td>
-                ${statusCalls.map(status => `
-                  <td class='fixed-width'>${pivotData[teamPlant][status] === 0 ? '-' : pivotData[teamPlant][status]}</td>
-                `).join('')}
-                ${orderedPendingUnits.map(pending => `
-                  <td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>
-                `).join('')}
+                ${statusCalls.map(status => `<td class='fixed-width'>${pivotData[teamPlant][status] === 0 ? '-' : pivotData[teamPlant][status]}</td>`).join('')}
+                ${orderedPendingUnits.map(pending => `<td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>`).join('')}
               </tr>
             `).join('')}
             <tr>
@@ -1314,6 +731,7 @@
           </tbody>
         </table>
       `;
+
       let summaryHtml = `
         <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
         <h3>จำนวน Call ค้างตามศูนย์พื้นที่และสถานะ Call</h3>
@@ -1330,32 +748,27 @@
         spareSummaryModal.style.display = "block";
         return;
       }
+
       const pivotData = {};
-      const materials = [...new Set(filteredData.map(row => row["Material"] + '|' + row["Description"]))];
+      const materials = [...new Set(filteredData.map(row => (row["Material"] + '|' + getDesc(row))))];
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
         .map(unit => unit.replace(/Stock\s*/gi, '').trim())
         .filter(unit => unit)
         .sort();
+
       materials.forEach(matDesc => {
-        const [material, description] = matDesc.split('|');
         pivotData[matDesc] = { total: 0 };
-        pendingUnits.forEach(pending => {
-          pivotData[matDesc][pending] = 0;
-        });
+        pendingUnits.forEach(pending => { pivotData[matDesc][pending] = 0; });
       });
+
       filteredData.forEach(row => {
-        const matDesc = row["Material"] + '|' + row["Description"];
+        const matDesc = row["Material"] + '|' + getDesc(row);
         const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
-        if (pivotData[matDesc] && pending) {
-          pivotData[matDesc].total++;
-          pivotData[matDesc][pending]++;
-        }
+        if (pivotData[matDesc] && pending) { pivotData[matDesc].total++; pivotData[matDesc][pending]++; }
       });
-      const sortedMaterials = materials.sort((a, b) => {
-        const totalA = pivotData[a].total;
-        const totalB = pivotData[b].total;
-        return totalB - totalA;
-      });
+
+      const sortedMaterials = materials.sort((a, b) => pivotData[b].total - pivotData[a].total);
+
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -1393,56 +806,17 @@
           <head>
             <title>พิมพ์สรุปข้อมูล</title>
             <style>
-              body {
-                font-family: 'Prompt', sans-serif;
-                margin: 10mm;
-                padding: 0;
-              }
-              h2, h3 {
-                color: #000;
-                margin: 10px 0;
-              }
-              .detail-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-              }
-              .detail-table th, .detail-table td {
-                padding: 8px;
-                border: 1px solid #ccc;
-                text-align: center;
-              }
-              .detail-table th {
-                background-color: #007bff;
-                color: white;
-              }
-              .detail-table tr:nth-child(even) {
-                background-color: #f9f9f9;
-              }
-              .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
-                width: 80px;
-                min-width: 80px;
-                max-width: 80px;
-              }
-              .detail-table th:first-child, .detail-table td:first-child {
-                width: auto;
-                min-width: 120px;
-              }
-              .label {
-                font-weight: bold;
-                color: #007bff;
-              }
-              .value {
-                color: #000;
-              }
-              @media print {
-                body {
-                  margin: 0;
-                }
-                @page {
-                  margin: 10mm;
-                }
-              }
+              body { font-family: 'Prompt', sans-serif; margin: 10mm; padding: 0; }
+              h2, h3 { color: #000; margin: 10px 0; }
+              .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+              .detail-table th, .detail-table td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+              .detail-table th { background-color: #007bff; color: white; }
+              .detail-table tr:nth-child(even) { background-color: #f9f9f9; }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) { width: 80px; min-width: 80px; max-width: 80px; }
+              .detail-table th:first-child, .detail-table td:first-child { width: auto; min-width: 120px; }
+              .label { font-weight: bold; color: #007bff; }
+              .value { color: #000; }
+              @media print { body { margin: 0; } @page { margin: 10mm; } }
             </style>
           </head>
           <body onload="window.print()">
@@ -1461,49 +835,15 @@
           <head>
             <title>พิมพ์สรุปอะไหล่</title>
             <style>
-              body {
-                font-family: 'Prompt', sans-serif;
-                margin: 10mm;
-                padding: 0;
-              }
-              h2, h3 {
-                color: #000;
-                margin: 10px 0;
-              }
-              .detail-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-              }
-              .detail-table th, .detail-table td {
-                padding: 8px;
-                border: 1px solid #ccc;
-                text-align: center;
-              }
-              .detail-table th {
-                background-color: #007bff;
-                color: white;
-              }
-              .detail-table tr:nth-child(even) {
-                background-color: #f9f9f9;
-              }
-              .detail-table th:not(:first-child), .detail-table td:not(:first-child) {
-                width: 80px;
-                min-width: 80px;
-                max-width: 80px;
-              }
-              .detail-table th:first-child, .detail-table td:first-child {
-                width: auto;
-                min-width: 120px;
-              }
-              @media print {
-                body {
-                  margin: 0;
-                }
-                @page {
-                  margin: 10mm;
-                }
-              }
+              body { font-family: 'Prompt', sans-serif; margin: 10mm; padding: 0; }
+              h2, h3 { color: #000; margin: 10px 0; }
+              .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+              .detail-table th, .detail-table td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+              .detail-table th { background-color: #007bff; color: white; }
+              .detail-table tr:nth-child(even) { background-color: #f9f9f9; }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) { width: 80px; min-width: 80px; max-width: 80px; }
+              .detail-table th:first-child, .detail-table td:first-child { width: auto; min-width: 120px; }
+              @media print { body { margin: 0; } @page { margin: 10mm; } }
             </style>
           </head>
           <body onload="window.print()">
@@ -1515,54 +855,31 @@
       printWindow.document.close();
     }
 
-    closeModal.onclick = () => {
-      modal.style.display = "none";
-      currentTicketNumber = null;
-    };
+    // Close modal handlers
+    closeModal.onclick = () => { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; };
     closeGraphModal.onclick = () => graphModal.style.display = "none";
     closeSummaryModal.onclick = () => summaryModal.style.display = "none";
     closeSpareSummaryModal.onclick = () => spareSummaryModal.style.display = "none";
     window.onclick = event => {
-      if (event.target == modal) {
-        modal.style.display = "none";
-        currentTicketNumber = null;
-      }
-      if (event.target == graphModal) {
-        graphModal.style.display = "none";
-      }
-      if (event.target == summaryModal) {
-        summaryModal.style.display = "none";
-      }
-      if (event.target == spareSummaryModal) {
-        spareSummaryModal.style.display = "none";
-      }
+      if (event.target == modal) { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; }
+      if (event.target == graphModal) graphModal.style.display = "none";
+      if (event.target == summaryModal) summaryModal.style.display = "none";
+      if (event.target == spareSummaryModal) spareSummaryModal.style.display = "none";
     };
 
+    // Buttons
     graphButton.addEventListener("click", showGraph);
     excelButton.addEventListener("click", exportToCSV);
     summaryButton.addEventListener("click", showSummary);
     spareSummaryButton.addEventListener("click", showSpareSummary);
-    itemsPerPageSelect.addEventListener("change", (e) => {
-      itemsPerPage = parseInt(e.target.value);
-      currentPage = 1;
-      filterAndRenderTable();
-    });
-    searchInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        filterAndRenderTable();
-      }
-    });
-    searchButton.addEventListener("click", () => {
-      filterAndRenderTable();
-    });
+    itemsPerPageSelect.addEventListener("change", (e) => { itemsPerPage = parseInt(e.target.value); currentPage = 1; filterAndRenderTable(); });
+    searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") filterAndRenderTable(); });
+    searchButton.addEventListener("click", () => { filterAndRenderTable(); });
     printTableButton.addEventListener("click", printTable);
 
     function populateTeamPlantFilter(data) {
-      if (!data || data.length === 0) {
-        console.warn("No data to populate TeamPlant filter");
-        return;
-      }
-      const teamPlants = [...new Set(data.map(row => row["TeamPlant"]).filter(teamPlant => teamPlant))].sort();
+      if (!data || data.length === 0) return;
+      const teamPlants = [...new Set(data.map(row => row["TeamPlant"]).filter(Boolean))].sort();
       employeeFilter.innerHTML = '<option value="">ทั้งหมด</option>';
       teamPlants.forEach(teamPlant => {
         const option = document.createElement("option");
@@ -1573,13 +890,10 @@
     }
 
     function updatePendingFilter(data, selectedTeamPlant) {
-      if (!data || data.length === 0) {
-        console.warn("No data to populate Pending filter");
-        return;
-      }
+      if (!data || data.length === 0) return;
       const currentPendingValue = pendingFilter.value;
       const filteredData = selectedTeamPlant ? data.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant) : data;
-      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"]).filter(pending => pending))].sort();
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"]).filter(Boolean))].sort();
       pendingFilter.innerHTML = '<option value="">ทั้งหมด</option>';
       pendingUnits.forEach(pending => {
         const option = document.createElement("option");
@@ -1587,29 +901,19 @@
         option.textContent = pending;
         pendingFilter.appendChild(option);
       });
-      if (currentPendingValue && pendingUnits.includes(currentPendingValue)) {
-        pendingFilter.value = currentPendingValue;
-      } else {
-        pendingFilter.value = "";
-      }
+      if (currentPendingValue && pendingUnits.includes(currentPendingValue)) pendingFilter.value = currentPendingValue;
+      else pendingFilter.value = "";
       updateStockFilter(data, selectedTeamPlant, pendingFilter.value);
       updateStatusCallFilter(data, selectedTeamPlant, pendingFilter.value);
     }
 
     function updateStockFilter(data, selectedTeamPlant, selectedPending) {
-      if (!data || data.length === 0) {
-        console.warn("No data to populate Stock filter");
-        return;
-      }
+      if (!data || data.length === 0) return;
       const currentStockValue = stockFilter.value;
       let filteredData = data;
-      if (selectedTeamPlant) {
-        filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
-      }
-      if (selectedPending) {
-        filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
-      }
-      const stockResponses = [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(stock => stock))].sort();
+      if (selectedTeamPlant) filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      if (selectedPending) filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
+      const stockResponses = [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(Boolean))].sort();
       stockFilter.innerHTML = '<option value="">ทั้งหมด</option>';
       stockResponses.forEach(stock => {
         const option = document.createElement("option");
@@ -1617,27 +921,17 @@
         option.textContent = stock;
         stockFilter.appendChild(option);
       });
-      if (currentStockValue && stockResponses.includes(currentStockValue)) {
-        stockFilter.value = currentStockValue;
-      } else {
-        stockFilter.value = "";
-      }
+      if (currentStockValue && stockResponses.includes(currentStockValue)) stockFilter.value = currentStockValue;
+      else stockFilter.value = "";
     }
 
     function updateStatusCallFilter(data, selectedTeamPlant, selectedPending) {
-      if (!data || data.length === 0) {
-        console.warn("No data to populate StatusCall filter");
-        return;
-      }
+      if (!data || data.length === 0) return;
       const currentStatusCallValue = statusCallFilter.value;
       let filteredData = data;
-      if (selectedTeamPlant) {
-        filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
-      }
-      if (selectedPending) {
-        filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
-      }
-      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"]).filter(status => status))].sort();
+      if (selectedTeamPlant) filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      if (selectedPending) filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
+      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"]).filter(Boolean))].sort();
       statusCallFilter.innerHTML = '<option value="">ทั้งหมด</option>';
       statusCalls.forEach(status => {
         const option = document.createElement("option");
@@ -1645,11 +939,8 @@
         option.textContent = status;
         statusCallFilter.appendChild(option);
       });
-      if (currentStatusCallValue && statusCalls.includes(currentStatusCallValue)) {
-        statusCallFilter.value = currentStatusCallValue;
-      } else {
-        statusCallFilter.value = "";
-      }
+      if (currentStatusCallValue && statusCalls.includes(currentStatusCallValue)) statusCallFilter.value = currentStatusCallValue;
+      else statusCallFilter.value = "";
     }
 
     function addSortListeners() {
@@ -1657,12 +948,8 @@
       sortableHeaders.forEach(header => {
         header.addEventListener("click", () => {
           const column = header.getAttribute("data-column");
-          if (sortConfig.column === column) {
-            sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-          } else {
-            sortConfig.column = column;
-            sortConfig.direction = 'asc';
-          }
+          if (sortConfig.column === column) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+          else { sortConfig.column = column; sortConfig.direction = 'asc'; }
           updateSortArrows();
           filterAndRenderTable();
         });
@@ -1674,11 +961,7 @@
       sortableHeaders.forEach(header => {
         const arrow = header.querySelector(".arrow");
         const column = header.getAttribute("data-column");
-        if (column === sortConfig.column) {
-          arrow.textContent = sortConfig.direction === 'asc' ? '↑' : '↓';
-        } else {
-          arrow.textContent = '';
-        }
+        arrow.textContent = (column === sortConfig.column) ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '';
       });
     }
 
@@ -1688,7 +971,7 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-      console.log("Filters applied:", { selectedTeamPlant, selectedPending, selectedStock, selectedStatusCall, keyword });
+
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1705,7 +988,7 @@
             (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
-            (row["Description"] || "").toLowerCase().includes(keyword) ||
+            (getDesc(row) || "").toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
             (row["Request"] || "").toLowerCase().includes(keyword) ||
@@ -1716,28 +999,25 @@
           )
         );
       });
+
       updatePendingFilter(allData, selectedTeamPlant);
       updateStockFilter(allData, selectedTeamPlant, selectedPending);
       updateStatusCallFilter(allData, selectedTeamPlant, selectedPending);
-      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
-      const ticketCountValue = document.getElementById("ticketCountValue");
-      ticketCountValue.textContent = uniqueTickets;
+
+      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
+      document.getElementById("ticketCountValue").textContent = uniqueTickets;
+
       if (sortConfig.column) {
         filteredData.sort((a, b) => {
-          let valueA = a[sortConfig.column] || "";
-          let valueB = b[sortConfig.column] || "";
+          let valueA = a[sortConfig.column] ?? (sortConfig.column === "Description" ? getDesc(a) : "");
+          let valueB = b[sortConfig.column] ?? (sortConfig.column === "Description" ? getDesc(b) : "");
           if (sortConfig.column === 'DayRepair') {
-            let dayA = parseFloat(valueA) || 0;
-            let dayB = parseFloat(valueB) || 0;
-            let ticketA = a["Ticket Number"] || "";
-            let ticketB = b["Ticket Number"] || "";
-            if (dayA !== dayB) {
-              return sortConfig.direction === 'asc' ? dayA - dayB : dayB - dayA;
-            }
+            let dayA = parseFloat(valueA) || 0, dayB = parseFloat(valueB) || 0;
+            let ticketA = a["Ticket Number"] || "", ticketB = b["Ticket Number"] || "";
+            if (dayA !== dayB) return sortConfig.direction === 'asc' ? dayA - dayB : dayB - dayA;
             return ticketA.localeCompare(ticketB);
           } else {
-            valueA = valueA.toString().toLowerCase();
-            valueB = valueB.toString().toLowerCase();
+            valueA = valueA.toString().toLowerCase(); valueB = valueB.toString().toLowerCase();
             return sortConfig.direction === 'asc'
               ? (valueA > valueB ? 1 : valueA < valueB ? -1 : 0)
               : (valueA < valueB ? 1 : valueA > valueB ? -1 : 0);
@@ -1749,111 +1029,82 @@
           let dayB = parseFloat(b["DayRepair"]) || 0;
           let ticketA = a["Ticket Number"] || "";
           let ticketB = b["Ticket Number"] || "";
-          if (dayA !== dayB) {
-            return dayB - dayA;
-          }
+          if (dayA !== dayB) return dayB - dayA;
           return ticketA.localeCompare(ticketB);
         });
       }
+
       renderTable(filteredData);
       updateCallCount(filteredData);
     }
 
-    employeeFilter.addEventListener("change", () => {
-      filterAndRenderTable();
-    });
-    pendingFilter.addEventListener("change", () => {
-      filterAndRenderTable();
-    });
+    employeeFilter.addEventListener("change", filterAndRenderTable);
+    pendingFilter.addEventListener("change", filterAndRenderTable);
     stockFilter.addEventListener("change", filterAndRenderTable);
     statusCallFilter.addEventListener("change", filterAndRenderTable);
 
     function updateCallCount(data) {
-      const count = [...new Set(data.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
-      const callCountValue = document.getElementById("callCountValue");
-      callCountValue.textContent = count;
+      const count = [...new Set(data.map(row => row["Ticket Number"]).filter(Boolean))].length;
+      document.getElementById("callCountValue").textContent = count;
     }
 
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="17">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
-        console.warn("No data to render in table");
         return;
       }
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
       const paginatedData = data.slice(startIdx, endIdx);
+
       const ticketGroups = {};
       data.forEach(row => {
         const ticket = row["Ticket Number"];
-        if (!ticketGroups[ticket]) {
-          ticketGroups[ticket] = [];
-        }
+        if (!ticketGroups[ticket]) ticketGroups[ticket] = [];
         ticketGroups[ticket].push(row);
       });
       const uniqueTickets = Object.keys(ticketGroups).sort();
       const colorMap = {};
-      uniqueTickets.forEach((ticket, index) => {
-        colorMap[ticket] = index % 2 === 0 ? "yellow-light" : "pink-pastel";
-      });
+      uniqueTickets.forEach((ticket, index) => { colorMap[ticket] = index % 2 === 0 ? "yellow-light" : "pink-pastel"; });
+
       paginatedData.forEach((row, i) => {
         const tr = document.createElement("tr");
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-        const columns = ["DayRepair", "DateTime", "Ticket Number", "Brand", "Team", "TeamPlant", "ค้างหน่วยงาน", "Material", "Description", "Nawa", "Vipa", "Request", "QtyPlant", "คลังตอบ", "StatusCall", "AnswerX"];
-       columns.forEach(col => {
-  const td = document.createElement("td");
-  let cellValue = row[col] || "-";
-  let displayValue = cellValue;
 
-  // จัดการกับ DayRepair
-  if (col === "DayRepair") {
-    displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
-  }
-  // จัดการกับ คลังตอบ (เดิม)
-  else if (col === "คลังตอบ") {
-    if (cellValue === "ดำเนินการแล้ว") {
-      displayValue = "ดำเนินการแล้ว";
-      td.style.color = "#28a745";
-      td.style.fontWeight = "bold";
-    } else if (cellValue === "รอตรวจสอบ") {
-      displayValue = "รอตรวจสอบ";
-      td.style.color = "#dc3545";
-      td.style.fontWeight = "bold";
-    }
-  }
-  // จัดการกับ StatusCall (เพิ่มใหม่)
-  else if (col === "StatusCall") {
-    displayValue = cellValue || "-";
-    if (cellValue === "รอของเข้า") {
-      td.style.color = "#dc3545"; // แดง
-      td.style.fontWeight = "bold";
-    } else if (cellValue === "สำเร็จ") {
-      td.style.color = "#28a745"; // เขียว
-      td.style.fontWeight = "bold";
-    } else if (cellValue === "เบิกนวนคร") {
-      td.style.color = "#007bff"; // น้ำเงิน
-      td.style.fontWeight = "bold";
-    } else if (cellValue === "เบิกวิภาวดี") {
-      td.style.color = "#d4ac0d"; // เหลืองทอง
-      td.style.fontWeight = "bold";
-    } else {
-      td.style.color = "#6c757d"; // เทา (สำหรับอื่นๆ)
-    }
-  }
+        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","AnswerX"];
+        columns.forEach(col => {
+          const td = document.createElement("td");
+          let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
+          let displayValue = cellValue;
 
-  td.textContent = displayValue;
-  td.classList.add("text-left");
-  tr.appendChild(td);
-});
+          if (col === "DayRepair") {
+            displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
+          } else if (col === "คลังตอบ") {
+            if (cellValue === "ดำเนินการแล้ว") { displayValue = "ดำเนินการแล้ว"; td.style.color = "#28a745"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "รอตรวจสอบ") { displayValue = "รอตรวจสอบ"; td.style.color = "#dc3545"; td.style.fontWeight = "bold"; }
+          } else if (col === "StatusCall") {
+            if (cellValue === "รอของเข้า") { td.style.color = "#dc3545"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "สำเร็จ") { td.style.color = "#28a745"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "เบิกนวนคร") { td.style.color = "#007bff"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "เบิกวิภาวดี") { td.style.color = "#d4ac0d"; td.style.fontWeight = "bold"; }
+            else { td.style.color = "#6c757d"; }
+          }
+
+          td.textContent = displayValue;
+          td.classList.add("text-left");
+          tr.appendChild(td);
+        });
+
         const detailTd = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "ดูรายละเอียด";
         btn.className = "detail-button";
         btn.onclick = () => {
           currentTicketNumber = row["Ticket Number"];
+          currentRowData = row; // <— เก็บข้อมูลแถวที่เปิดรายละเอียด
           const timeline = row["TimeLine"] || "";
           let timelineHtml = '<table class="timeline-table"><thead><tr><th>วันที่</th><th>ผู้แจ้ง</th><th>สถานะ</th><th>รายละเอียด</th></tr></thead><tbody>';
           if (timeline) {
@@ -1861,46 +1112,26 @@
             events.forEach(event => {
               let eventTrim = event.trim();
               if (eventTrim) {
-                let date = '';
-                let person = '';
-                let status = '';
-                let details = '';
+                let date = ''; let person = ''; let status = ''; let details = '';
                 const dateMatch = eventTrim.match(/^(\d{2}\.\d{2})\s/);
-                if (dateMatch) {
-                  date = dateMatch[1];
-                  eventTrim = eventTrim.slice(dateMatch[0].length);
-                }
-                if (eventTrim.startsWith('Backlog ')) {
-                  person = 'Backlog';
-                  eventTrim = eventTrim.slice(8);
-                } else if (eventTrim.startsWith('คุณ')) {
+                if (dateMatch) { date = dateMatch[1]; eventTrim = eventTrim.slice(dateMatch[0].length); }
+                if (eventTrim.startsWith('Backlog ')) { person = 'Backlog'; eventTrim = eventTrim.slice(8); }
+                else if (eventTrim.startsWith('คุณ')) {
                   const personEnd = eventTrim.indexOf(' ', 3);
-                  if (personEnd > -1) {
-                    person = eventTrim.slice(0, personEnd);
-                    eventTrim = eventTrim.slice(personEnd + 1);
-                  } else {
-                    person = eventTrim;
-                    eventTrim = '';
-                  }
+                  if (personEnd > -1) { person = eventTrim.slice(0, personEnd); eventTrim = eventTrim.slice(personEnd + 1); }
+                  else { person = eventTrim; eventTrim = ''; }
                 }
                 if (eventTrim.startsWith('แจ้งค้าง_')) {
                   const statusEnd = eventTrim.indexOf(' ', 9);
-                  if (statusEnd > -1) {
-                    status = eventTrim.slice(0, statusEnd);
-                    details = eventTrim.slice(statusEnd + 1);
-                  } else {
-                    status = eventTrim;
-                    details = '';
-                  }
-                } else {
-                  status = eventTrim;
-                  details = '';
-                }
+                  if (statusEnd > -1) { status = eventTrim.slice(0, statusEnd); details = eventTrim.slice(statusEnd + 1); }
+                  else { status = eventTrim; details = ''; }
+                } else { status = eventTrim; details = ''; }
                 timelineHtml += `<tr><td>${date || '-'}</td><td>${person || '-'}</td><td>${status || '-'}</td><td>${details || '-'}</td></tr>`;
               }
             });
           }
           timelineHtml += '</tbody></table>';
+
           modalContent.innerHTML = `
             <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
             <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
@@ -1910,7 +1141,7 @@
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
             <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
-            <div><span class="label">Description:</span> <span class="value">${row["Description"] || "-"}</span></div>
+            <div><span class="label">Description:</span> <span class="value">${getDesc(row) || "-"}</span></div>
             <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
             <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
             <div><span class="label">Request:</span> <span class="value">${row["Request"] || "-"}</span></div>
@@ -1927,6 +1158,7 @@
         tr.appendChild(detailTd);
         tableBody.appendChild(tr);
       });
+
       updatePagination(data.length);
     }
 
@@ -1938,48 +1170,29 @@
       const maxPageButtons = 5;
       let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
       let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-      if (endPage - startPage + 1 < maxPageButtons) {
-        startPage = Math.max(1, endPage - maxPageButtons + 1);
-      }
+      if (endPage - startPage + 1 < maxPageButtons) startPage = Math.max(1, endPage - maxPageButtons + 1);
+
       for (let i = startPage; i <= endPage; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
         btn.className = "page-number";
-        if (i === currentPage) {
-          btn.classList.add("active");
-        }
-        btn.addEventListener("click", () => {
-          currentPage = i;
-          filterAndRenderTable();
-        });
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => { currentPage = i; filterAndRenderTable(); });
         pageNumbersContainer.appendChild(btn);
       }
+
       firstPageButton.disabled = currentPage === 1;
       prevPageButton.disabled = currentPage === 1;
       nextPageButton.disabled = currentPage === totalPages;
       lastPageButton.disabled = currentPage === totalPages;
-      firstPageButton.onclick = () => {
-        currentPage = 1;
-        filterAndRenderTable();
-      };
-      prevPageButton.onclick = () => {
-        if (currentPage > 1) {
-          currentPage--;
-          filterAndRenderTable();
-        }
-      };
-      nextPageButton.onclick = () => {
-        if (currentPage < totalPages) {
-          currentPage++;
-          filterAndRenderTable();
-        }
-      };
-      lastPageButton.onclick = () => {
-        currentPage = totalPages;
-        filterAndRenderTable();
-      };
+
+      firstPageButton.onclick = () => { currentPage = 1; filterAndRenderTable(); };
+      prevPageButton.onclick = () => { if (currentPage > 1) { currentPage--; filterAndRenderTable(); } };
+      nextPageButton.onclick = () => { if (currentPage < totalPages) { currentPage++; filterAndRenderTable(); } };
+      lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
     }
 
+    // Initial load
     fetch(url)
       .then(response => response.json())
       .then(data => {
