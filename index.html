@@ -40,8 +40,8 @@
     .close:hover{ color:#000; }
     .print-button{ float:right; margin-right:10px; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; transition:all .3s ease; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:16px; }
     .print-button:hover{ background:#2980b9; transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.1); }
-    #modalContent span.label{ color:#007bff; font-weight:bold; }
-    #modalContent span.value{ color:#000; }
+    #modalContent .label{ color:#007bff; font-weight:bold; }
+    #modalContent .value{ color:#000; }
     #graphWarning{ color:#d32f2f; font-size:14px; margin-top:10px; text-align:center; }
     .pagination{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:20px; }
     .pagination button,.pagination select{ padding:8px 12px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; margin:0 5px; transition:all .3s ease; }
@@ -75,8 +75,16 @@
     .detail-table th,.detail-table td{ padding:8px; border:1px solid #ccc; text-align:center; }
     .detail-table th{ background:#007bff; color:#fff; }
     .detail-table tr:nth-child(even){ background:#f9f9f9; }
+    /* ความกว้างคอลัมน์ตัวอย่าง */
     .detail-table th:not(:first-child),.detail-table td:not(:first-child){ width:80px; min-width:80px; max-width:80px; }
     .detail-table th:first-child,.detail-table td:first-child{ width:auto; min-width:120px; }
+    /* คอลัมน์ 2 ในตารางทั่วไปเดิมเป็นชิดซ้าย */
+    .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
+      width: 40%; min-width: 200px; max-width: 350px; white-space: normal; text-align: left;
+    }
+    /* ✅ Center เฉพาะคอลัมน์ "รวม" ในตารางสรุป */
+    .summary-table th:nth-child(2), .summary-table td:nth-child(2){ text-align:center !important; }
+
     @media print{
       .report-title,.close,.print-button,#printTableButton,#searchButton,#graphButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{ display:none; }
       .modal-content{ margin:0; padding:0; width:100%; max-width:none; border-radius:0; box-shadow:none; }
@@ -283,10 +291,11 @@
     let sortConfig = { column: 'DayRepair', direction: 'desc' };
     let teamChart = null;
 
+    // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
     let currentTicketNumber = null;
-    let currentRowData = null; // <— สำคัญ: เก็บแถวที่เปิดรายละเอียดอยู่
+    let currentRowData = null;
 
-    /** Helper: อ่าน Description รองรับสะกดหลายแบบ */
+    /** อ่าน Description รองรับสะกดหลายแบบ */
     function getDesc(row) {
       return (row["Description"] ?? row["Discription"] ?? row["Discrtiption"] ?? "-");
     }
@@ -301,7 +310,7 @@
 
     function fetchUpdateDate() {
       fetch(updateUrl)
-        .then(response => response.json())
+        .then(r => r.json())
         .then(updateData => {
           if (!updateData || updateData.length === 0) { updateValueSpan.textContent = '-'; return; }
           let maxDate = null, maxDateStr = '';
@@ -445,7 +454,7 @@
       printWindow.document.close();
     }
 
-    /** พิมพ์สติ๊กเกอร์จากหน้าหลัก (ตามหน้าปัจจุบัน) */
+    /** พิมพ์สติ๊กเกอร์จากหน้าหลัก */
     function printTable() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
@@ -590,8 +599,8 @@
       if (sortedTeams.length > 50) { limitedTeams = sortedTeams.slice(0, 50); warningMessage = `แสดงเฉพาะ 50 ทีมแรกจากทั้งหมด ${sortedTeams.length} ทีมเนื่องจากข้อจำกัดด้านการแสดงผล`; }
       const sortedCounts = limitedTeams.map(team => teamCounts[team]);
 
-      const backgroundColors = limitedTeams.map((_, index) => index % 2 === 0 ? '#c9ffc4' : '#fce4ec');
-      const borderColors = limitedTeams.map((_, index) => index % 2 === 0 ? '#4caf50' : '#f06292');
+      const backgroundColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#c9ffc4' : '#fce4ec');
+      const borderColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#4caf50' : '#f06292');
       graphWarning.textContent = warningMessage;
 
       if (limitedTeams.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
@@ -661,7 +670,7 @@
         );
       });
 
-      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(ticket => ticket))].length;
+      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
       const totalCalls = uniqueTickets;
 
       const pivotData = {};
@@ -697,8 +706,9 @@
         return { teamPlant, total, ...pivotData[teamPlant] };
       }).sort((a, b) => b.total - a.total);
 
+      // ✅ ใส่คลาส summary-table เพื่อให้คอลัมน์ "รวม" จัดกึ่งกลาง
       let pivotTableHtml = `
-        <table class='detail-table'>
+        <table class='detail-table summary-table'>
           <thead>
             <tr>
               <th>ศูนย์พื้นที่</th>
@@ -816,6 +826,8 @@
               .detail-table th:first-child, .detail-table td:first-child { width: auto; min-width: 120px; }
               .label { font-weight: bold; color: #007bff; }
               .value { color: #000; }
+              /* ✅ กึ่งกลางคอลัมน์ "รวม" ในหน้าพิมพ์ด้วย */
+              .summary-table th:nth-child(2), .summary-table td:nth-child(2){ text-align:center !important; }
               @media print { body { margin: 0; } @page { margin: 10mm; } }
             </style>
           </head>
@@ -855,26 +867,26 @@
       printWindow.document.close();
     }
 
-    // Close modal handlers
+    // ปิดโมดัล
     closeModal.onclick = () => { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; };
     closeGraphModal.onclick = () => graphModal.style.display = "none";
     closeSummaryModal.onclick = () => summaryModal.style.display = "none";
     closeSpareSummaryModal.onclick = () => spareSummaryModal.style.display = "none";
-    window.onclick = event => {
-      if (event.target == modal) { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; }
-      if (event.target == graphModal) graphModal.style.display = "none";
-      if (event.target == summaryModal) summaryModal.style.display = "none";
-      if (event.target == spareSummaryModal) spareSummaryModal.style.display = "none";
+    window.onclick = e => {
+      if (e.target == modal) { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; }
+      if (e.target == graphModal) graphModal.style.display = "none";
+      if (e.target == summaryModal) summaryModal.style.display = "none";
+      if (e.target == spareSummaryModal) spareSummaryModal.style.display = "none";
     };
 
-    // Buttons
+    // ปุ่มต่าง ๆ
     graphButton.addEventListener("click", showGraph);
     excelButton.addEventListener("click", exportToCSV);
     summaryButton.addEventListener("click", showSummary);
     spareSummaryButton.addEventListener("click", showSpareSummary);
-    itemsPerPageSelect.addEventListener("change", (e) => { itemsPerPage = parseInt(e.target.value); currentPage = 1; filterAndRenderTable(); });
-    searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") filterAndRenderTable(); });
-    searchButton.addEventListener("click", () => { filterAndRenderTable(); });
+    itemsPerPageSelect.addEventListener("change", e => { itemsPerPage = parseInt(e.target.value); currentPage = 1; filterAndRenderTable(); });
+    searchInput.addEventListener("keypress", e => { if (e.key === "Enter") filterAndRenderTable(); });
+    searchButton.addEventListener("click", filterAndRenderTable);
     printTableButton.addEventListener("click", printTable);
 
     function populateTeamPlantFilter(data) {
@@ -1029,7 +1041,7 @@
           let dayB = parseFloat(b["DayRepair"]) || 0;
           let ticketA = a["Ticket Number"] || "";
           let ticketB = b["Ticket Number"] || "";
-          if (dayA !== dayB) return dayB - dayA;
+          if (dayA !== dayB) return b - a;
           return ticketA.localeCompare(ticketB);
         });
       }
@@ -1104,7 +1116,7 @@
         btn.className = "detail-button";
         btn.onclick = () => {
           currentTicketNumber = row["Ticket Number"];
-          currentRowData = row; // <— เก็บข้อมูลแถวที่เปิดรายละเอียด
+          currentRowData = row; // เก็บแถวปัจจุบันสำหรับพิมพ์จากโมดัล
           const timeline = row["TimeLine"] || "";
           let timelineHtml = '<table class="timeline-table"><thead><tr><th>วันที่</th><th>ผู้แจ้ง</th><th>สถานะ</th><th>รายละเอียด</th></tr></thead><tbody>';
           if (timeline) {
@@ -1192,9 +1204,9 @@
       lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
     }
 
-    // Initial load
+    // โหลดข้อมูลครั้งแรก
     fetch(url)
-      .then(response => response.json())
+      .then(r => r.json())
       .then(data => {
         allData = data;
         populateTeamPlantFilter(data);
@@ -1204,7 +1216,7 @@
         filterAndRenderTable();
         addSortListeners();
       })
-      .catch(error => console.error('Error fetching data:', error));
+      .catch(err => console.error('Error fetching data:', err));
 
     fetchUpdateDate();
   </script>
