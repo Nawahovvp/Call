@@ -7,123 +7,662 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: 'Prompt', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
-    .report-title { font-size: 24px; font-weight: 700; color: #333; text-align: center; background-color: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,.1); margin-bottom: 20px; transition: all .3s ease; }
-    @media (max-width: 768px){ .report-title{ font-size:20px; padding:10px; } }
-    #searchContainer{ display:flex; flex-direction:column; align-items:flex-start; margin-bottom:20px; }
-    .filter-row{ display:flex; align-items:center; margin-bottom:10px; }
-    .search-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    #employeeFilterLabel,#pendingFilterLabel,#stockFilterLabel,#statusCallFilterLabel{ font-size:16px; color:#333; }
-    #employeeFilter,#pendingFilter,#stockFilter,#statusCallFilter{ margin-left:5px; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:16px; background:#fff; cursor:pointer; transition:all .3s ease; }
-    #employeeFilter:hover,#pendingFilter:hover,#stockFilter:hover,#statusCallFilter:hover{ border-color:#2980b9; }
-    #searchInput{ width:300px; padding:12px; border-radius:12px; border:1px solid #ccc; font-size:16px; transition:all .3s ease; }
-    #searchInput:focus{ border-color:#2980b9; box-shadow:0 0 8px rgba(41,128,185,.3); outline:none; }
-    .action-button{ display:flex; align-items:center; gap:8px; padding:10px 16px; background:linear-gradient(135deg,#3498db,#2980b9); color:#fff; border:none; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; transition:all .3s ease; box-shadow:0 4px 8px rgba(0,0,0,.1); }
-    .action-button i{ font-size:18px; }
-    .action-button:hover{ background:linear-gradient(135deg,#2980b9,#1c6ea4); transform:scale(1.05); box-shadow:0 6px 12px rgba(0,0,0,.15); }
-    .action-button:active{ transform:scale(.95); }
-    .table-container{ overflow-x:auto; width:100%; }
-    table{ width:100%; border-collapse:collapse; background:#fff; box-shadow:0 4px 6px rgba(0,0,0,.1); border-radius:12px; overflow:hidden; min-width:900px; }
-    th,td{ padding:8px 12px; text-align:left; border:1px solid #ccc; white-space:nowrap; }
-    th{ background:#007bff; color:#fff; }
-    th.sortable{ cursor:pointer; }
-    th.sortable:hover{ background:#0056b3; }
-    .arrow{ font-size:12px; margin-left:5px; }
-    tr:hover{ background:#f1f1f1; }
-    .detail-button{ padding:6px 10px; background:#3498db; color:#fff; border:none; width:100px; border-radius:6px; cursor:pointer; transition:all .3s ease; }
-    .detail-button:hover{ background:#2980b9; transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.1); }
-    .modal{ display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,.5); }
-    .modal-content{ background:#fff; margin:10% auto; padding:20px; border-radius:12px; width:90%; max-width:1200px; animation:zoomIn .4s ease; overflow-x:auto; position:relative; }
-    #spareSummaryModal .modal-content{ max-width:95%; }
-    .graph-modal-content{ background:#fff; margin:10% auto; padding:20px; border-radius:12px; width:90%; max-width:800px; animation:zoomIn .4s ease; position:relative; }
-    .close{ color:#aaa; float:right; font-size:24px; font-weight:bold; cursor:pointer; }
-    .close:hover{ color:#000; }
-    .print-button{ float:right; margin-right:10px; padding:10px 16px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; transition:all .3s ease; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:16px; }
-    .print-button:hover{ background:#2980b9; transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.1); }
-    #modalContent .label{ color:#007bff; font-weight:bold; }
-    #modalContent .value{ color:#000; }
-    #graphWarning{ color:#d32f2f; font-size:14px; margin-top:10px; text-align:center; }
-    .pagination{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:20px; }
-    .pagination button,.pagination select{ padding:8px 12px; background:#3498db; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; margin:0 5px; transition:all .3s ease; }
-    .pagination button:hover,.pagination select:hover{ background:#2980b9; }
-    .pagination .page-number{ width:36px; height:36px; background:#3498db; color:#fff; border-radius:50%; display:inline-flex; justify-content:center; align-items:center; margin:0 5px; cursor:pointer; font-size:16px; border:none; transition:all .3s ease; }
-    .pagination .page-number:hover{ background:#2980b9; transform:scale(1.1); }
-    .pagination .page-number.active{ background:#e67e22; color:#fff; }
-    .items-per-page{ margin-left:10px; font-size:16px; }
-    tr{ opacity:0; transform:translateY(10px); animation:fadeInUp .5s ease forwards; }
-    tr:nth-child(even){ animation-delay:.1s; }
-    tr:nth-child(odd){ animation-delay:.2s; }
-    @keyframes fadeInUp{ to{ opacity:1; transform:translateY(0); } }
-    @keyframes zoomIn{ from{ opacity:0; transform:scale(.8); } to{ opacity:1; transform:scale(1); } }
-    th:nth-child(3),td:nth-child(3){ width:auto; min-width:100px; max-width:150px; white-space:normal; }
-    th:nth-child(7),td:nth-child(7){ min-width:150px; }
-    @media (max-width: 768px){
-      th:nth-child(3),td:nth-child(3){ min-width:80px; font-size:14px; }
-      #searchInput{ width:100%; max-width:300px; }
-      .search-row{ flex-direction:column; align-items:flex-start; }
-      .action-button{ width:100%; max-width:150px; justify-content:center; }
+    :root {
+      --bg-color: #f0f4f8;
+      --card-bg: #fff;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --border-color: #ccc;
+      --header-bg: #007bff;
+      --header-text: #fff;
+      --hover-bg: #f1f1f1;
+      --success-color: #28a745;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --info-color: #17a2b8;
+      --button-bg: linear-gradient(135deg,#3498db,#2980b9);
+      --button-hover: linear-gradient(135deg,#2980b9,#1c6ea4);
+      --shadow-color: rgba(0,0,0,.1);
+      --modal-bg: rgba(0,0,0,.5);
+      --call-count-bg: #e6f2ff;
+      --modern-label-bg: #fff;
+      --modern-label-border: #d0eaff;
     }
-    .yellow-light{ background:#c9ffc4; }
-    .pink-pastel{ background:#fce4ec; }
-    .text-left{ text-align:left; }
-    .text-center{ text-align:center; }
-    .call-count-box{ margin-left:20px; padding:10px 16px; background:#e6f2ff; color:#007bff; border-radius:10px; font-size:16px; font-weight:bold; display:inline-flex; align-items:center; box-shadow:0 2px 4px rgba(0,0,0,.05); transition:background .3s ease; }
-    .call-count-box span{ color:#d63384; margin:0 4px; font-size:18px; }
-    .modern-label{ display:inline-block; padding:10px 16px; background:#fff; color:#007bff; border-radius:10px; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,.1); border:1px solid #d0eaff; transition:all .3s ease; margin-right:8px; }
-    .modern-label:hover{ background:#e6f2ff; color:#0056b3; }
-    .detail-table{ width:100%; border-collapse:collapse; margin-top:10px; }
-    .detail-table th,.detail-table td{ padding:8px; border:1px solid #ccc; text-align:center; }
-    .detail-table th{ background:#007bff; color:#fff; }
-    .detail-table tr:nth-child(even){ background:#f9f9f9; }
+    .dark-theme {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --border-color: #333;
+      --header-bg: #37474f;
+      --header-text: #e0e0e0;
+      --hover-bg: #2a2a2a;
+      --success-color: #66bb6a;
+      --danger-color: #ef5350;
+      --warning-color: #ffca28;
+      --info-color: #42a5f5;
+      --button-bg: linear-gradient(135deg,#455a64,#546e7a);
+      --button-hover: linear-gradient(135deg,#546e7a,#455a64);
+      --shadow-color: rgba(0,0,0,.3);
+      --modal-bg: rgba(0,0,0,.7);
+      --call-count-bg: #263238;
+      --modern-label-bg: #2d2d2d;
+      --modern-label-border: #455a64;
+      .yellow-light {
+        background: #2e7d32 !important;
+        color: #fff !important;
+      }
+      .pink-pastel {
+        background: #7b1fa2 !important;
+        color: #fff !important;
+      }
+    }
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background-color: var(--bg-color); 
+      color: var(--text-primary); 
+      margin: 0; 
+      padding: 20px; 
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .report-title { 
+      font-size: 24px; 
+      font-weight: 700; 
+      color: var(--text-primary); 
+      text-align: center; 
+      background-color: var(--card-bg); 
+      padding: 15px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 8px var(--shadow-color); 
+      margin-bottom: 20px; 
+      transition: all .3s ease; 
+    }
+    @media (max-width: 768px){ 
+      .report-title{ 
+        font-size:20px; 
+        padding:10px; 
+      } 
+    }
+    #searchContainer{ 
+      display:flex; 
+      flex-direction:column; 
+      align-items:flex-start; 
+      margin-bottom:20px; 
+    }
+    .filter-row{ 
+      display:flex; 
+      align-items:center; 
+      margin-bottom:10px; 
+    }
+    .search-row{ 
+      display:flex; 
+      align-items:center; 
+      gap:10px; 
+      flex-wrap:wrap; 
+      margin-top:10px; 
+    }
+    #employeeFilterLabel,#pendingFilterLabel,#stockFilterLabel,#statusCallFilterLabel{ 
+      font-size:16px; 
+      color: var(--text-primary); 
+    }
+    #employeeFilter,#pendingFilter,#stockFilter,#statusCallFilter{ 
+      margin-left:5px; 
+      padding:10px; 
+      border-radius:8px; 
+      border:1px solid var(--border-color); 
+      font-size:16px; 
+      background: var(--card-bg); 
+      color: var(--text-primary); 
+      cursor:pointer; 
+      transition:all .3s ease; 
+    }
+    #employeeFilter:hover,#pendingFilter:hover,#stockFilter:hover,#statusCallFilter:hover{ 
+      border-color: var(--info-color); 
+    }
+    #searchInput{ 
+      width:300px; 
+      padding:12px; 
+      border-radius:12px; 
+      border:1px solid var(--border-color); 
+      font-size:16px; 
+      background: var(--card-bg); 
+      color: var(--text-primary); 
+      transition:all .3s ease; 
+    }
+    #searchInput:focus{ 
+      border-color: var(--info-color); 
+      box-shadow:0 0 8px rgba(23,162,184,.3); 
+      outline:none; 
+    }
+    .action-button{ 
+      display:flex; 
+      align-items:center; 
+      gap:8px; 
+      padding:10px 16px; 
+      background: var(--button-bg); 
+      color:#fff; 
+      border:none; 
+      border-radius:12px; 
+      cursor:pointer; 
+      font-size:14px; 
+      font-weight:500; 
+      transition:all .3s ease; 
+      box-shadow:0 4px 8px var(--shadow-color); 
+    }
+    .action-button i{ 
+      font-size:18px; 
+    }
+    .action-button:hover{ 
+      background: var(--button-hover); 
+      transform:scale(1.05); 
+      box-shadow:0 6px 12px var(--shadow-color); 
+    }
+    .action-button:active{ 
+      transform:scale(.95); 
+    }
+    .table-container{ 
+      overflow-x:auto; 
+      width:100%; 
+    }
+    table{ 
+      width:100%; 
+      border-collapse:collapse; 
+      background: var(--card-bg); 
+      box-shadow:0 4px 6px var(--shadow-color); 
+      border-radius:12px; 
+      overflow:hidden; 
+      min-width:900px; 
+      border: 1px solid var(--border-color);
+    }
+    th,td{ 
+      padding:8px 12px; 
+      text-align:left; 
+      border:1px solid var(--border-color); 
+      white-space:nowrap; 
+      color: var(--text-primary);
+    }
+    th{ 
+      background: var(--header-bg); 
+      color: var(--header-text); 
+    }
+    th.sortable{ 
+      cursor:pointer; 
+    }
+    th.sortable:hover{ 
+      background: var(--info-color); 
+    }
+    .arrow{ 
+      font-size:12px; 
+      margin-left:5px; 
+    }
+    tr:hover{ 
+      background: var(--hover-bg); 
+    }
+    .detail-button{ 
+      padding:6px 10px; 
+      background: var(--info-color); 
+      color:#fff; 
+      border:none; 
+      width:100px; 
+      border-radius:6px; 
+      cursor:pointer; 
+      transition:all .3s ease; 
+    }
+    .detail-button:hover{ 
+      background: var(--warning-color); 
+      transform:translateY(-2px); 
+      box-shadow:0 4px 10px var(--shadow-color); 
+    }
+    .modal{ 
+      display:none; 
+      position:fixed; 
+      z-index:1000; 
+      left:0; 
+      top:0; 
+      width:100%; 
+      height:100%; 
+      overflow:auto; 
+      background: var(--modal-bg); 
+    }
+    .modal-content{ 
+      background: var(--card-bg); 
+      margin:10% auto; 
+      padding:20px; 
+      border-radius:12px; 
+      width:90%; 
+      max-width:1200px; 
+      animation:zoomIn .4s ease; 
+      overflow-x:auto; 
+      position:relative; 
+      color: var(--text-primary);
+      box-shadow: 0 8px 16px var(--shadow-color);
+    }
+    #spareSummaryModal .modal-content{ 
+      max-width:95%; 
+    }
+    .graph-modal-content{ 
+      background: var(--card-bg); 
+      margin:10% auto; 
+      padding:20px; 
+      border-radius:12px; 
+      width:90%; 
+      max-width:800px; 
+      animation:zoomIn .4s ease; 
+      position:relative; 
+      color: var(--text-primary);
+    }
+    .close{ 
+      color: var(--text-secondary); 
+      float:right; 
+      font-size:24px; 
+      font-weight:bold; 
+      cursor:pointer; 
+    }
+    .close:hover{ 
+      color: var(--text-primary); 
+    }
+    .print-button{ 
+      float:right; 
+      margin-right:10px; 
+      padding:10px 16px; 
+      background: var(--info-color); 
+      color:#fff; 
+      border:none; 
+      border-radius:6px; 
+      cursor:pointer; 
+      transition:all .3s ease; 
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      gap:4px; 
+      font-size:16px; 
+    }
+    .print-button:hover{ 
+      background: var(--warning-color); 
+      transform:translateY(-2px); 
+      box-shadow:0 4px 10px var(--shadow-color); 
+    }
+    #modalContent .label{ 
+      color: var(--info-color); 
+      font-weight:bold; 
+    }
+    #modalContent .value{ 
+      color: var(--text-primary); 
+    }
+    #graphWarning{ 
+      color: var(--danger-color); 
+      font-size:14px; 
+      margin-top:10px; 
+      text-align:center; 
+    }
+    .pagination{ 
+      display:flex; 
+      flex-wrap:wrap; 
+      justify-content:center; 
+      align-items:center; 
+      margin-top:20px; 
+    }
+    .pagination button,.pagination select{ 
+      padding:8px 12px; 
+      background: var(--info-color); 
+      color:#fff; 
+      border:none; 
+      border-radius:6px; 
+      cursor:pointer; 
+      font-size:16px; 
+      margin:0 5px; 
+      transition:all .3s ease; 
+    }
+    .pagination button:hover,.pagination select:hover{ 
+      background: var(--warning-color); 
+    }
+    .pagination .page-number{ 
+      width:36px; 
+      height:36px; 
+      background: var(--info-color); 
+      color:#fff; 
+      border-radius:50%; 
+      display:inline-flex; 
+      justify-content:center; 
+      align-items:center; 
+      margin:0 5px; 
+      cursor:pointer; 
+      font-size:16px; 
+      border:none; 
+      transition:all .3s ease; 
+    }
+    .pagination .page-number:hover{ 
+      background: var(--warning-color); 
+      transform:scale(1.1); 
+    }
+    .pagination .page-number.active{ 
+      background: var(--warning-color); 
+      color:#fff; 
+    }
+    .items-per-page{ 
+      margin-left:10px; 
+      font-size:16px; 
+      color: var(--text-primary);
+    }
+    tr{ 
+      opacity:0; 
+      transform:translateY(10px); 
+      animation:fadeInUp .5s ease forwards; 
+    }
+    tr:nth-child(even){ 
+      animation-delay:.1s; 
+    }
+    tr:nth-child(odd){ 
+      animation-delay:.2s; 
+    }
+    @keyframes fadeInUp{ 
+      to{ 
+        opacity:1; 
+        transform:translateY(0); 
+      } 
+    }
+    @keyframes zoomIn{ 
+      from{ 
+        opacity:0; 
+        transform:scale(.8); 
+      } 
+      to{ 
+        opacity:1; 
+        transform:scale(1); 
+      } 
+    }
+    th:nth-child(3),td:nth-child(3){ 
+      width:auto; 
+      min-width:100px; 
+      max-width:150px; 
+      white-space:normal; 
+    }
+    th:nth-child(7),td:nth-child(7){ 
+      min-width:150px; 
+    }
+    @media (max-width: 768px){
+      th:nth-child(3),td:nth-child(3){ 
+        min-width:80px; 
+        font-size:14px; 
+      }
+      #searchInput{ 
+        width:100%; 
+        max-width:300px; 
+      }
+      .search-row{ 
+        flex-direction:column; 
+        align-items:flex-start; 
+      }
+      .action-button{ 
+        width:100%; 
+        max-width:150px; 
+        justify-content:center; 
+      }
+    }
+    .yellow-light{ 
+      background:#c9ffc4; 
+    }
+    .pink-pastel{ 
+      background:#fce4ec; 
+    }
+    .text-left{ 
+      text-align:left; 
+    }
+    .text-center{ 
+      text-align:center; 
+    }
+    .call-count-box{ 
+      margin-left:20px; 
+      padding:10px 16px; 
+      background: var(--call-count-bg); 
+      color: var(--info-color); 
+      border-radius:10px; 
+      font-size:16px; 
+      font-weight:bold; 
+      display:inline-flex; 
+      align-items:center; 
+      box-shadow:0 2px 4px var(--shadow-color); 
+      transition:background .3s ease; 
+    }
+    .call-count-box span{ 
+      color: var(--danger-color); 
+      margin:0 4px; 
+      font-size:18px; 
+    }
+    .modern-label{ 
+      display:inline-block; 
+      padding:10px 16px; 
+      background: var(--modern-label-bg); 
+      color: var(--info-color); 
+      border-radius:10px; 
+      font-size:16px; 
+      font-weight:bold; 
+      box-shadow:0 2px 6px var(--shadow-color); 
+      border:1px solid var(--modern-label-border); 
+      transition:all .3s ease; 
+      margin-right:8px; 
+    }
+    .modern-label:hover{ 
+      background: var(--hover-bg); 
+      color: var(--warning-color); 
+    }
+    .detail-table{ 
+      width:100%; 
+      border-collapse:collapse; 
+      margin-top:10px; 
+      border: 1px solid var(--border-color);
+    }
+    .detail-table th,.detail-table td{ 
+      padding:8px; 
+      border:1px solid var(--border-color); 
+      text-align:center; 
+      color: var(--text-primary);
+    }
+    .detail-table th{ 
+      background: var(--header-bg); 
+      color: var(--header-text); 
+    }
+    .detail-table tr:nth-child(even){ 
+      background: var(--hover-bg); 
+    }
     /* ความกว้างคอลัมน์ตัวอย่าง */
-    .detail-table th:not(:first-child),.detail-table td:not(:first-child){ width:80px; min-width:80px; max-width:80px; }
-    .detail-table th:first-child,.detail-table td:first-child{ width:auto; min-width:120px; }
+    .detail-table th:not(:first-child),.detail-table td:not(:first-child){ 
+      width:80px; 
+      min-width:80px; 
+      max-width:80px; 
+    }
+    .detail-table th:first-child,.detail-table td:first-child{ 
+      width:auto; 
+      min-width:120px; 
+    }
     /* คอลัมน์ 2 ในตารางทั่วไปเดิมเป็นชิดซ้าย */
     .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
-      width: 40%; min-width: 200px; max-width: 350px; white-space: normal; text-align: left;
+      width: 40%; 
+      min-width: 200px; 
+      max-width: 350px; 
+      white-space: normal; 
+      text-align: left;
     }
     /* ✅ Center เฉพาะคอลัมน์ "รวม" ในตารางสรุป */
-    .summary-table th:nth-child(2), .summary-table td:nth-child(2){ text-align:center !important; }
-
-    @media print{
-      .report-title,.close,.print-button,#printTableButton,#searchButton,#graphButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{ display:none; }
-      .modal-content{ margin:0; padding:0; width:100%; max-width:none; border-radius:0; box-shadow:none; }
-      .sticker{ width:80mm; height:100mm; border:1px solid #000; padding:2mm; box-sizing:border-box; font-size:13pt; line-height:1.3; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; page-break-after:always; }
-      .sticker div{ margin-bottom:1.5mm; overflow-wrap:break-word; }
-      .sticker div.description{ flex:1; }
-      .sticker .label{ font-weight:bold; color:#000; font-size:14pt; }
-      .sticker .value{ color:#000; }
-      h2{ font-size:14pt; color:#000; margin:1.5mm 0; }
-      @page{ size:80mm 100mm; margin:0; }
-      body{ margin:0; padding:0; }
-      .detail-table th,.detail-table td{ text-align:center; }
-      .detail-table th:not(:first-child),.detail-table td:not(:first-child){ width:80px; min-width:80px; max-width:80px; }
-      .detail-table th:first-child,.detail-table td:first-child{ width:auto; min-width:120px; }
+    .summary-table th:nth-child(2), .summary-table td:nth-child(2){ 
+      text-align:center !important; 
     }
-    .green-text{ color:green; }
-    .red-text{ color:red; }
-    .timeline-table{ width:100%; border-collapse:collapse; margin-top:20px; }
-    .timeline-table th,.timeline-table td{ padding:8px; border:1px solid #ccc; text-align:left; white-space:pre-wrap; word-wrap:break-word; }
-    .timeline-table th{ background:#007bff; color:#fff; }
-    .timeline-table tr:nth-child(even){ background:#f9f9f9; }
-    .detail-table th:nth-child(1),.detail-table td:nth-child(1){ width:20%; min-width:50px; max-width:80px; white-space:normal; }
-    .detail-table th:nth-child(2),.detail-table td:nth-child(2){ width:40%; min-width:200px; max-width:350px; white-space:normal; text-align:left; }
-    .detail-table th:nth-child(3),.detail-table td:nth-child(3){ width:10%; min-width:80px; max-width:100px; text-align:center; }
-    .detail-table th:nth-child(n+4),.detail-table td:nth-child(n+4){ width:10%; min-width:80px; max-width:100px; text-align:center; }
+    @media print{
+      .report-title,.close,.print-button,#printTableButton,#searchButton,#graphButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{ 
+        display:none; 
+      }
+      .modal-content{ 
+        margin:0; 
+        padding:0; 
+        width:100%; 
+        max-width:none; 
+        border-radius:0; 
+        box-shadow:none; 
+      }
+      .sticker{ 
+        width:80mm; 
+        height:100mm; 
+        border:1px solid #000; 
+        padding:2mm; 
+        box-sizing:border-box; 
+        font-size:13pt; 
+        line-height:1.3; 
+        overflow:hidden; 
+        display:flex; 
+        flex-direction:column; 
+        justify-content:space-between; 
+        page-break-after:always; 
+      }
+      .sticker div{ 
+        margin-bottom:1.5mm; 
+        overflow-wrap:break-word; 
+      }
+      .sticker div.description{ 
+        flex:1; 
+      }
+      .sticker .label{ 
+        font-weight:bold; 
+        color:#000; 
+        font-size:14pt; 
+      }
+      .sticker .value{ 
+        color:#000; 
+      }
+      h2{ 
+        font-size:14pt; 
+        color:#000; 
+        margin:1.5mm 0; 
+      }
+      @page{ 
+        size:80mm 100mm; 
+        margin:0; 
+      }
+      body{ 
+        margin:0; 
+        padding:0; 
+      }
+      .detail-table th,.detail-table td{ 
+        text-align:center; 
+      }
+      .detail-table th:not(:first-child),.detail-table td:not(:first-child){ 
+        width:80px; 
+        min-width:80px; 
+        max-width:80px; 
+      }
+      .detail-table th:first-child,.detail-table td:first-child{ 
+        width:auto; 
+        min-width:120px; 
+      }
+    }
+    .green-text{ 
+      color: var(--success-color); 
+    }
+    .red-text{ 
+      color: var(--danger-color); 
+    }
+    .timeline-table{ 
+      width:100%; 
+      border-collapse:collapse; 
+      margin-top:20px; 
+      border: 1px solid var(--border-color);
+    }
+    .timeline-table th,.timeline-table td{ 
+      padding:8px; 
+      border:1px solid var(--border-color); 
+      text-align:left; 
+      white-space:pre-wrap; 
+      word-wrap:break-word; 
+      color: var(--text-primary);
+    }
+    .timeline-table th{ 
+      background: var(--header-bg); 
+      color: var(--header-text); 
+    }
+    .timeline-table tr:nth-child(even){ 
+      background: var(--hover-bg); 
+    }
+    .detail-table th:nth-child(1),.detail-table td:nth-child(1){ 
+      width:20%; 
+      min-width:50px; 
+      max-width:80px; 
+      white-space:normal; 
+    }
+    .detail-table th:nth-child(2),.detail-table td:nth-child(2){ 
+      width:40%; 
+      min-width:200px; 
+      max-width:350px; 
+      white-space:normal; 
+      text-align:left; 
+    }
+    .detail-table th:nth-child(3),.detail-table td:nth-child(3){ 
+      width:10%; 
+      min-width:80px; 
+      max-width:100px; 
+      text-align:center; 
+    }
+    .detail-table th:nth-child(n+4),.detail-table td:nth-child(n+4){ 
+      width:10%; 
+      min-width:80px; 
+      max-width:100px; 
+      text-align:center; 
+    }
     th:nth-child(10),td:nth-child(10),
     th:nth-child(11),td:nth-child(11),
     th:nth-child(12),td:nth-child(12),
-    th:nth-child(13),td:nth-child(13){ min-width:50px; width:50px; max-width:60px; text-align:center; }
-    th:nth-child(12),td:nth-child(12){ font-weight:bold; color:#c00; }
-    th:nth-child(13),td:nth-child(13){ font-weight:bold; color:#000; }
-    .date-update{ text-align:center; background:#fff; padding:10px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); margin-bottom:10px; font-size:16px; color:#333; font-weight:500; }
-    .date-update span{ color:#007bff; font-weight:bold; }
+    th:nth-child(13),td:nth-child(13){ 
+      min-width:50px; 
+      width:50px; 
+      max-width:60px; 
+      text-align:center; 
+    }
+    th:nth-child(12),td:nth-child(12){ 
+      font-weight:bold; 
+      color: var(--danger-color); 
+    }
+    th:nth-child(13),td:nth-child(13){ 
+      font-weight:bold; 
+      color: var(--text-primary); 
+    }
+    .date-update{ 
+      text-align:center; 
+      background: var(--card-bg); 
+      padding:10px; 
+      border-radius:8px; 
+      box-shadow:0 2px 4px var(--shadow-color); 
+      margin-bottom:10px; 
+      font-size:16px; 
+      color: var(--text-primary); 
+      font-weight:500; 
+    }
+    .date-update span{ 
+      color: var(--info-color); 
+      font-weight:bold; 
+    }
+    .setting-modal-content {
+      max-width: 400px;
+    }
+    .theme-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: var(--hover-bg);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .theme-option:hover {
+      background: var(--info-color);
+      color: #fff;
+    }
+    .theme-option input[type="radio"] {
+      margin-right: 10px;
+    }
   </style>
 </head>
-<body>
+<body class="dark-theme">
   <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
   <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
-
   <div id="searchContainer">
     <div class="filter-row">
       <label id="employeeFilterLabel" for="employeeFilter" class="modern-label">ศูนย์พื้นที่</label>
@@ -151,9 +690,9 @@
       <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
       <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
       <button id="spareSummaryButton" class="action-button"><i class="fas fa-list-alt"></i> สรุปอะไหล่</button>
+      <button id="settingButton" class="action-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
     </div>
   </div>
-
   <div class="table-container">
     <table id="data-table">
       <thead>
@@ -180,7 +719,6 @@
       <tbody></tbody>
     </table>
   </div>
-
   <!-- Modals -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
@@ -193,7 +731,6 @@
       <div id="modalContent"></div>
     </div>
   </div>
-
   <div id="graphModal" class="modal">
     <div class="graph-modal-content">
       <span class="close" id="closeGraphModal">×</span>
@@ -202,7 +739,6 @@
       <div id="graphWarning"></div>
     </div>
   </div>
-
   <div id="summaryModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeSummaryModal">×</span>
@@ -214,7 +750,6 @@
       <div id="summaryContent"></div>
     </div>
   </div>
-
   <div id="spareSummaryModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeSpareSummaryModal">×</span>
@@ -226,7 +761,22 @@
       <div id="spareSummaryContent"></div>
     </div>
   </div>
-
+  <div id="settingModal" class="modal">
+    <div class="modal-content setting-modal-content">
+      <span class="close" id="closeSettingModal">×</span>
+      <h2>ตั้งค่า</h2>
+      <div>
+        <div class="theme-option">
+          <input type="radio" id="darkTheme" name="theme" value="dark" checked>
+          <label for="darkTheme">ธีมมืด (สีซีด)</label>
+        </div>
+        <div class="theme-option">
+          <input type="radio" id="lightTheme" name="theme" value="light">
+          <label for="lightTheme">ธีมสว่าง</label>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="pagination">
     <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
     <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
@@ -242,25 +792,23 @@
       </select>
     </div>
   </div>
-
   <script>
     const sheetID = '1dzE4Xjc7H0OtNUmne62u0jFQT-CiGsG2eBo-1v6mrZk';
     const sheetName = 'Coll_Stock';
     const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
-
     const updateSheetName = 'Update';
     const updateUrl = `https://opensheet.elk.sh/${sheetID}/${updateSheetName}`;
-
     const modal = document.getElementById("detailModal");
     const graphModal = document.getElementById("graphModal");
     const summaryModal = document.getElementById("summaryModal");
     const spareSummaryModal = document.getElementById("spareSummaryModal");
+    const settingModal = document.getElementById("settingModal");
     const modalContent = document.getElementById("modalContent");
     const closeModal = document.getElementById("closeModal");
     const closeGraphModal = document.getElementById("closeGraphModal");
     const closeSummaryModal = document.getElementById("closeSummaryModal");
     const closeSpareSummaryModal = document.getElementById("closeSpareSummaryModal");
-
+    const closeSettingModal = document.getElementById("closeSettingModal");
     const employeeFilter = document.getElementById("employeeFilter");
     const pendingFilter = document.getElementById("pendingFilter");
     const stockFilter = document.getElementById("stockFilter");
@@ -272,7 +820,7 @@
     const excelButton = document.getElementById("excelButton");
     const summaryButton = document.getElementById("summaryButton");
     const spareSummaryButton = document.getElementById("spareSummaryButton");
-
+    const settingButton = document.getElementById("settingButton");
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
     const firstPageButton = document.getElementById("firstPage");
@@ -284,22 +832,41 @@
     const summaryContent = document.getElementById("summaryContent");
     const spareSummaryContent = document.getElementById("spareSummaryContent");
     const updateValueSpan = document.getElementById("updateValue");
-
     let allData = [];
     let currentPage = 1;
     let itemsPerPage = 20;
     let sortConfig = { column: 'DayRepair', direction: 'desc' };
     let teamChart = null;
-
     // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
     let currentTicketNumber = null;
     let currentRowData = null;
-
+    /** ฟังก์ชันจัดการธีม */
+    function setTheme(theme) {
+      document.body.className = theme === 'dark' ? 'dark-theme' : '';
+      localStorage.setItem('theme', theme);
+    }
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      setTheme(savedTheme);
+      document.querySelector(`input[value="${savedTheme}"]`).checked = true;
+    }
+    // Event listeners สำหรับ setting modal
+    settingButton.addEventListener('click', () => { settingModal.style.display = 'block'; });
+    closeSettingModal.onclick = () => { settingModal.style.display = 'none'; };
+    document.querySelectorAll('input[name="theme"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        setTheme(e.target.value);
+      });
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target === settingModal) {
+        settingModal.style.display = 'none';
+      }
+    });
     /** อ่าน Description รองรับสะกดหลายแบบ */
     function getDesc(row) {
       return (row["Description"] ?? row["Discription"] ?? row["Discrtiption"] ?? "-");
     }
-
     function parseDate(dateStr) {
       if (!dateStr || typeof dateStr !== 'string') return null;
       const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})/);
@@ -307,7 +874,6 @@
       const [, day, month, year, hour, minute, second] = parts;
       return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second));
     }
-
     function fetchUpdateDate() {
       fetch(updateUrl)
         .then(r => r.json())
@@ -323,7 +889,6 @@
         })
         .catch(() => { updateValueSpan.textContent = '-'; });
     }
-
     function escapeCSVValue(value) {
       if (value == null) return '""';
       const stringValue = value.toString();
@@ -332,7 +897,6 @@
       }
       return stringValue;
     }
-
     function exportToCSV() {
       if (!allData || allData.length === 0) { alert("ไม่มีข้อมูลในระบบสำหรับการส่งออก CSV"); return; }
       const selectedTeamPlant = employeeFilter.value;
@@ -340,7 +904,6 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -368,9 +931,7 @@
           )
         );
       });
-
       if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง"); return; }
-
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
         let dayB = parseFloat(b["DayRepair"]) || 0;
@@ -379,12 +940,10 @@
         if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
-
       const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description"];
       const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"DateTime","Ticket Number":"Ticket Number","Brand":"Brand","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description" };
       const csvRows = [];
       csvRows.push(columns.map(col => `"${displayColumns[col]}"`).join(','));
-
       filteredData.forEach(row => {
         const rowData = columns.map(col => {
           let value;
@@ -395,7 +954,6 @@
         });
         csvRows.push(rowData.join(','));
       });
-
       const csvContent = csvRows.join('\n');
       const bom = '\uFEFF';
       const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -405,13 +963,11 @@
       link.click();
       URL.revokeObjectURL(link.href);
     }
-
     /** พิมพ์จากโมดัล: ใช้ currentRowData ให้ตรงกับรายละเอียดที่เห็น */
     function printModalContent() {
       if (!currentRowData) { alert("ไม่พบข้อมูลสำหรับการพิมพ์"); return; }
       const modalData = currentRowData;
       const desc = getDesc(modalData);
-
       const stickerContent = `
         <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
         <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
@@ -422,7 +978,6 @@
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
         <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
       `;
-
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
@@ -453,7 +1008,6 @@
       `);
       printWindow.document.close();
     }
-
     /** พิมพ์สติ๊กเกอร์จากหน้าหลัก */
     function printTable() {
       const selectedTeamPlant = employeeFilter.value;
@@ -461,7 +1015,6 @@
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -489,9 +1042,7 @@
           )
         );
       });
-
       if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา"); return; }
-
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
         let dayB = parseFloat(b["DayRepair"]) || 0;
@@ -500,11 +1051,9 @@
         if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
-
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
       const paginatedData = filteredData.slice(startIdx, endIdx);
-
       const stickersHtml = paginatedData.map(row => {
         const desc = getDesc(row);
         return `
@@ -520,7 +1069,6 @@
           </div>
         `;
       }).join('');
-
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
@@ -547,14 +1095,12 @@
       `);
       printWindow.document.close();
     }
-
     function showGraph() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -582,30 +1128,24 @@
           )
         );
       });
-
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
         const team = row["Team"] || "ไม่ระบุทีม";
         if (ticket && !ticketCounts[ticket]) ticketCounts[ticket] = team;
       });
-
       const teamCounts = {};
       Object.values(ticketCounts).forEach(team => { teamCounts[team] = (teamCounts[team] || 0) + 1; });
-
       const sortedTeams = Object.keys(teamCounts).sort((a, b) => teamCounts[b] - teamCounts[a]);
       let limitedTeams = sortedTeams;
       let warningMessage = "";
       if (sortedTeams.length > 50) { limitedTeams = sortedTeams.slice(0, 50); warningMessage = `แสดงเฉพาะ 50 ทีมแรกจากทั้งหมด ${sortedTeams.length} ทีมเนื่องจากข้อจำกัดด้านการแสดงผล`; }
       const sortedCounts = limitedTeams.map(team => teamCounts[team]);
-
       const backgroundColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#c9ffc4' : '#fce4ec');
       const borderColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#4caf50' : '#f06292');
       graphWarning.textContent = warningMessage;
-
       if (limitedTeams.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
       if (teamChart) teamChart.destroy();
-
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
         type: 'line',
@@ -634,14 +1174,12 @@
       });
       graphModal.style.display = "block";
     }
-
     function showSummary() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -669,22 +1207,18 @@
           )
         );
       });
-
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
       const totalCalls = uniqueTickets;
-
       const pivotData = {};
       const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
-
       teamPlants.forEach(teamPlant => {
         pivotData[teamPlant] = {};
         statusCalls.forEach(status => { pivotData[teamPlant][status] = 0; });
         pendingUnits.forEach(pending => { pivotData[teamPlant][pending] = 0; });
       });
-
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -697,7 +1231,6 @@
           ticketCounts[ticket] = true;
         }
       });
-
       const teamPlantTotals = teamPlants.map(teamPlant => {
         const total = Object.keys(pivotData[teamPlant]).reduce((sum, key) => {
           if (statusCalls.includes(key)) return sum + pivotData[teamPlant][key];
@@ -705,7 +1238,6 @@
         }, 0);
         return { teamPlant, total, ...pivotData[teamPlant] };
       }).sort((a, b) => b.total - a.total);
-
       // ✅ ใส่คลาส summary-table เพื่อให้คอลัมน์ "รวม" จัดกึ่งกลาง
       let pivotTableHtml = `
         <table class='detail-table summary-table'>
@@ -741,7 +1273,6 @@
           </tbody>
         </table>
       `;
-
       let summaryHtml = `
         <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
         <h3>จำนวน Call ค้างตามศูนย์พื้นที่และสถานะ Call</h3>
@@ -750,7 +1281,6 @@
       summaryContent.innerHTML = summaryHtml;
       summaryModal.style.display = "block";
     }
-
     function showSpareSummary() {
       let filteredData = allData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
       if (filteredData.length === 0) {
@@ -758,27 +1288,22 @@
         spareSummaryModal.style.display = "block";
         return;
       }
-
       const pivotData = {};
       const materials = [...new Set(filteredData.map(row => (row["Material"] + '|' + getDesc(row))))];
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
         .map(unit => unit.replace(/Stock\s*/gi, '').trim())
         .filter(unit => unit)
         .sort();
-
       materials.forEach(matDesc => {
         pivotData[matDesc] = { total: 0 };
         pendingUnits.forEach(pending => { pivotData[matDesc][pending] = 0; });
       });
-
       filteredData.forEach(row => {
         const matDesc = row["Material"] + '|' + getDesc(row);
         const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
         if (pivotData[matDesc] && pending) { pivotData[matDesc].total++; pivotData[matDesc][pending]++; }
       });
-
       const sortedMaterials = materials.sort((a, b) => pivotData[b].total - pivotData[a].total);
-
       let pivotTableHtml = `
         <table class='detail-table'>
           <thead>
@@ -808,7 +1333,6 @@
       spareSummaryContent.innerHTML = pivotTableHtml;
       spareSummaryModal.style.display = "block";
     }
-
     function printSummaryContent() {
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
@@ -839,7 +1363,6 @@
       `);
       printWindow.document.close();
     }
-
     function printSpareSummaryContent() {
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
@@ -866,7 +1389,6 @@
       `);
       printWindow.document.close();
     }
-
     // ปิดโมดัล
     closeModal.onclick = () => { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; };
     closeGraphModal.onclick = () => graphModal.style.display = "none";
@@ -878,7 +1400,6 @@
       if (e.target == summaryModal) summaryModal.style.display = "none";
       if (e.target == spareSummaryModal) spareSummaryModal.style.display = "none";
     };
-
     // ปุ่มต่าง ๆ
     graphButton.addEventListener("click", showGraph);
     excelButton.addEventListener("click", exportToCSV);
@@ -888,7 +1409,6 @@
     searchInput.addEventListener("keypress", e => { if (e.key === "Enter") filterAndRenderTable(); });
     searchButton.addEventListener("click", filterAndRenderTable);
     printTableButton.addEventListener("click", printTable);
-
     function populateTeamPlantFilter(data) {
       if (!data || data.length === 0) return;
       const teamPlants = [...new Set(data.map(row => row["TeamPlant"]).filter(Boolean))].sort();
@@ -900,7 +1420,6 @@
         employeeFilter.appendChild(option);
       });
     }
-
     function updatePendingFilter(data, selectedTeamPlant) {
       if (!data || data.length === 0) return;
       const currentPendingValue = pendingFilter.value;
@@ -918,7 +1437,6 @@
       updateStockFilter(data, selectedTeamPlant, pendingFilter.value);
       updateStatusCallFilter(data, selectedTeamPlant, pendingFilter.value);
     }
-
     function updateStockFilter(data, selectedTeamPlant, selectedPending) {
       if (!data || data.length === 0) return;
       const currentStockValue = stockFilter.value;
@@ -936,7 +1454,6 @@
       if (currentStockValue && stockResponses.includes(currentStockValue)) stockFilter.value = currentStockValue;
       else stockFilter.value = "";
     }
-
     function updateStatusCallFilter(data, selectedTeamPlant, selectedPending) {
       if (!data || data.length === 0) return;
       const currentStatusCallValue = statusCallFilter.value;
@@ -954,7 +1471,6 @@
       if (currentStatusCallValue && statusCalls.includes(currentStatusCallValue)) statusCallFilter.value = currentStatusCallValue;
       else statusCallFilter.value = "";
     }
-
     function addSortListeners() {
       const sortableHeaders = document.querySelectorAll("th.sortable");
       sortableHeaders.forEach(header => {
@@ -967,7 +1483,6 @@
         });
       });
     }
-
     function updateSortArrows() {
       const sortableHeaders = document.querySelectorAll("th.sortable");
       sortableHeaders.forEach(header => {
@@ -976,14 +1491,12 @@
         arrow.textContent = (column === sortConfig.column) ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '';
       });
     }
-
     function filterAndRenderTable() {
       const selectedTeamPlant = employeeFilter.value;
       const selectedPending = pendingFilter.value;
       const selectedStock = stockFilter.value;
       const selectedStatusCall = statusCallFilter.value;
       const keyword = searchInput.value.toLowerCase().trim();
-
       let filteredData = allData.filter(row => {
         if (!row) return false;
         return (
@@ -1011,14 +1524,11 @@
           )
         );
       });
-
       updatePendingFilter(allData, selectedTeamPlant);
       updateStockFilter(allData, selectedTeamPlant, selectedPending);
       updateStatusCallFilter(allData, selectedTeamPlant, selectedPending);
-
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
       document.getElementById("ticketCountValue").textContent = uniqueTickets;
-
       if (sortConfig.column) {
         filteredData.sort((a, b) => {
           let valueA = a[sortConfig.column] ?? (sortConfig.column === "Description" ? getDesc(a) : "");
@@ -1045,21 +1555,17 @@
           return ticketA.localeCompare(ticketB);
         });
       }
-
       renderTable(filteredData);
       updateCallCount(filteredData);
     }
-
     employeeFilter.addEventListener("change", filterAndRenderTable);
     pendingFilter.addEventListener("change", filterAndRenderTable);
     stockFilter.addEventListener("change", filterAndRenderTable);
     statusCallFilter.addEventListener("change", filterAndRenderTable);
-
     function updateCallCount(data) {
       const count = [...new Set(data.map(row => row["Ticket Number"]).filter(Boolean))].length;
       document.getElementById("callCountValue").textContent = count;
     }
-
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
@@ -1069,7 +1575,6 @@
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
       const paginatedData = data.slice(startIdx, endIdx);
-
       const ticketGroups = {};
       data.forEach(row => {
         const ticket = row["Ticket Number"];
@@ -1079,37 +1584,32 @@
       const uniqueTickets = Object.keys(ticketGroups).sort();
       const colorMap = {};
       uniqueTickets.forEach((ticket, index) => { colorMap[ticket] = index % 2 === 0 ? "yellow-light" : "pink-pastel"; });
-
       paginatedData.forEach((row, i) => {
         const tr = document.createElement("tr");
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-
         const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","AnswerX"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
           let displayValue = cellValue;
-
           if (col === "DayRepair") {
             displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
           } else if (col === "คลังตอบ") {
-            if (cellValue === "ดำเนินการแล้ว") { displayValue = "ดำเนินการแล้ว"; td.style.color = "#28a745"; td.style.fontWeight = "bold"; }
-            else if (cellValue === "รอตรวจสอบ") { displayValue = "รอตรวจสอบ"; td.style.color = "#dc3545"; td.style.fontWeight = "bold"; }
+            if (cellValue === "ดำเนินการแล้ว") { displayValue = "ดำเนินการแล้ว"; td.style.color = "var(--success-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "รอตรวจสอบ") { displayValue = "รอตรวจสอบ"; td.style.color = "var(--danger-color)"; td.style.fontWeight = "bold"; }
           } else if (col === "StatusCall") {
-            if (cellValue === "รอของเข้า") { td.style.color = "#dc3545"; td.style.fontWeight = "bold"; }
-            else if (cellValue === "สำเร็จ") { td.style.color = "#28a745"; td.style.fontWeight = "bold"; }
-            else if (cellValue === "เบิกนวนคร") { td.style.color = "#007bff"; td.style.fontWeight = "bold"; }
-            else if (cellValue === "เบิกวิภาวดี") { td.style.color = "#d4ac0d"; td.style.fontWeight = "bold"; }
-            else { td.style.color = "#6c757d"; }
+            if (cellValue === "รอของเข้า") { td.style.color = "var(--danger-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "สำเร็จ") { td.style.color = "var(--success-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "เบิกนวนคร") { td.style.color = "var(--info-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "เบิกวิภาวดี") { td.style.color = "var(--warning-color)"; td.style.fontWeight = "bold"; }
+            else { td.style.color = "var(--text-secondary)"; }
           }
-
           td.textContent = displayValue;
           td.classList.add("text-left");
           tr.appendChild(td);
         });
-
         const detailTd = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "ดูรายละเอียด";
@@ -1143,7 +1643,6 @@
             });
           }
           timelineHtml += '</tbody></table>';
-
           modalContent.innerHTML = `
             <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
             <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
@@ -1170,10 +1669,8 @@
         tr.appendChild(detailTd);
         tableBody.appendChild(tr);
       });
-
       updatePagination(data.length);
     }
-
     function updatePagination(totalItems) {
       const totalPages = Math.ceil(totalItems / itemsPerPage);
       currentPage = Math.min(currentPage, totalPages);
@@ -1183,7 +1680,6 @@
       let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
       let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
       if (endPage - startPage + 1 < maxPageButtons) startPage = Math.max(1, endPage - maxPageButtons + 1);
-
       for (let i = startPage; i <= endPage; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
@@ -1192,18 +1688,15 @@
         btn.addEventListener("click", () => { currentPage = i; filterAndRenderTable(); });
         pageNumbersContainer.appendChild(btn);
       }
-
       firstPageButton.disabled = currentPage === 1;
       prevPageButton.disabled = currentPage === 1;
       nextPageButton.disabled = currentPage === totalPages;
       lastPageButton.disabled = currentPage === totalPages;
-
       firstPageButton.onclick = () => { currentPage = 1; filterAndRenderTable(); };
       prevPageButton.onclick = () => { if (currentPage > 1) { currentPage--; filterAndRenderTable(); } };
       nextPageButton.onclick = () => { if (currentPage < totalPages) { currentPage++; filterAndRenderTable(); } };
       lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
     }
-
     // โหลดข้อมูลครั้งแรก
     fetch(url)
       .then(r => r.json())
@@ -1217,8 +1710,9 @@
         addSortListeners();
       })
       .catch(err => console.error('Error fetching data:', err));
-
     fetchUpdateDate();
+    // Initialize theme on load
+    initTheme();
   </script>
 </body>
 </html>
