@@ -4,7 +4,2096 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>รายงานพนักงาน</title>
+  <link rel="styleshe<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายงานพนักงาน</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-color: #f0f4f8;
+      --card-bg: #fff;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --border-color: #ccc;
+      --header-bg: #007bff;
+      --header-text: #fff;
+      --hover-bg: #f1f1f1;
+      --success-color: #28a745;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --info-color: #17a2b8;
+      --button-bg: linear-gradient(135deg,#3498db,#2980b9);
+      --button-hover: linear-gradient(135deg,#2980b9,#1c6ea4);
+      --shadow-color: rgba(0,0,0,.1);
+      --modal-bg: rgba(0,0,0,.5);
+      --call-count-bg: #e6f2ff;
+      --modern-label-bg: #fff;
+      --modern-label-border: #d0eaff;
+    }
+    .dark-theme {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --border-color: #333;
+      --header-bg: #37474f;
+      --header-text: #e0e0e0;
+      --hover-bg: #2a2a2a;
+      --success-color: #66bb6a;
+      --danger-color: #ef5350;
+      --warning-color: #ffca28;
+      --info-color: #42a5f5;
+      --button-bg: linear-gradient(135deg,#455a64,#546e7a);
+      --button-hover: linear-gradient(135deg,#546e7a,#455a64);
+      --shadow-color: rgba(0,0,0,.3);
+      --modal-bg: rgba(0,0,0,.7);
+      --call-count-bg: #263238;
+      --modern-label-bg: #2d2d2d;
+      --modern-label-border: #455a64;
+      .yellow-light {
+        background: #2e7d32 !important;
+        color: #fff !important;
+      }
+      .pink-pastel {
+        background: #7b1fa2 !important;
+        color: #fff !important;
+      }
+    }
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .report-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+      background-color: var(--card-bg);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      margin-bottom: 20px;
+      transition: all .3s ease;
+    }
+    @media (max-width: 768px){
+      .report-title{
+        font-size:20px;
+        padding:10px;
+      }
+    }
+    #searchContainer{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      margin-bottom:20px;
+    }
+    .filter-row{
+      display:flex;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .search-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    #employeeFilterLabel,#pendingFilterLabel,#stockFilterLabel,#statusCallFilterLabel{
+      font-size:16px;
+      color: var(--text-primary);
+    }
+    #employeeFilter,#pendingFilter,#stockFilter,#statusCallFilter{
+      margin-left:5px;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid var(--border-color);
+      font-size:16px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      cursor:pointer;
+      transition:all .3s ease;
+    }
+    #employeeFilter:hover,#pendingFilter:hover,#stockFilter:hover,#statusCallFilter:hover{
+      border-color: var(--info-color);
+    }
+    #searchInput{
+      width:300px;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--border-color);
+      font-size:16px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      transition:all .3s ease;
+    }
+    #searchInput:focus{
+      border-color: var(--info-color);
+      box-shadow:0 0 8px rgba(23,162,184,.3);
+      outline:none;
+    }
+    .action-button{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 16px;
+      background: var(--button-bg);
+      color:#fff;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:500;
+      transition:all .3s ease;
+      box-shadow:0 4px 8px var(--shadow-color);
+    }
+    .action-button i{
+      font-size:18px;
+    }
+    .action-button:hover{
+      background: var(--button-hover);
+      transform:scale(1.05);
+      box-shadow:0 6px 12px var(--shadow-color);
+    }
+    .action-button:active{
+      transform:scale(.95);
+    }
+    .table-container{
+      overflow-x:auto;
+      width:100%;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background: var(--card-bg);
+      box-shadow:0 4px 6px var(--shadow-color);
+      border-radius:12px;
+      overflow:hidden;
+      min-width:900px;
+      border: 1px solid var(--border-color);
+    }
+    th,td{
+      padding:8px 12px;
+      text-align:left;
+      border:1px solid var(--border-color);
+      white-space:nowrap;
+      color: var(--text-primary);
+    }
+    th{
+      background: var(--header-bg);
+      color: var(--header-text);
+    }
+    th.sortable{
+      cursor:pointer;
+    }
+    th.sortable:hover{
+      background: var(--info-color);
+    }
+    .arrow{
+      font-size:12px;
+      margin-left:5px;
+    }
+    tr:hover{
+      background: var(--hover-bg);
+    }
+    .detail-button{
+      padding:6px 10px;
+      background: var(--info-color);
+      color:#fff;
+      border:none;
+      width:100px;
+      border-radius:6px;
+      cursor:pointer;
+      transition:all .3s ease;
+    }
+    .detail-button:hover{
+      background: var(--warning-color);
+      transform:translateY(-2px);
+      box-shadow:0 4px 10px var(--shadow-color);
+    }
+    .modal{
+      display:none;
+      position:fixed;
+      z-index:1000;
+      left:0;
+      top:0;
+      width:100%;
+      height:100%;
+      overflow:auto;
+      background: var(--modal-bg);
+    }
+    .modal-content{
+      background: var(--card-bg);
+      margin:10% auto;
+      padding:20px;
+      border-radius:12px;
+      width:90%;
+      max-width:1200px;
+      animation:zoomIn .4s ease;
+      overflow-x:auto;
+      position:relative;
+      color: var(--text-primary);
+      box-shadow: 0 8px 16px var(--shadow-color);
+    }
+    #spareSummaryModal .modal-content{
+      max-width:95%;
+    }
+    .graph-modal-content{
+      background: var(--card-bg);
+      margin:10% auto;
+      padding:20px;
+      border-radius:12px;
+      width:90%;
+      max-width:800px;
+      animation:zoomIn .4s ease;
+      position:relative;
+      color: var(--text-primary);
+    }
+    .close{
+      color: var(--text-secondary);
+      float:right;
+      font-size:24px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .close:hover{
+      color: var(--text-primary);
+    }
+    .print-button{
+      float:right;
+      margin-right:10px;
+      padding:10px 16px;
+      background: var(--info-color);
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      transition:all .3s ease;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      font-size:16px;
+    }
+    .print-button:hover{
+      background: var(--warning-color);
+      transform:translateY(-2px);
+      box-shadow:0 4px 10px var(--shadow-color);
+    }
+    #modalContent .label{
+      color: var(--info-color);
+      font-weight:bold;
+    }
+    #modalContent .value{
+      color: var(--text-primary);
+    }
+    #graphWarning{
+      color: var(--danger-color);
+      font-size:14px;
+      margin-top:10px;
+      text-align:center;
+    }
+    .pagination{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin-top:20px;
+    }
+    .pagination button,.pagination select{
+      padding:8px 12px;
+      background: var(--info-color);
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:16px;
+      margin:0 5px;
+      transition:all .3s ease;
+    }
+    .pagination button:hover,.pagination select:hover{
+      background: var(--warning-color);
+    }
+    .pagination .page-number{
+      width:36px;
+      height:36px;
+      background: var(--info-color);
+      color:#fff;
+      border-radius:50%;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      margin:0 5px;
+      cursor:pointer;
+      font-size:16px;
+      border:none;
+      transition:all .3s ease;
+    }
+    .pagination .page-number:hover{
+      background: var(--warning-color);
+      transform:scale(1.1);
+    }
+    .pagination .page-number.active{
+      background: var(--warning-color);
+      color:#fff;
+    }
+    .items-per-page{
+      margin-left:10px;
+      font-size:16px;
+      color: var(--text-primary);
+    }
+    tr{
+      opacity:0;
+      transform:translateY(10px);
+      animation:fadeInUp .5s ease forwards;
+    }
+    tr:nth-child(even){
+      animation-delay:.1s;
+    }
+    tr:nth-child(odd){
+      animation-delay:.2s;
+    }
+    @keyframes fadeInUp{
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+    @keyframes zoomIn{
+      from{
+        opacity:0;
+        transform:scale(.8);
+      }
+      to{
+        opacity:1;
+        transform:scale(1);
+      }
+    }
+    th:nth-child(3),td:nth-child(3){
+      width:auto;
+      min-width:100px;
+      max-width:150px;
+      white-space:normal;
+    }
+    th:nth-child(7),td:nth-child(7){
+      min-width:150px;
+    }
+    @media (max-width: 768px){
+      th:nth-child(3),td:nth-child(3){
+        min-width:80px;
+        font-size:14px;
+      }
+      #searchInput{
+        width:100%;
+        max-width:300px;
+      }
+      .search-row{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .action-button{
+        width:100%;
+        max-width:150px;
+        justify-content:center;
+      }
+    }
+    .yellow-light{
+      background:#c9ffc4;
+    }
+    .pink-pastel{
+      background:#fce4ec;
+    }
+    .text-left{
+      text-align:left;
+    }
+    .text-center{
+      text-align:center;
+    }
+    .call-count-box{
+      margin-left:20px;
+      padding:10px 16px;
+      background: var(--call-count-bg);
+      color: var(--info-color);
+      border-radius:10px;
+      font-size:16px;
+      font-weight:bold;
+      display:inline-flex;
+      align-items:center;
+      box-shadow:0 2px 4px var(--shadow-color);
+      transition:background .3s ease;
+    }
+    .call-count-box span{
+      color: var(--danger-color);
+      margin:0 4px;
+      font-size:18px;
+    }
+    .modern-label{
+      display:inline-block;
+      padding:10px 16px;
+      background: var(--modern-label-bg);
+      color: var(--info-color);
+      border-radius:10px;
+      font-size:16px;
+      font-weight:bold;
+      box-shadow:0 2px 6px var(--shadow-color);
+      border:1px solid var(--modern-label-border);
+      transition:all .3s ease;
+      margin-right:8px;
+    }
+    .modern-label:hover{
+      background: var(--hover-bg);
+      color: var(--warning-color);
+    }
+    .detail-table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      border: 1px solid var(--border-color);
+    }
+    .detail-table th,.detail-table td{
+      padding:8px;
+      border:1px solid var(--border-color);
+      text-align:center;
+      color: var(--text-primary);
+    }
+    .detail-table th{
+      background: var(--header-bg);
+      color: var(--header-text);
+    }
+    .detail-table tr:nth-child(even){
+      background: var(--hover-bg);
+    }
+    /* ความกว้างคอลัมน์ตัวอย่าง */
+    .detail-table th:not(:first-child),.detail-table td:not(:first-child){
+      width:80px;
+      min-width:80px;
+      max-width:80px;
+    }
+    .detail-table th:first-child,.detail-table td:first-child{
+      width:auto;
+      min-width:120px;
+    }
+    /* คอลัมน์ 2 ในตารางทั่วไปเดิมเป็นชิดซ้าย */
+    .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
+      width: 40%;
+      min-width: 200px;
+      max-width: 350px;
+      white-space: normal;
+      text-align: left;
+    }
+    /* ✅ Center เฉพาะคอลัมน์ "รวม" ในตารางสรุป */
+    .summary-table th:nth-child(2), .summary-table td:nth-child(2){
+      text-align:center !important;
+    }
+    @media print{
+      .report-title,.close,.print-button,#printTableButton,#searchButton,#graphButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{
+        display:none;
+      }
+      .modal-content{
+        margin:0;
+        padding:0;
+        width:100%;
+        max-width:none;
+        border-radius:0;
+        box-shadow:none;
+      }
+      .sticker{
+        width:80mm;
+        height:100mm;
+        border:1px solid #000;
+        padding:2mm;
+        box-sizing:border-box;
+        font-size:13pt;
+        line-height:1.3;
+        overflow:hidden;
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        page-break-after:always;
+      }
+      .sticker div{
+        margin-bottom:1.5mm;
+        overflow-wrap:break-word;
+      }
+      .sticker div.description{
+        flex:1;
+      }
+      .sticker .label{
+        font-weight:bold;
+        color:#000;
+        font-size:14pt;
+      }
+      .sticker .value{
+        color:#000;
+      }
+      h2{
+        font-size:14pt;
+        color:#000;
+        margin:1.5mm 0;
+      }
+      @page{
+        size:80mm 100mm;
+        margin:0;
+      }
+      body{
+        margin:0;
+        padding:0;
+      }
+      .detail-table th,.detail-table td{
+        text-align:center;
+      }
+      .detail-table th:not(:first-child),.detail-table td:not(:first-child){
+        width:80px;
+        min-width:80px;
+        max-width:80px;
+      }
+      .detail-table th:first-child,.detail-table td:first-child{
+        width:auto;
+        min-width:120px;
+      }
+    }
+    .green-text{
+      color: var(--success-color);
+    }
+    .red-text{
+      color: var(--danger-color);
+    }
+    .timeline-table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+      border: 1px solid var(--border-color);
+    }
+    .timeline-table th,.timeline-table td{
+      padding:8px;
+      border:1px solid var(--border-color);
+      text-align:left;
+      white-space:pre-wrap;
+      word-wrap:break-word;
+      color: var(--text-primary);
+    }
+    .timeline-table th{
+      background: var(--header-bg);
+      color: var(--header-text);
+    }
+    .timeline-table tr:nth-child(even){
+      background: var(--hover-bg);
+    }
+    .detail-table th:nth-child(1),.detail-table td:nth-child(1){
+      width:20%;
+      min-width:50px;
+      max-width:80px;
+      white-space:normal;
+    }
+    .detail-table th:nth-child(2),.detail-table td:nth-child(2){
+      width:40%;
+      min-width:200px;
+      max-width:350px;
+      white-space:normal;
+      text-align:left;
+    }
+    .detail-table th:nth-child(3),.detail-table td:nth-child(3){
+      width:10%;
+      min-width:80px;
+      max-width:100px;
+      text-align:center;
+    }
+    .detail-table th:nth-child(n+4),.detail-table td:nth-child(n+4){
+      width:10%;
+      min-width:80px;
+      max-width:100px;
+      text-align:center;
+    }
+    th:nth-child(10),td:nth-child(10),
+    th:nth-child(11),td:nth-child(11),
+    th:nth-child(12),td:nth-child(12),
+    th:nth-child(13),td:nth-child(13){
+      min-width:50px;
+      width:50px;
+      max-width:60px;
+      text-align:center;
+    }
+    th:nth-child(12),td:nth-child(12){
+      font-weight:bold;
+      color: var(--danger-color);
+    }
+    th:nth-child(13),td:nth-child(13){
+      font-weight:bold;
+      color: var(--text-primary);
+    }
+    .date-update{
+      text-align:center;
+      background: var(--card-bg);
+      padding:10px;
+      border-radius:8px;
+      box-shadow:0 2px 4px var(--shadow-color);
+      margin-bottom:10px;
+      font-size:16px;
+      color: var(--text-primary);
+      font-weight:500;
+    }
+    .date-update span{
+      color: var(--info-color);
+      font-weight:bold;
+    }
+    .setting-modal-content {
+      max-width: 400px;
+    }
+    .theme-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: var(--hover-bg);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .theme-option:hover {
+      background: var(--info-color);
+      color: #fff;
+    }
+    .theme-option input[type="radio"] {
+      margin-right: 10px;
+    }
+    /* Dashboard Styles */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .dashboard-card {
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      text-align: center;
+      transition: transform 0.3s ease;
+      color: white;
+      cursor: pointer;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+    .dashboard-card.active {
+      border: 3px solid #fff;
+      box-shadow: 0 8px 16px rgba(255,255,255,0.3);
+      transform: scale(1.02);
+    }
+    .dashboard-card h3 {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .dashboard-card .value {
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+    .total-card {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+    }
+    .pending-card {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+    }
+    .success-card {
+      background: linear-gradient(135deg, #28a745, #1e7e34);
+    }
+    .new-card {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+    }
+    .over7-card {
+      background: linear-gradient(135deg, #fd7e14, #f06c00);
+    }
+    .request-card {
+      background: linear-gradient(135deg, #20c997, #0d9488);
+    }
+    .nawa-card {
+      background: linear-gradient(135deg, #6f42c1, #5a2d91);
+    }
+    .max-card {
+      background: linear-gradient(135deg, #6c757d, #545b62);
+    }
+    .dark-theme .total-card {
+      background: linear-gradient(135deg, #42a5f5, #1976d2);
+    }
+    .dark-theme .pending-card {
+      background: linear-gradient(135deg, #ef5350, #d32f2f);
+    }
+    .dark-theme .success-card {
+      background: linear-gradient(135deg, #66bb6a, #388e3c);
+    }
+    .dark-theme .new-card {
+      background: linear-gradient(135deg, #ffca28, #ffb300);
+    }
+    .dark-theme .over7-card {
+      background: linear-gradient(135deg, #ff9800, #f57c00);
+    }
+    .dark-theme .request-card {
+      background: linear-gradient(135deg, #26a69a, #00796b);
+    }
+    .dark-theme .nawa-card {
+      background: linear-gradient(135deg, #ab47bc, #8e24aa);
+    }
+    .dark-theme .max-card {
+      background: linear-gradient(135deg, #90a4ae, #78909c);
+    }
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+      .dashboard-card .value {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
+  <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
+  <!-- Dashboard Section -->
+  <div id="dashboard" class="dashboard">
+    <div id="totalCard" class="dashboard-card total-card">
+      <h3>จำนวน Call ทั้งหมด</h3>
+      <div class="value" id="totalCalls">0</div>
+    </div>
+    <div id="pendingCard" class="dashboard-card pending-card">
+      <h3>Call ค้าง (รอของเข้า)</h3>
+      <div class="value" id="callsPending">0</div>
+    </div>
+    <div id="successCard" class="dashboard-card success-card">
+      <h3>Call สำเร็จ</h3>
+      <div class="value" id="callsSuccess">0</div>
+    </div>
+    <div id="newTodayCard" class="dashboard-card new-card">
+      <h3>Call ใหม่วันนี้</h3>
+      <div class="value" id="callsNewToday">0</div>
+    </div>
+    <div id="over7Card" class="dashboard-card over7-card">
+      <h3>Call เกิน 7 วัน</h3>
+      <div class="value" id="callsOver7">0</div>
+    </div>
+    <div id="requestCard" class="dashboard-card request-card">
+      <h3>Call (ขอซื้อขอซ่อม)</h3>
+      <div class="value" id="callsRequest">0</div>
+    </div>
+    <div id="nawaCard" class="dashboard-card nawa-card">
+      <h3>Call (เบิกศูนย์นวนคร)</h3>
+      <div class="value" id="callsNawaVipa">0</div>
+    </div>
+    <div id="maxCard" class="dashboard-card max-card">
+      <h3>ศูนย์พื้นที่ที่มี Call มากที่สุด</h3>
+      <div class="value" id="maxTeamPlant">-</div>
+    </div>
+  </div>
+  <div id="searchContainer">
+    <div class="filter-row">
+      <label id="employeeFilterLabel" for="employeeFilter" class="modern-label">ศูนย์พื้นที่</label>
+      <select id="employeeFilter"><option value="">ทั้งหมด</option></select>
+      <div id="ticketCountInfo" class="call-count-box">จำนวน Call: <span id="ticketCountValue">0</span> Call</div>
+    </div>
+    <div class="filter-row">
+      <label id="pendingFilterLabel" for="pendingFilter" class="modern-label">ค้างหน่วยงาน</label>
+      <select id="pendingFilter"><option value="">ทั้งหมด</option></select>
+      <div id="callCountInfo" class="call-count-box">จำนวนรายการ <span id="callCountValue">0</span> รายการ</div>
+    </div>
+    <div class="filter-row">
+      <label id="stockFilterLabel" for="stockFilter" class="modern-label">คลังตอบ</label>
+      <select id="stockFilter"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="filter-row">
+      <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">Status</label>
+      <select id="statusCallFilter"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ, StatusCall..." />
+      <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
+      <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
+      <button id="graphButton" class="action-button"><i class="fas fa-chart-line"></i> กราฟ</button>
+      <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
+      <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
+      <button id="spareSummaryButton" class="action-button"><i class="fas fa-list-alt"></i> สรุปอะไหล่</button>
+      <button id="settingButton" class="action-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
+    </div>
+  </div>
+  <div class="table-container">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-column="DayRepair">ผ่านมา <span class="arrow"></span></th>
+          <th class="sortable" data-column="DateTime">DateTime <span class="arrow"></span></th>
+          <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
+          <th class="sortable" data-column="Brand">Brand <span class="arrow"></span></th>
+          <th class="sortable" data-column="Team">Team <span class="arrow"></span></th>
+          <th class="sortable" data-column="TeamPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
+          <th class="sortable" data-column="ค้างหน่วยงาน">ค้างหน่วยงาน <span class="arrow"></span></th>
+          <th class="sortable" data-column="Material">Material <span class="arrow"></span></th>
+          <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
+          <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
+          <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
+          <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
+          <th class="sortable" data-column="QtyPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
+          <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
+          <th class="sortable" data-column="StatusCall">Status <span class="arrow"></span></th>
+          <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
+          <th>ดูรายละเอียด</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <!-- Modals -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">×</span>
+      <button class="print-button" onclick="printModalContent()">
+        <i class="fas fa-print"></i>
+        <span>พิมพ์</span>
+      </button>
+      <h2>รายละเอียด</h2>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <div id="graphModal" class="modal">
+    <div class="graph-modal-content">
+      <span class="close" id="closeGraphModal">×</span>
+      <h2>จำนวน Call ค้างต่อทีม</h2>
+      <canvas id="teamChart" style="max-height: 400px;"></canvas>
+      <div id="graphWarning"></div>
+    </div>
+  </div>
+  <div id="summaryModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeSummaryModal">×</span>
+      <button class="print-button" onclick="printSummaryContent()">
+        <i class="fas fa-print"></i>
+        <span>พิมพ์สรุป</span>
+      </button>
+      <h2>สรุปข้อมูล Call ค้าง</h2>
+      <div id="summaryContent"></div>
+    </div>
+  </div>
+  <div id="spareSummaryModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeSpareSummaryModal">×</span>
+      <button class="print-button" onclick="printSpareSummaryContent()">
+        <i class="fas fa-print"></i>
+        <span>พิมพ์สรุปอะไหล่</span>
+      </button>
+      <h2>สรุปอะไหล่ (รอของเข้า)</h2>
+      <div id="spareSummaryContent"></div>
+    </div>
+  </div>
+  <div id="settingModal" class="modal">
+    <div class="modal-content setting-modal-content">
+      <span class="close" id="closeSettingModal">×</span>
+      <h2>ตั้งค่า</h2>
+      <div>
+        <div class="theme-option">
+          <input type="radio" id="darkTheme" name="theme" value="dark" checked>
+          <label for="darkTheme">ธีมมืด (สีซีด)</label>
+        </div>
+        <div class="theme-option">
+          <input type="radio" id="lightTheme" name="theme" value="light">
+          <label for="lightTheme">ธีมสว่าง</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pagination">
+    <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
+    <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
+    <div id="pageNumbers"></div>
+    <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+    <button id="lastPage"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>
+    <div class="items-per-page">
+      <label for="itemsPerPage">รายการต่อหน้า:</label>
+      <select id="itemsPerPage">
+        <option value="10">10 รายการ</option>
+        <option value="20" selected>20 รายการ</option>
+        <option value="30">30 รายการ</option>
+      </select>
+    </div>
+  </div>
+  <script>
+    const sheetID = '1dzE4Xjc7H0OtNUmne62u0jFQT-CiGsG2eBo-1v6mrZk';
+    const sheetName = 'Coll_Stock';
+    const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+    const updateSheetName = 'Update';
+    const updateUrl = `https://opensheet.elk.sh/${sheetID}/${updateSheetName}`;
+    const modal = document.getElementById("detailModal");
+    const graphModal = document.getElementById("graphModal");
+    const summaryModal = document.getElementById("summaryModal");
+    const spareSummaryModal = document.getElementById("spareSummaryModal");
+    const settingModal = document.getElementById("settingModal");
+    const modalContent = document.getElementById("modalContent");
+    const closeModal = document.getElementById("closeModal");
+    const closeGraphModal = document.getElementById("closeGraphModal");
+    const closeSummaryModal = document.getElementById("closeSummaryModal");
+    const closeSpareSummaryModal = document.getElementById("closeSpareSummaryModal");
+    const closeSettingModal = document.getElementById("closeSettingModal");
+    const employeeFilter = document.getElementById("employeeFilter");
+    const pendingFilter = document.getElementById("pendingFilter");
+    const stockFilter = document.getElementById("stockFilter");
+    const statusCallFilter = document.getElementById("statusCallFilter");
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const printTableButton = document.getElementById("printTableButton");
+    const graphButton = document.getElementById("graphButton");
+    const excelButton = document.getElementById("excelButton");
+    const summaryButton = document.getElementById("summaryButton");
+    const spareSummaryButton = document.getElementById("spareSummaryButton");
+    const settingButton = document.getElementById("settingButton");
+    const tableBody = document.querySelector("#data-table tbody");
+    const pageNumbersContainer = document.getElementById("pageNumbers");
+    const firstPageButton = document.getElementById("firstPage");
+    const prevPageButton = document.getElementById("prevPage");
+    const nextPageButton = document.getElementById("nextPage");
+    const lastPageButton = document.getElementById("lastPage");
+    const itemsPerPageSelect = document.getElementById("itemsPerPage");
+    const graphWarning = document.getElementById("graphWarning");
+    const summaryContent = document.getElementById("summaryContent");
+    const spareSummaryContent = document.getElementById("spareSummaryContent");
+    const updateValueSpan = document.getElementById("updateValue");
+    // Dashboard cards
+    const totalCard = document.getElementById("totalCard");
+    const pendingCard = document.getElementById("pendingCard");
+    const successCard = document.getElementById("successCard");
+    const newTodayCard = document.getElementById("newTodayCard");
+    const over7Card = document.getElementById("over7Card");
+    const requestCard = document.getElementById("requestCard");
+    const nawaCard = document.getElementById("nawaCard");
+    const maxCard = document.getElementById("maxCard");
+    let allData = [];
+    let currentPage = 1;
+    let itemsPerPage = 20;
+    let sortConfig = { column: 'DayRepair', direction: 'desc' };
+    let teamChart = null;
+    let dashboardFilter = null;
+    // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
+    let currentTicketNumber = null;
+    let currentRowData = null;
+    /** ฟังก์ชันจัดการธีม */
+    function setTheme(theme) {
+      document.body.className = theme === 'dark' ? 'dark-theme' : '';
+      localStorage.setItem('theme', theme);
+    }
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      setTheme(savedTheme);
+      document.querySelector(`input[value="${savedTheme}"]`).checked = true;
+    }
+    // Event listeners สำหรับ setting modal
+    settingButton.addEventListener('click', () => { settingModal.style.display = 'block'; });
+    closeSettingModal.onclick = () => { settingModal.style.display = 'none'; };
+    document.querySelectorAll('input[name="theme"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        setTheme(e.target.value);
+      });
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target === settingModal) {
+        settingModal.style.display = 'none';
+      }
+    });
+    function updateActiveCard(cardId) {
+      document.querySelectorAll('.dashboard-card').forEach(card => card.classList.remove('active'));
+      if (cardId) {
+        const card = document.getElementById(cardId);
+        if (card) card.classList.add('active');
+      }
+    }
+    /** อ่าน Description รองรับสะกดหลายแบบ */
+    function getDesc(row) {
+      return (row["Description"] ?? row["Discription"] ?? row["Discrtiption"] ?? "-");
+    }
+    function parseDate(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') return null;
+      const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})/);
+      if (!parts) return null;
+      const [, day, month, year, hour, minute, second] = parts;
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second));
+    }
+    function getBaseFilteredData() {
+      const selectedTeamPlant = employeeFilter.value;
+      const selectedPending = pendingFilter.value;
+      const selectedStock = stockFilter.value;
+      const selectedStatusCall = statusCallFilter.value;
+      const keyword = searchInput.value.toLowerCase().trim();
+      return allData.filter(row => {
+        if (!row) return false;
+        return (
+          (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
+          (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
+          (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
+          (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
+          (!keyword ||
+            (row["DayRepair"] || "").toString().toLowerCase().includes(keyword) ||
+            (row["DateTime"] || "").toLowerCase().includes(keyword) ||
+            (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
+            (row["Brand"] || "").toLowerCase().includes(keyword) ||
+            (row["Team"] || "").toLowerCase().includes(keyword) ||
+            (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
+            (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
+            (row["Material"] || "").toLowerCase().includes(keyword) ||
+            (getDesc(row) || "").toLowerCase().includes(keyword) ||
+            (row["Nawa"] || "").toLowerCase().includes(keyword) ||
+            (row["Vipa"] || "").toLowerCase().includes(keyword) ||
+            (row["Request"] || "").toLowerCase().includes(keyword) ||
+            (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
+            (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
+            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["StatusCall"] || "").toLowerCase().includes(keyword)
+          )
+        );
+      });
+    }
+    /** คำนวณเมตริก Dashboard */
+    function calculateDashboardMetrics(data) {
+      const ticketSet = new Set();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const newTodayTickets = new Set();
+      const pendingTickets = new Set();
+      const successTickets = new Set();
+      const nawaVipaTickets = new Set();
+      const over7Tickets = new Set();
+      const requestTickets = new Set();
+      const teamPlantTicketCounts = {};
+      data.forEach(row => {
+        const ticket = row["Ticket Number"];
+        if (!ticket || ticketSet.has(ticket)) return;
+        ticketSet.add(ticket);
+        const dt = parseDate(row["DateTime"]);
+        if (dt && dt.getFullYear() === today.getFullYear() &&
+            dt.getMonth() === today.getMonth() &&
+            dt.getDate() === today.getDate()) {
+          newTodayTickets.add(ticket);
+        }
+        const dayRepair = parseFloat(row["DayRepair"]) || 0;
+        if (dayRepair > 7) {
+          over7Tickets.add(ticket);
+        }
+        const status = row["StatusCall"];
+        if (status === "รอของเข้า") {
+          pendingTickets.add(ticket);
+        } else if (status === "สำเร็จ") {
+          successTickets.add(ticket);
+        } else if (status === "เบิกนวนคร" || status === "เบิกวิภาวดี") {
+          nawaVipaTickets.add(ticket);
+        }
+        if (!row["Material"] || row["Material"] === "" || row["Material"] === "-") {
+          requestTickets.add(ticket);
+        }
+        const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+        if (!teamPlantTicketCounts[teamPlant]) teamPlantTicketCounts[teamPlant] = new Set();
+        teamPlantTicketCounts[teamPlant].add(ticket);
+      });
+      const totalCalls = ticketSet.size;
+      const callsPending = pendingTickets.size;
+      const callsSuccess = successTickets.size;
+      const callsNawaVipa = nawaVipaTickets.size;
+      const callsNewToday = newTodayTickets.size;
+      const callsOver7 = over7Tickets.size;
+      const callsRequest = requestTickets.size;
+      const teamPlantCounts = Object.fromEntries(Object.entries(teamPlantTicketCounts).map(([teamPlant, set]) => [teamPlant, set.size]));
+      const maxTeamPlantEntry = Object.entries(teamPlantCounts).length > 0 ? Object.entries(teamPlantCounts).reduce((a, b) => a[1] > b[1] ? a : b) : null;
+      const maxTeamPlant = maxTeamPlantEntry ? maxTeamPlantEntry[0] : '-';
+      return {
+        totalCalls,
+        callsPending,
+        callsSuccess,
+        callsNawaVipa,
+        callsNewToday,
+        callsOver7,
+        callsRequest,
+        maxTeamPlant
+      };
+    }
+    function fetchUpdateDate() {
+      fetch(updateUrl)
+        .then(r => r.json())
+        .then(updateData => {
+          if (!updateData || updateData.length === 0) { updateValueSpan.textContent = '-'; return; }
+          let maxDate = null, maxDateStr = '';
+          updateData.forEach(row => {
+            const dateStr = row['Date'];
+            const parsedDate = parseDate(dateStr);
+            if (parsedDate && (!maxDate || parsedDate > maxDate)) { maxDate = parsedDate; maxDateStr = dateStr; }
+          });
+          updateValueSpan.textContent = maxDateStr || '-';
+        })
+        .catch(() => { updateValueSpan.textContent = '-'; });
+    }
+    function escapeCSVValue(value) {
+      if (value == null) return '""';
+      const stringValue = value.toString();
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    }
+    function exportToCSV() {
+      if (!allData || allData.length === 0) { alert("ไม่มีข้อมูลในระบบสำหรับการส่งออก CSV"); return; }
+      const baseFilteredData = getBaseFilteredData();
+      let filteredData = [...baseFilteredData];
+      if (dashboardFilter) {
+        switch(dashboardFilter) {
+          case 'pending':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+            break;
+          case 'success':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+            break;
+          case 'newToday':
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredData = filteredData.filter(row => {
+              const dt = parseDate(row["DateTime"]);
+              return dt && dt.getFullYear() === today.getFullYear() &&
+                     dt.getMonth() === today.getMonth() &&
+                     dt.getDate() === today.getDate();
+            });
+            break;
+          case 'over7':
+            filteredData = filteredData.filter(row => {
+              const day = parseFloat(row["DayRepair"] || 0);
+              return day > 7;
+            });
+            break;
+          case 'request':
+            filteredData = filteredData.filter(row => {
+              const mat = row["Material"] || "";
+              return mat === "" || mat === "-" || !mat.trim();
+            });
+            break;
+          case 'nawaVipa':
+            filteredData = filteredData.filter(row => {
+              const status = row["StatusCall"] || "";
+              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+            });
+            break;
+        }
+      }
+      if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง"); return; }
+      filteredData.sort((a, b) => {
+        let dayA = parseFloat(a["DayRepair"]) || 0;
+        let dayB = parseFloat(b["DayRepair"]) || 0;
+        let ticketA = a["Ticket Number"] || "";
+        let ticketB = b["Ticket Number"] || "";
+        if (dayA !== dayB) return dayB - dayA;
+        return ticketA.localeCompare(ticketB);
+      });
+      const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description"];
+      const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"DateTime","Ticket Number":"Ticket Number","Brand":"Brand","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description" };
+      const csvRows = [];
+      csvRows.push(columns.map(col => `"${displayColumns[col]}"`).join(','));
+      filteredData.forEach(row => {
+        const rowData = columns.map(col => {
+          let value;
+          if (col === "Description") value = getDesc(row);
+          else value = row[col] || "-";
+          if (col === "DayRepair") value = isNaN(parseFloat(value)) ? "-" : parseFloat(value).toFixed(0);
+          return escapeCSVValue(value);
+        });
+        csvRows.push(rowData.join(','));
+      });
+      const csvContent = csvRows.join('\n');
+      const bom = '\uFEFF';
+      const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `report_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    /** พิมพ์จากโมดัล: ใช้ currentRowData ให้ตรงกับรายละเอียดที่เห็น */
+    function printModalContent() {
+      if (!currentRowData) { alert("ไม่พบข้อมูลสำหรับการพิมพ์"); return; }
+      const modalData = currentRowData;
+      const desc = getDesc(modalData);
+      const stickerContent = `
+        <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
+        <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
+        <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
+        <div><span class="label">DateTime:</span> <span class="value">${modalData["DateTime"] || "-"}</span></div>
+        <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
+        <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
+        <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
+        <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
+      `;
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์รายละเอียด</title>
+            <style>
+              body { font-family: 'Prompt', sans-serif; margin: 0; padding: 0; }
+              .sticker { width: 80mm; height: 100mm; border: 1px solid #000; padding: 2mm; box-sizing: border-box; font-size: 13pt; line-height: 1.3; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+              .sticker div { margin-bottom: 1.5mm; overflow-wrap: break-word; }
+              .sticker div.description { flex: 1; }
+              .sticker .label { font-weight: bold; color: #000; font-size: 14pt; }
+              .sticker .value { color: #000; }
+              .sticker .value.team-brand { font-size: 20pt; font-weight: bold; }
+              h2 { font-size: 14pt; color: #000; margin: 1.5mm 0; }
+              @media print {
+                body { margin: 0; }
+                @page { size: 80mm 100mm; margin: 0; }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <div class="sticker">
+              <h2>รายละเอียด</h2>
+              ${stickerContent}
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+    /** พิมพ์สติ๊กเกอร์จากหน้าหลัก */
+    function printTable() {
+      const baseFilteredData = getBaseFilteredData();
+      let filteredData = [...baseFilteredData];
+      if (dashboardFilter) {
+        switch(dashboardFilter) {
+          case 'pending':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+            break;
+          case 'success':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+            break;
+          case 'newToday':
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredData = filteredData.filter(row => {
+              const dt = parseDate(row["DateTime"]);
+              return dt && dt.getFullYear() === today.getFullYear() &&
+                     dt.getMonth() === today.getMonth() &&
+                     dt.getDate() === today.getDate();
+            });
+            break;
+          case 'over7':
+            filteredData = filteredData.filter(row => {
+              const day = parseFloat(row["DayRepair"] || 0);
+              return day > 7;
+            });
+            break;
+          case 'request':
+            filteredData = filteredData.filter(row => {
+              const mat = row["Material"] || "";
+              return mat === "" || mat === "-" || !mat.trim();
+            });
+            break;
+          case 'nawaVipa':
+            filteredData = filteredData.filter(row => {
+              const status = row["StatusCall"] || "";
+              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+            });
+            break;
+        }
+      }
+      if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา"); return; }
+      filteredData.sort((a, b) => {
+        let dayA = parseFloat(a["DayRepair"]) || 0;
+        let dayB = parseFloat(b["DayRepair"]) || 0;
+        let ticketA = a["Ticket Number"] || "";
+        let ticketB = b["Ticket Number"] || "";
+        if (dayA !== dayB) return dayB - dayA;
+        return ticketA.localeCompare(ticketB);
+      });
+      const startIdx = (currentPage - 1) * itemsPerPage;
+      const endIdx = startIdx + itemsPerPage;
+      const paginatedData = filteredData.slice(startIdx, endIdx);
+      const stickersHtml = paginatedData.map(row => {
+        const desc = getDesc(row);
+        return `
+          <div class="sticker">
+            <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
+            <div><span class="label">Team:</span> <span class="value team-brand">${row["Team"] || "-"}</span></div>
+            <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
+            <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
+            <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
+            <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
+          </div>
+        `;
+      }).join('');
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สติ๊กเกอร์</title>
+            <style>
+              body { font-family: 'Prompt', sans-serif; margin: 0; padding: 0; }
+              .sticker { width: 80mm; height: 100mm; border: 1px solid #000; padding: 2mm; box-sizing: border-box; font-size: 13pt; line-height: 1.3; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+              .sticker div { margin-bottom: 1.5mm; overflow-wrap: break-word; }
+              .sticker div.description { flex: 1; }
+              .sticker .label { font-weight: bold; color: #000; font-size: 14pt; }
+              .sticker .value { color: #000; }
+              .sticker .value.team-brand { font-size: 16pt; font-weight: bold; }
+              @media print {
+                body { margin: 0; }
+                @page { size: 80mm 100mm; margin: 0; }
+              }
+            </style>
+          </head>
+          <body onload="window.print()">
+            ${stickersHtml}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+    function showGraph() {
+      const baseFilteredData = getBaseFilteredData();
+      let filteredData = [...baseFilteredData];
+      if (dashboardFilter) {
+        switch(dashboardFilter) {
+          case 'pending':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+            break;
+          case 'success':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+            break;
+          case 'newToday':
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredData = filteredData.filter(row => {
+              const dt = parseDate(row["DateTime"]);
+              return dt && dt.getFullYear() === today.getFullYear() &&
+                     dt.getMonth() === today.getMonth() &&
+                     dt.getDate() === today.getDate();
+            });
+            break;
+          case 'over7':
+            filteredData = filteredData.filter(row => {
+              const day = parseFloat(row["DayRepair"] || 0);
+              return day > 7;
+            });
+            break;
+          case 'request':
+            filteredData = filteredData.filter(row => {
+              const mat = row["Material"] || "";
+              return mat === "" || mat === "-" || !mat.trim();
+            });
+            break;
+          case 'nawaVipa':
+            filteredData = filteredData.filter(row => {
+              const status = row["StatusCall"] || "";
+              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+            });
+            break;
+        }
+      }
+      const ticketCounts = {};
+      filteredData.forEach(row => {
+        const ticket = row["Ticket Number"];
+        const team = row["Team"] || "ไม่ระบุทีม";
+        if (ticket && !ticketCounts[ticket]) ticketCounts[ticket] = team;
+      });
+      const teamCounts = {};
+      Object.values(ticketCounts).forEach(team => { teamCounts[team] = (teamCounts[team] || 0) + 1; });
+      const sortedTeams = Object.keys(teamCounts).sort((a, b) => teamCounts[b] - teamCounts[a]);
+      let limitedTeams = sortedTeams;
+      let warningMessage = "";
+      if (sortedTeams.length > 50) { limitedTeams = sortedTeams.slice(0, 50); warningMessage = `แสดงเฉพาะ 50 ทีมแรกจากทั้งหมด ${sortedTeams.length} ทีมเนื่องจากข้อจำกัดด้านการแสดงผล`; }
+      const sortedCounts = limitedTeams.map(team => teamCounts[team]);
+      const backgroundColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#c9ffc4' : '#fce4ec');
+      const borderColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#4caf50' : '#f06292');
+      graphWarning.textContent = warningMessage;
+      if (limitedTeams.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
+      if (teamChart) teamChart.destroy();
+      const ctx = document.getElementById('teamChart').getContext('2d');
+      teamChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: limitedTeams,
+          datasets: [{
+            label: 'จำนวน Call ค้าง',
+            data: sortedCounts,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 3,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            fill: false,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+      graphModal.style.display = "block";
+    }
+    function showSummary() {
+      const baseFilteredData = getBaseFilteredData();
+      let filteredData = [...baseFilteredData];
+      if (dashboardFilter) {
+        switch(dashboardFilter) {
+          case 'pending':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+            break;
+          case 'success':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+            break;
+          case 'newToday':
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredData = filteredData.filter(row => {
+              const dt = parseDate(row["DateTime"]);
+              return dt && dt.getFullYear() === today.getFullYear() &&
+                     dt.getMonth() === today.getMonth() &&
+                     dt.getDate() === today.getDate();
+            });
+            break;
+          case 'over7':
+            filteredData = filteredData.filter(row => {
+              const day = parseFloat(row["DayRepair"] || 0);
+              return day > 7;
+            });
+            break;
+          case 'request':
+            filteredData = filteredData.filter(row => {
+              const mat = row["Material"] || "";
+              return mat === "" || mat === "-" || !mat.trim();
+            });
+            break;
+          case 'nawaVipa':
+            filteredData = filteredData.filter(row => {
+              const status = row["StatusCall"] || "";
+              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+            });
+            break;
+        }
+      }
+      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
+      const totalCalls = uniqueTickets;
+      const pivotData = {};
+      const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
+      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
+      const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
+      teamPlants.forEach(teamPlant => {
+        pivotData[teamPlant] = {};
+        statusCalls.forEach(status => { pivotData[teamPlant][status] = 0; });
+        pendingUnits.forEach(pending => { pivotData[teamPlant][pending] = 0; });
+      });
+      const ticketCounts = {};
+      filteredData.forEach(row => {
+        const ticket = row["Ticket Number"];
+        if (!ticketCounts[ticket]) {
+          const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+          const status = row["StatusCall"] || "ไม่ระบุ";
+          const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+          pivotData[teamPlant][status]++;
+          pivotData[teamPlant][pending]++;
+          ticketCounts[ticket] = true;
+        }
+      });
+      const teamPlantTotals = teamPlants.map(teamPlant => {
+        const total = Object.keys(pivotData[teamPlant]).reduce((sum, key) => {
+          if (statusCalls.includes(key)) return sum + pivotData[teamPlant][key];
+          return sum;
+        }, 0);
+        return { teamPlant, total, ...pivotData[teamPlant] };
+      }).sort((a, b) => b.total - a.total);
+      // ✅ ใส่คลาส summary-table เพื่อให้คอลัมน์ "รวม" จัดกึ่งกลาง
+      let pivotTableHtml = `
+        <table class='detail-table summary-table'>
+          <thead>
+            <tr>
+              <th>ศูนย์พื้นที่</th>
+              <th class='fixed-width'>รวม</th>
+              ${statusCalls.map(status => `<th class='fixed-width'>${status}</th>`).join('')}
+              ${orderedPendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${teamPlantTotals.map(({ teamPlant, total }) => `
+              <tr>
+                <td>${teamPlant}</td>
+                <td class='fixed-width'>${total === 0 ? '-' : total}</td>
+                ${statusCalls.map(status => `<td class='fixed-width'>${pivotData[teamPlant][status] === 0 ? '-' : pivotData[teamPlant][status]}</td>`).join('')}
+                ${orderedPendingUnits.map(pending => `<td class='fixed-width'>${pivotData[teamPlant][pending] === 0 ? '-' : pivotData[teamPlant][pending]}</td>`).join('')}
+              </tr>
+            `).join('')}
+            <tr>
+              <td><strong>รวม</strong></td>
+              <td class='fixed-width'><strong>${totalCalls === 0 ? '-' : totalCalls}</strong></td>
+              ${statusCalls.map(status => {
+                const totalStatus = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][status], 0);
+                return `<td class='fixed-width'><strong>${totalStatus === 0 ? '-' : totalStatus}</strong></td>`;
+              }).join('')}
+              ${orderedPendingUnits.map(pending => {
+                const totalPending = teamPlants.reduce((sum, teamPlant) => sum + pivotData[teamPlant][pending], 0);
+                return `<td class='fixed-width'><strong>${totalPending === 0 ? '-' : totalPending}</strong></td>`;
+              }).join('')}
+            </tr>
+          </tbody>
+        </table>
+      `;
+      let summaryHtml = `
+        <div><span class='label'>จำนวน Call ทั้งหมด:</span> <span class='value'>${totalCalls} Call</span></div>
+        <h3>จำนวน Call ค้างตามศูนย์พื้นที่และสถานะ Call</h3>
+        ${pivotTableHtml}
+      `;
+      summaryContent.innerHTML = summaryHtml;
+      summaryModal.style.display = "block";
+    }
+    function showSpareSummary() {
+      const baseFilteredData = getBaseFilteredData();
+      let filteredData = baseFilteredData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
+      if (dashboardFilter) {
+        switch(dashboardFilter) {
+          case 'pending':
+            // already filtered to pending
+            break;
+          case 'success':
+            filteredData = [];
+            break;
+          case 'newToday':
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredData = filteredData.filter(row => {
+              const dt = parseDate(row["DateTime"]);
+              return dt && dt.getFullYear() === today.getFullYear() &&
+                     dt.getMonth() === today.getMonth() &&
+                     dt.getDate() === today.getDate();
+            });
+            break;
+          case 'over7':
+            filteredData = filteredData.filter(row => {
+              const day = parseFloat(row["DayRepair"] || 0);
+              return day > 7;
+            });
+            break;
+          case 'request':
+            filteredData = filteredData.filter(row => {
+              const mat = row["Material"] || "";
+              return mat === "" || mat === "-" || !mat.trim();
+            });
+            break;
+          case 'nawaVipa':
+            filteredData = [];
+            break;
+        }
+      }
+      if (filteredData.length === 0) {
+        spareSummaryContent.innerHTML = '<p>ไม่มีข้อมูลสำหรับ StatusCall = "รอของเข้า"</p>';
+        spareSummaryModal.style.display = "block";
+        return;
+      }
+      const pivotData = {};
+      const materials = [...new Set(filteredData.map(row => (row["Material"] + '|' + getDesc(row))))];
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))]
+        .map(unit => unit.replace(/Stock\s*/gi, '').trim())
+        .filter(unit => unit)
+        .sort();
+      materials.forEach(matDesc => {
+        pivotData[matDesc] = { total: 0 };
+        pendingUnits.forEach(pending => { pivotData[matDesc][pending] = 0; });
+      });
+      filteredData.forEach(row => {
+        const matDesc = row["Material"] + '|' + getDesc(row);
+        const pending = (row["ค้างหน่วยงาน"] || "ไม่ระบุ").replace(/Stock\s*/gi, '').trim();
+        if (pivotData[matDesc] && pending) { pivotData[matDesc].total++; pivotData[matDesc][pending]++; }
+      });
+      const sortedMaterials = materials.sort((a, b) => pivotData[b].total - pivotData[a].total);
+      let pivotTableHtml = `
+        <table class='detail-table'>
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Description</th>
+              <th class='fixed-width'>จำนวนรวม</th>
+              ${pendingUnits.map(pending => `<th class='fixed-width'>${pending}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedMaterials.map(matDesc => {
+              const [material, description] = matDesc.split('|');
+              const data = pivotData[matDesc];
+              return `
+                <tr>
+                  <td>${material}</td>
+                  <td>${description}</td>
+                  <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
+                  ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+      spareSummaryContent.innerHTML = pivotTableHtml;
+      spareSummaryModal.style.display = "block";
+    }
+    function printSummaryContent() {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สรุปข้อมูล</title>
+            <style>
+              body { font-family: 'Prompt', sans-serif; margin: 10mm; padding: 0; }
+              h2, h3 { color: #000; margin: 10px 0; }
+              .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+              .detail-table th, .detail-table td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+              .detail-table th { background-color: #007bff; color: white; }
+              .detail-table tr:nth-child(even) { background-color: #f9f9f9; }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) { width: 80px; min-width: 80px; max-width: 80px; }
+              .detail-table th:first-child, .detail-table td:first-child { width: auto; min-width: 120px; }
+              .label { font-weight: bold; color: #007bff; }
+              .value { color: #000; }
+              /* ✅ กึ่งกลางคอลัมน์ "รวม" ในหน้าพิมพ์ด้วย */
+              .summary-table th:nth-child(2), .summary-table td:nth-child(2){ text-align:center !important; }
+              @media print { body { margin: 0; } @page { margin: 10mm; } }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <h2>สรุปข้อมูล Call ค้าง</h2>
+            ${summaryContent.innerHTML}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+    function printSpareSummaryContent() {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>พิมพ์สรุปอะไหล่</title>
+            <style>
+              body { font-family: 'Prompt', sans-serif; margin: 10mm; padding: 0; }
+              h2, h3 { color: #000; margin: 10px 0; }
+              .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+              .detail-table th, .detail-table td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+              .detail-table th { background-color: #007bff; color: white; }
+              .detail-table tr:nth-child(even) { background-color: #f9f9f9; }
+              .detail-table th:not(:first-child), .detail-table td:not(:first-child) { width: 80px; min-width: 80px; max-width: 80px; }
+              .detail-table th:first-child, .detail-table td:first-child { width: auto; min-width: 120px; }
+              @media print { body { margin: 0; } @page { margin: 10mm; } }
+            </style>
+          </head>
+          <body onload="window.print()">
+            <h2>สรุปอะไหล่ (รอของเข้า)</h2>
+            ${spareSummaryContent.innerHTML}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+    // Dashboard click events
+    totalCard.addEventListener('click', () => {
+      dashboardFilter = null;
+      updateActiveCard(null);
+      filterAndRenderTable();
+    });
+    pendingCard.addEventListener('click', () => {
+      dashboardFilter = 'pending';
+      updateActiveCard('pendingCard');
+      filterAndRenderTable();
+    });
+    successCard.addEventListener('click', () => {
+      dashboardFilter = 'success';
+      updateActiveCard('successCard');
+      filterAndRenderTable();
+    });
+    newTodayCard.addEventListener('click', () => {
+      dashboardFilter = 'newToday';
+      updateActiveCard('newTodayCard');
+      filterAndRenderTable();
+    });
+    over7Card.addEventListener('click', () => {
+      dashboardFilter = 'over7';
+      updateActiveCard('over7Card');
+      filterAndRenderTable();
+    });
+    requestCard.addEventListener('click', () => {
+      dashboardFilter = 'request';
+      updateActiveCard('requestCard');
+      filterAndRenderTable();
+    });
+    nawaCard.addEventListener('click', () => {
+      dashboardFilter = 'nawaVipa';
+      updateActiveCard('nawaCard');
+      filterAndRenderTable();
+    });
+    maxCard.addEventListener('click', () => {
+      const base = getBaseFilteredData();
+      if (base.length === 0) return;
+      const metrics = calculateDashboardMetrics(base);
+      const maxTP = metrics.maxTeamPlant;
+      if (maxTP !== '-') {
+        employeeFilter.value = maxTP;
+        dashboardFilter = null;
+        updateActiveCard('maxCard');
+        filterAndRenderTable();
+      }
+    });
+    // ปิดโมดัล
+    closeModal.onclick = () => { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; };
+    closeGraphModal.onclick = () => graphModal.style.display = "none";
+    closeSummaryModal.onclick = () => summaryModal.style.display = "none";
+    closeSpareSummaryModal.onclick = () => spareSummaryModal.style.display = "none";
+    window.onclick = e => {
+      if (e.target == modal) { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; }
+      if (e.target == graphModal) graphModal.style.display = "none";
+      if (e.target == summaryModal) summaryModal.style.display = "none";
+      if (e.target == spareSummaryModal) spareSummaryModal.style.display = "none";
+    };
+    // ปุ่มต่าง ๆ
+    graphButton.addEventListener("click", showGraph);
+    excelButton.addEventListener("click", exportToCSV);
+    summaryButton.addEventListener("click", showSummary);
+    spareSummaryButton.addEventListener("click", showSpareSummary);
+    itemsPerPageSelect.addEventListener("change", e => { itemsPerPage = parseInt(e.target.value); currentPage = 1; filterAndRenderTable(); });
+    searchInput.addEventListener("keypress", e => { if (e.key === "Enter") filterAndRenderTable(); });
+    searchButton.addEventListener("click", filterAndRenderTable);
+    printTableButton.addEventListener("click", printTable);
+    function populateTeamPlantFilter(data) {
+      if (!data || data.length === 0) return;
+      const teamPlants = [...new Set(data.map(row => row["TeamPlant"]).filter(Boolean))].sort();
+      employeeFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+      teamPlants.forEach(teamPlant => {
+        const option = document.createElement("option");
+        option.value = teamPlant;
+        option.textContent = teamPlant;
+        employeeFilter.appendChild(option);
+      });
+    }
+    function updatePendingFilter(data, selectedTeamPlant) {
+      if (!data || data.length === 0) return;
+      const currentPendingValue = pendingFilter.value;
+      const filteredData = selectedTeamPlant ? data.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant) : data;
+      const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"]).filter(Boolean))].sort();
+      pendingFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+      pendingUnits.forEach(pending => {
+        const option = document.createElement("option");
+        option.value = pending;
+        option.textContent = pending;
+        pendingFilter.appendChild(option);
+      });
+      if (currentPendingValue && pendingUnits.includes(currentPendingValue)) pendingFilter.value = currentPendingValue;
+      else pendingFilter.value = "";
+      updateStockFilter(data, selectedTeamPlant, pendingFilter.value);
+      updateStatusCallFilter(data, selectedTeamPlant, pendingFilter.value);
+    }
+    function updateStockFilter(data, selectedTeamPlant, selectedPending) {
+      if (!data || data.length === 0) return;
+      const currentStockValue = stockFilter.value;
+      let filteredData = data;
+      if (selectedTeamPlant) filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      if (selectedPending) filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
+      const stockResponses = [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(Boolean))].sort();
+      stockFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+      stockResponses.forEach(stock => {
+        const option = document.createElement("option");
+        option.value = stock;
+        option.textContent = stock;
+        stockFilter.appendChild(option);
+      });
+      if (currentStockValue && stockResponses.includes(currentStockValue)) stockFilter.value = currentStockValue;
+      else stockFilter.value = "";
+    }
+    function updateStatusCallFilter(data, selectedTeamPlant, selectedPending) {
+      if (!data || data.length === 0) return;
+      const currentStatusCallValue = statusCallFilter.value;
+      let filteredData = data;
+      if (selectedTeamPlant) filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      if (selectedPending) filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
+      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"]).filter(Boolean))].sort();
+      statusCallFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+      statusCalls.forEach(status => {
+        const option = document.createElement("option");
+        option.value = status;
+        option.textContent = status;
+        statusCallFilter.appendChild(option);
+      });
+      if (currentStatusCallValue && statusCalls.includes(currentStatusCallValue)) statusCallFilter.value = currentStatusCallValue;
+      else statusCallFilter.value = "";
+    }
+    function addSortListeners() {
+      const sortableHeaders = document.querySelectorAll("th.sortable");
+      sortableHeaders.forEach(header => {
+        header.addEventListener("click", () => {
+          const column = header.getAttribute("data-column");
+          if (sortConfig.column === column) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+          else { sortConfig.column = column; sortConfig.direction = 'asc'; }
+          updateSortArrows();
+          filterAndRenderTable();
+        });
+      });
+    }
+    function updateSortArrows() {
+      const sortableHeaders = document.querySelectorAll("th.sortable");
+      sortableHeaders.forEach(header => {
+        const arrow = header.querySelector(".arrow");
+        const column = header.getAttribute("data-column");
+        arrow.textContent = (column === sortConfig.column) ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '';
+      });
+    }
+    function filterAndRenderTable() {
+      const baseFilteredData = getBaseFilteredData();
+      let filteredData = [...baseFilteredData];
+      if (dashboardFilter) {
+        switch(dashboardFilter) {
+          case 'pending':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+            break;
+          case 'success':
+            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+            break;
+          case 'newToday':
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredData = filteredData.filter(row => {
+              const dt = parseDate(row["DateTime"]);
+              return dt && dt.getFullYear() === today.getFullYear() &&
+                     dt.getMonth() === today.getMonth() &&
+                     dt.getDate() === today.getDate();
+            });
+            break;
+          case 'over7':
+            filteredData = filteredData.filter(row => {
+              const day = parseFloat(row["DayRepair"] || 0);
+              return day > 7;
+            });
+            break;
+          case 'request':
+            filteredData = filteredData.filter(row => {
+              const mat = row["Material"] || "";
+              return mat === "" || mat === "-" || !mat.trim();
+            });
+            break;
+          case 'nawaVipa':
+            filteredData = filteredData.filter(row => {
+              const status = row["StatusCall"] || "";
+              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+            });
+            break;
+        }
+      }
+      const selectedTeamPlant = employeeFilter.value;
+      updatePendingFilter(allData, selectedTeamPlant);
+      updateStockFilter(allData, selectedTeamPlant, pendingFilter.value);
+      updateStatusCallFilter(allData, selectedTeamPlant, pendingFilter.value);
+      // Update Dashboard Metrics
+      const metrics = calculateDashboardMetrics(filteredData);
+      document.getElementById("totalCalls").textContent = metrics.totalCalls;
+      document.getElementById("callsPending").textContent = metrics.callsPending;
+      document.getElementById("callsSuccess").textContent = metrics.callsSuccess;
+      document.getElementById("callsNawaVipa").textContent = metrics.callsNawaVipa;
+      document.getElementById("callsNewToday").textContent = metrics.callsNewToday;
+      document.getElementById("callsOver7").textContent = metrics.callsOver7;
+      document.getElementById("callsRequest").textContent = metrics.callsRequest;
+      document.getElementById("maxTeamPlant").textContent = metrics.maxTeamPlant;
+      const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
+      document.getElementById("ticketCountValue").textContent = uniqueTickets;
+      if (sortConfig.column) {
+        filteredData.sort((a, b) => {
+          let valueA = a[sortConfig.column] ?? (sortConfig.column === "Description" ? getDesc(a) : "");
+          let valueB = b[sortConfig.column] ?? (sortConfig.column === "Description" ? getDesc(b) : "");
+          if (sortConfig.column === 'DayRepair') {
+            let dayA = parseFloat(valueA) || 0, dayB = parseFloat(valueB) || 0;
+            let ticketA = a["Ticket Number"] || "", ticketB = b["Ticket Number"] || "";
+            if (dayA !== dayB) return sortConfig.direction === 'asc' ? dayA - dayB : dayB - dayA;
+            return ticketA.localeCompare(ticketB);
+          } else {
+            valueA = valueA.toString().toLowerCase(); valueB = valueB.toString().toLowerCase();
+            return sortConfig.direction === 'asc'
+              ? (valueA > valueB ? 1 : valueA < valueB ? -1 : 0)
+              : (valueA < valueB ? 1 : valueA > valueB ? -1 : 0);
+          }
+        });
+      } else {
+        filteredData.sort((a, b) => {
+          let dayA = parseFloat(a["DayRepair"]) || 0;
+          let dayB = parseFloat(b["DayRepair"]) || 0;
+          let ticketA = a["Ticket Number"] || "";
+          let ticketB = b["Ticket Number"] || "";
+          if (dayA !== dayB) return dayB - dayA;
+          return ticketA.localeCompare(ticketB);
+        });
+      }
+      renderTable(filteredData);
+      updateCallCount(filteredData);
+    }
+    employeeFilter.addEventListener("change", filterAndRenderTable);
+    pendingFilter.addEventListener("change", filterAndRenderTable);
+    stockFilter.addEventListener("change", filterAndRenderTable);
+    statusCallFilter.addEventListener("change", filterAndRenderTable);
+    function updateCallCount(data) {
+      const count = [...new Set(data.map(row => row["Ticket Number"]).filter(Boolean))].length;
+      document.getElementById("callCountValue").textContent = count;
+    }
+    function renderTable(data) {
+      tableBody.innerHTML = '';
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="17">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        return;
+      }
+      const startIdx = (currentPage - 1) * itemsPerPage;
+      const endIdx = startIdx + itemsPerPage;
+      const paginatedData = data.slice(startIdx, endIdx);
+      const ticketGroups = {};
+      data.forEach(row => {
+        const ticket = row["Ticket Number"];
+        if (!ticketGroups[ticket]) ticketGroups[ticket] = [];
+        ticketGroups[ticket].push(row);
+      });
+      const uniqueTickets = Object.keys(ticketGroups).sort();
+      const colorMap = {};
+      uniqueTickets.forEach((ticket, index) => { colorMap[ticket] = index % 2 === 0 ? "yellow-light" : "pink-pastel"; });
+      paginatedData.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.style.animationDelay = `${i * 0.05}s`;
+        const ticket = row["Ticket Number"];
+        tr.className = colorMap[ticket] || "yellow-light";
+        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","AnswerX"];
+        columns.forEach(col => {
+          const td = document.createElement("td");
+          let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
+          let displayValue = cellValue;
+          if (col === "DayRepair") {
+            displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
+          } else if (col === "คลังตอบ") {
+            if (cellValue === "ดำเนินการแล้ว") { displayValue = "ดำเนินการแล้ว"; td.style.color = "var(--success-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "รอตรวจสอบ") { displayValue = "รอตรวจสอบ"; td.style.color = "var(--danger-color)"; td.style.fontWeight = "bold"; }
+          } else if (col === "StatusCall") {
+            if (cellValue === "รอของเข้า") { td.style.color = "var(--danger-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "สำเร็จ") { td.style.color = "var(--success-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "เบิกนวนคร") { td.style.color = "var(--info-color)"; td.style.fontWeight = "bold"; }
+            else if (cellValue === "เบิกวิภาวดี") { td.style.color = "var(--warning-color)"; td.style.fontWeight = "bold"; }
+            else { td.style.color = "var(--text-secondary)"; }
+          }
+          td.textContent = displayValue;
+          td.classList.add("text-left");
+          tr.appendChild(td);
+        });
+        const detailTd = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.textContent = "ดูรายละเอียด";
+        btn.className = "detail-button";
+        btn.onclick = () => {
+          currentTicketNumber = row["Ticket Number"];
+          currentRowData = row; // เก็บแถวปัจจุบันสำหรับพิมพ์จากโมดัล
+          const timeline = row["TimeLine"] || "";
+          let timelineHtml = '<table class="timeline-table"><thead><tr><th>วันที่</th><th>ผู้แจ้ง</th><th>สถานะ</th><th>รายละเอียด</th></tr></thead><tbody>';
+          if (timeline) {
+            const events = timeline.split('|');
+            events.forEach(event => {
+              let eventTrim = event.trim();
+              if (eventTrim) {
+                let date = ''; let person = ''; let status = ''; let details = '';
+                const dateMatch = eventTrim.match(/^(\d{2}\.\d{2})\s/);
+                if (dateMatch) { date = dateMatch[1]; eventTrim = eventTrim.slice(dateMatch[0].length); }
+                if (eventTrim.startsWith('Backlog ')) { person = 'Backlog'; eventTrim = eventTrim.slice(8); }
+                else if (eventTrim.startsWith('คุณ')) {
+                  const personEnd = eventTrim.indexOf(' ', 3);
+                  if (personEnd > -1) { person = eventTrim.slice(0, personEnd); eventTrim = eventTrim.slice(personEnd + 1); }
+                  else { person = eventTrim; eventTrim = ''; }
+                }
+                if (eventTrim.startsWith('แจ้งค้าง_')) {
+                  const statusEnd = eventTrim.indexOf(' ', 9);
+                  if (statusEnd > -1) { status = eventTrim.slice(0, statusEnd); details = eventTrim.slice(statusEnd + 1); }
+                  else { status = eventTrim; details = ''; }
+                } else { status = eventTrim; details = ''; }
+                timelineHtml += `<tr><td>${date || '-'}</td><td>${person || '-'}</td><td>${status || '-'}</td><td>${details || '-'}</td></tr>`;
+              }
+            });
+          }
+          timelineHtml += '</tbody></table>';
+          modalContent.innerHTML = `
+            <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
+            <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
+            <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
+            <div><span class="label">Brand:</span> <span class="value">${row["Brand"] || "-"}</span></div>
+            <div><span class="label">Team:</span> <span class="value">${row["Team"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
+            <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
+            <div><span class="label">Description:</span> <span class="value">${getDesc(row) || "-"}</span></div>
+            <div><span class="label">Nawa:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
+            <div><span class="label">Vipa:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
+            <div><span class="label">Request:</span> <span class="value">${row["Request"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
+            <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
+            <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
+            <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
+            <h3>ประวัติ Timeline</h3>
+            ${timelineHtml}
+          `;
+          modal.style.display = "block";
+        };
+        detailTd.appendChild(btn);
+        tr.appendChild(detailTd);
+        tableBody.appendChild(tr);
+      });
+      updatePagination(data.length);
+    }
+    function updatePagination(totalItems) {
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      currentPage = Math.min(currentPage, totalPages);
+      if (currentPage < 1) currentPage = 1;
+      pageNumbersContainer.innerHTML = '';
+      const maxPageButtons = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+      if (endPage - startPage + 1 < maxPageButtons) startPage = Math.max(1, endPage - maxPageButtons + 1);
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = "page-number";
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => { currentPage = i; filterAndRenderTable(); });
+        pageNumbersContainer.appendChild(btn);
+      }
+      firstPageButton.disabled = currentPage === 1;
+      prevPageButton.disabled = currentPage === 1;
+      nextPageButton.disabled = currentPage === totalPages;
+      lastPageButton.disabled = currentPage === totalPages;
+      firstPageButton.onclick = () => { currentPage = 1; filterAndRenderTable(); };
+      prevPageButton.onclick = () => { if (currentPage > 1) { currentPage--; filterAndRenderTable(); } };
+      nextPageButton.onclick = () => { if (currentPage < totalPages) { currentPage++; filterAndRenderTable(); } };
+      lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
+    }
+    // โหลดข้อมูลครั้งแรก
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        allData = data;
+        populateTeamPlantFilter(data);
+        updatePendingFilter(data, employeeFilter.value);
+        updateStockFilter(data, employeeFilter.value, pendingFilter.value);
+        updateStatusCallFilter(data, employeeFilter.value, pendingFilter.value);
+        filterAndRenderTable();
+        addSortListeners();
+      })
+      .catch(err => console.error('Error fetching data:', err));
+    fetchUpdateDate();
+    // Initialize theme on load
+    initTheme();
+  </script>
+</body>
+</html>et" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
