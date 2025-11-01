@@ -488,7 +488,7 @@
       text-align:center !important;
     }
     @media print{
-      .report-title,.close,.print-button,#printTableButton,#searchButton,#graphButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{
+      .report-title,.close,.print-button,#printTableButton,#searchButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{
         display:none;
       }
       .modal-content{
@@ -714,6 +714,12 @@
     .max-card {
       background: linear-gradient(135deg, #6c757d, #545b62);
     }
+    .graph-card {
+      background: linear-gradient(135deg, #6f42c1, #5a2d91);
+    }
+    .spare-card {
+      background: linear-gradient(135deg, #28a745, #20c09d);
+    }
     .dark-theme .total-card {
       background: linear-gradient(135deg, #42a5f5, #1976d2);
     }
@@ -738,6 +744,12 @@
     .dark-theme .max-card {
       background: linear-gradient(135deg, #90a4ae, #78909c);
     }
+    .dark-theme .graph-card {
+      background: linear-gradient(135deg, #ab47bc, #8e24aa);
+    }
+    .dark-theme .spare-card {
+      background: linear-gradient(135deg, #66bb6a, #4caf50);
+    }
     @media (max-width: 768px) {
       .dashboard {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -749,7 +761,7 @@
     }
   </style>
 </head>
-<body class="dark-theme">
+<body>
   <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
   <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
   <!-- Dashboard Section -->
@@ -767,7 +779,7 @@
       <div class="value" id="callsSuccess">0</div>
     </div>
             <div id="nawaCard" class="dashboard-card nawa-card">
-      <h3>Call (เบิกศูนย์อะไหล่)</h3>
+      <h3>Call (เบิกศูนย์นวนคร)</h3>
       <div class="value" id="callsNawaVipa">0</div>
     </div>
             <div id="requestCard" class="dashboard-card request-card">
@@ -785,6 +797,14 @@
     <div id="maxCard" class="dashboard-card max-card">
       <h3>ศูนย์พื้นที่ที่มี Call มากที่สุด</h3>
       <div class="value" id="maxTeamPlant">-</div>
+    </div>
+    <div id="graphCard" class="dashboard-card graph-card">
+      <h3><i class="fas fa-chart-line"></i> กราฟสรุป</h3>
+      <div class="value"><i class="fas fa-chart-line"></i></div>
+    </div>
+    <div id="spareSummaryCard" class="dashboard-card spare-card">
+      <h3><i class="fas fa-list-alt"></i> สรุปอะไหล่</h3>
+      <div class="value"><i class="fas fa-list-alt"></i></div>
     </div>
   </div>
   <div id="searchContainer">
@@ -810,10 +830,8 @@
       <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ, StatusCall..." />
       <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
       <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
-      <button id="graphButton" class="action-button"><i class="fas fa-chart-line"></i> กราฟ</button>
       <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
       <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
-      <button id="spareSummaryButton" class="action-button"><i class="fas fa-list-alt"></i> สรุปอะไหล่</button>
       <button id="settingButton" class="action-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
     </div>
   </div>
@@ -858,7 +876,7 @@
   <div id="graphModal" class="modal">
     <div class="graph-modal-content">
       <span class="close" id="closeGraphModal">×</span>
-      <h2>จำนวน Call ค้างต่อทีม</h2>
+      <h2>จำนวน Call ตามศูนย์พื้นที่และสถานะ</h2>
       <canvas id="teamChart" style="max-height: 400px;"></canvas>
       <div id="graphWarning"></div>
     </div>
@@ -891,11 +909,11 @@
       <h2>ตั้งค่า</h2>
       <div>
         <div class="theme-option">
-          <input type="radio" id="darkTheme" name="theme" value="dark" checked>
+          <input type="radio" id="darkTheme" name="theme" value="dark">
           <label for="darkTheme">ธีมมืด (สีซีด)</label>
         </div>
         <div class="theme-option">
-          <input type="radio" id="lightTheme" name="theme" value="light">
+          <input type="radio" id="lightTheme" name="theme" value="light" checked>
           <label for="lightTheme">ธีมสว่าง</label>
         </div>
       </div>
@@ -940,10 +958,8 @@
     const searchInput = document.getElementById("searchInput");
     const searchButton = document.getElementById("searchButton");
     const printTableButton = document.getElementById("printTableButton");
-    const graphButton = document.getElementById("graphButton");
     const excelButton = document.getElementById("excelButton");
     const summaryButton = document.getElementById("summaryButton");
-    const spareSummaryButton = document.getElementById("spareSummaryButton");
     const settingButton = document.getElementById("settingButton");
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
@@ -965,6 +981,8 @@
     const requestCard = document.getElementById("requestCard");
     const nawaCard = document.getElementById("nawaCard");
     const maxCard = document.getElementById("maxCard");
+    const graphCard = document.getElementById("graphCard");
+    const spareSummaryCard = document.getElementById("spareSummaryCard");
     let allData = [];
     let currentPage = 1;
     let itemsPerPage = 20;
@@ -980,7 +998,7 @@
       localStorage.setItem('theme', theme);
     }
     function initTheme() {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
+      const savedTheme = localStorage.getItem('theme') || 'light';
       setTheme(savedTheme);
       document.querySelector(`input[value="${savedTheme}"]`).checked = true;
     }
@@ -1389,21 +1407,55 @@
             break;
         }
       }
+      if (filteredData.length === 0) {
+        graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ";
+        graphModal.style.display = "block";
+        return;
+      }
+      const pivotData = {};
+      const teamPlantsRaw = filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ");
+      const teamPlants = [...new Set(teamPlantsRaw.map(tp => tp.replace(/Stock\s*/gi, '').trim()))].sort();
+      const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
+      teamPlants.forEach(teamPlant => {
+        pivotData[teamPlant] = {};
+        statusCalls.forEach(status => { pivotData[teamPlant][status] = 0; });
+      });
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
-        const team = row["Team"] || "ไม่ระบุทีม";
-        if (ticket && !ticketCounts[ticket]) ticketCounts[ticket] = team;
+        if (!ticketCounts[ticket]) {
+          const rawTeamPlant = row["TeamPlant"] || "ไม่ระบุ";
+          const cleanTeamPlant = rawTeamPlant.replace(/Stock\s*/gi, '').trim();
+          const status = row["StatusCall"] || "ไม่ระบุ";
+          pivotData[cleanTeamPlant][status]++;
+          ticketCounts[ticket] = true;
+        }
       });
-      const teamCounts = {};
-      Object.values(ticketCounts).forEach(team => { teamCounts[team] = (teamCounts[team] || 0) + 1; });
-      const sortedTeams = Object.keys(teamCounts).sort((a, b) => teamCounts[b] - teamCounts[a]);
-      let limitedTeams = sortedTeams;
+      const colors = {
+        "รอของเข้า": '#dc3545',
+        "ระหว่างขนส่ง": '#28a745',
+        "เบิกนวนคร": '#17a2b8',
+        "เบิกวิภาวดี": '#ffc107',
+        "ไม่ระบุ": '#6c757d'
+      };
+      const datasets = statusCalls.filter(status => status !== "ไม่ระบุ" && Object.values(pivotData).some(tp => tp[status] > 0)).map(status => ({
+        label: status === "สำเร็จ" ? "ระหว่างขนส่ง" : status,
+        data: teamPlants.map(teamPlant => pivotData[teamPlant][status] || 0),
+        borderColor: colors[status === "สำเร็จ" ? "ระหว่างขนส่ง" : status] || '#6c757d',
+        backgroundColor: (colors[status === "สำเร็จ" ? "ระหว่างขนส่ง" : status] || '#6c757d') + '30',
+        fill: false,
+        tension: 0.1
+      }));
+      let limitedTeams = teamPlants;
       let warningMessage = "";
-      if (sortedTeams.length > 50) { limitedTeams = sortedTeams.slice(0, 50); warningMessage = `แสดงเฉพาะ 50 ทีมแรกจากทั้งหมด ${sortedTeams.length} ทีมเนื่องจากข้อจำกัดด้านการแสดงผล`; }
-      const sortedCounts = limitedTeams.map(team => teamCounts[team]);
-      const backgroundColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#c9ffc4' : '#fce4ec');
-      const borderColors = limitedTeams.map((_, idx) => idx % 2 === 0 ? '#4caf50' : '#f06292');
+      if (teamPlants.length > 50) {
+        limitedTeams = teamPlants.slice(0, 50);
+        warningMessage = `แสดงเฉพาะ 50 ศูนย์พื้นที่แรกจากทั้งหมด ${teamPlants.length} เนื่องจากข้อจำกัดด้านการแสดงผล`;
+      }
+      const limitedDatasets = datasets.map(ds => ({
+        ...ds,
+        data: limitedTeams.map(teamPlant => pivotData[teamPlant][ds.label === "ระหว่างขนส่ง" ? "สำเร็จ" : ds.label] || 0)
+      }));
       graphWarning.textContent = warningMessage;
       if (limitedTeams.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
       if (teamChart) teamChart.destroy();
@@ -1412,17 +1464,7 @@
         type: 'line',
         data: {
           labels: limitedTeams,
-          datasets: [{
-            label: 'จำนวน Call ค้าง',
-            data: sortedCounts,
-            backgroundColor: backgroundColors,
-            borderColor: borderColors,
-            borderWidth: 3,
-            pointRadius: 5,
-            pointHoverRadius: 8,
-            fill: false,
-            tension: 0.4
-          }]
+          datasets: limitedDatasets
         },
         options: {
           responsive: true,
@@ -1430,7 +1472,7 @@
             x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
             y: { beginAtZero: true, ticks: { stepSize: 1 } }
           },
-          plugins: { legend: { display: false } }
+          plugins: { legend: { display: true } }
         }
       });
       graphModal.style.display = "block";
@@ -1742,6 +1784,8 @@
         filterAndRenderTable();
       }
     });
+    graphCard.addEventListener('click', showGraph);
+    spareSummaryCard.addEventListener('click', showSpareSummary);
     // ปิดโมดัล
     closeModal.onclick = () => { modal.style.display = "none"; currentTicketNumber = null; currentRowData = null; };
     closeGraphModal.onclick = () => graphModal.style.display = "none";
@@ -1754,10 +1798,8 @@
       if (e.target == spareSummaryModal) spareSummaryModal.style.display = "none";
     };
     // ปุ่มต่าง ๆ
-    graphButton.addEventListener("click", showGraph);
     excelButton.addEventListener("click", exportToCSV);
     summaryButton.addEventListener("click", showSummary);
-    spareSummaryButton.addEventListener("click", showSpareSummary);
     itemsPerPageSelect.addEventListener("change", e => { itemsPerPage = parseInt(e.target.value); currentPage = 1; filterAndRenderTable(); });
     searchInput.addEventListener("keypress", e => { if (e.key === "Enter") filterAndRenderTable(); });
     searchButton.addEventListener("click", filterAndRenderTable);
