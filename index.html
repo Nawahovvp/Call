@@ -1744,6 +1744,12 @@
     totalCard.addEventListener('click', () => {
       dashboardFilter = null;
       updateActiveCard(null);
+      // ✅ เพิ่ม: Reset filters กลับไปค่าตั้งต้นเพื่อแสดง Call ทั้งหมด
+      employeeFilter.value = "";
+      pendingFilter.value = "";
+      stockFilter.value = "";
+      statusCallFilter.value = "";
+      searchInput.value = "";
       filterAndRenderTable();
     });
     pendingCard.addEventListener('click', () => {
