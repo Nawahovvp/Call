@@ -1370,6 +1370,43 @@
       `);
       printWindow.document.close();
     }
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
+    }
+    const totalPlugin = {
+      id: 'totalLabel',
+      afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillStyle = '#333';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.shadowColor = 'rgba(0,0,0,0.1)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetY = 2;
+        chart.data.labels.forEach((label, index) => {
+          let total = 0;
+          let topY = chart.chartArea.bottom;
+          chart.data.datasets.forEach((dataset) => {
+            const value = dataset.data[index] || 0;
+            total += value;
+            if (value > 0) {
+              const dsIndex = chart.data.datasets.findIndex(d => d === dataset);
+              const meta = chart.getDatasetMeta(dsIndex);
+              const bar = meta.data[index];
+              topY = Math.min(topY, bar.y);
+            }
+          });
+          if (total > 0) {
+            const x = chart.scales.x.getPixelForValue(index);
+            ctx.fillText(total.toString(), x, topY - 10);
+          }
+        });
+        ctx.restore();
+      }
+    };
     function showGraph() {
       const baseFilteredData = getBaseFilteredData();
       let filteredData = [...baseFilteredData];
@@ -1436,20 +1473,25 @@
         }
       });
       const colors = {
-        "รอของเข้า": '#dc3545',
-        "ระหว่างขนส่ง": '#28a745',
-        "เบิกนวนคร": '#17a2b8',
-        "เบิกวิภาวดี": '#ffc107',
-        "ไม่ระบุ": '#6c757d'
+        "รอของเข้า": '#e74c3c',
+        "ระหว่างขนส่ง": '#27ae60',
+        "เบิกนวนคร": '#3498db',
+        "เบิกวิภาวดี": '#f39c12',
+        "ไม่ระบุ": '#95a5a6'
       };
-      const datasets = statusCalls.filter(status => status !== "ไม่ระบุ" && Object.values(pivotData).some(tp => tp[status] > 0)).map(status => ({
-        label: status === "สำเร็จ" ? "ระหว่างขนส่ง" : status,
-        data: teamPlants.map(teamPlant => pivotData[teamPlant][status] || 0),
-        borderColor: colors[status === "สำเร็จ" ? "ระหว่างขนส่ง" : status] || '#6c757d',
-        backgroundColor: (colors[status === "สำเร็จ" ? "ระหว่างขนส่ง" : status] || '#6c757d') + '30',
-        fill: false,
-        tension: 0.1
-      }));
+      const datasets = statusCalls.filter(status => status !== "ไม่ระบุ" && Object.values(pivotData).some(tp => tp[status] > 0)).map(status => {
+        const colorKey = status === "สำเร็จ" ? "ระหว่างขนส่ง" : status;
+        const rgb = hexToRgb(colors[colorKey] || '#6c757d');
+        return {
+          label: status === "สำเร็จ" ? "ระหว่างขนส่ง" : status,
+          data: teamPlants.map(teamPlant => pivotData[teamPlant][status] || 0),
+          borderColor: colors[colorKey] || '#6c757d',
+          backgroundColor: rgb ? `rgba(${rgb}, 0.8)` : '#6c757d',
+          borderWidth: 2,
+          borderRadius: 4,
+          stack: 'CallStack'
+        };
+      });
       let limitedTeams = teamPlants;
       let warningMessage = "";
       if (teamPlants.length > 50) {
@@ -1465,19 +1507,71 @@
       if (teamChart) teamChart.destroy();
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
           labels: limitedTeams,
           datasets: limitedDatasets
         },
         options: {
           responsive: true,
-          scales: {
-            x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
-            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          interaction: {
+            intersect: false,
+            mode: 'index'
           },
-          plugins: { legend: { display: true } }
-        }
+          animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
+          },
+          scales: {
+            x: {
+              stacked: true,
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45
+              },
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          },
+          plugins: {
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                title: function(context) {
+                  return `ศูนย์พื้นที่: ${context[0].label}`;
+                },
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.parsed.y} Call`;
+                },
+                footer: function(context) {
+                  let total = 0;
+                  context.forEach(function(ctx) {
+                    total += ctx.parsed.y;
+                  });
+                  return `รวม: ${total} Call`;
+                }
+              }
+            },
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20
+              }
+            }
+          }
+        },
+        plugins: [totalPlugin]
       });
       graphModal.style.display = "block";
     }
