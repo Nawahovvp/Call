@@ -795,7 +795,7 @@
       <div class="value" id="callsOver7">0</div>
     </div>
     <div id="maxCard" class="dashboard-card max-card">
-      <h3>ศูนย์พื้นที่ที่มี Call มากที่สุด</h3>
+      <h3>Call ค้างสูงสุด</h3>
       <div class="value" id="maxTeamPlant">-</div>
     </div>
     <div id="graphCard" class="dashboard-card graph-card">
@@ -992,6 +992,9 @@
     // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
     let currentTicketNumber = null;
     let currentRowData = null;
+    function getCleanTeamPlant(tp) {
+      return (tp || "").replace(/Stock\s*/gi, '').trim();
+    }
     /** ฟังก์ชันจัดการธีม */
     function setTheme(theme) {
       document.body.className = theme === 'dark' ? 'dark-theme' : '';
@@ -1041,8 +1044,9 @@
       const keyword = searchInput.value.toLowerCase().trim();
       return allData.filter(row => {
         if (!row) return false;
+        const cleanRowTP = getCleanTeamPlant(row["TeamPlant"]);
         return (
-          (!selectedTeamPlant || (row["TeamPlant"] || "") === selectedTeamPlant) &&
+          (!selectedTeamPlant || cleanRowTP === selectedTeamPlant) &&
           (!selectedPending || (row["ค้างหน่วยงาน"] || "") === selectedPending) &&
           (!selectedStock || (row["คลังตอบ"] || "") === selectedStock) &&
           (!selectedStatusCall || (row["StatusCall"] || "") === selectedStatusCall) &&
@@ -1052,7 +1056,7 @@
             (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
             (row["Brand"] || "").toLowerCase().includes(keyword) ||
             (row["Team"] || "").toLowerCase().includes(keyword) ||
-            (row["TeamPlant"] || "").toLowerCase().includes(keyword) ||
+            cleanRowTP.toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (getDesc(row) || "").toLowerCase().includes(keyword) ||
@@ -1104,7 +1108,7 @@
         if (!row["Material"] || row["Material"] === "" || row["Material"] === "-") {
           requestTickets.add(ticket);
         }
-        const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+        const teamPlant = getCleanTeamPlant(row["TeamPlant"] || "ไม่ระบุ");
         if (!teamPlantTicketCounts[teamPlant]) teamPlantTicketCounts[teamPlant] = new Set();
         teamPlantTicketCounts[teamPlant].add(ticket);
       });
@@ -1237,7 +1241,7 @@
         <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
         <div><span class="label">DateTime:</span> <span class="value">${modalData["DateTime"] || "-"}</span></div>
         <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
-        <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${modalData["TeamPlant"] || "-"}</span></div>
+        <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${getCleanTeamPlant(modalData["TeamPlant"]) || "-"}</span></div>
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
         <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
       `;
@@ -1334,7 +1338,7 @@
             <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
             <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
-            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(row["TeamPlant"]) || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
           </div>
@@ -1414,7 +1418,7 @@
       }
       const pivotData = {};
       const teamPlantsRaw = filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ");
-      const teamPlants = [...new Set(teamPlantsRaw.map(tp => tp.replace(/Stock\s*/gi, '').trim()))].sort();
+      const teamPlants = [...new Set(teamPlantsRaw.map(tp => getCleanTeamPlant(tp)) )].sort();
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
       teamPlants.forEach(teamPlant => {
         pivotData[teamPlant] = {};
@@ -1425,7 +1429,7 @@
         const ticket = row["Ticket Number"];
         if (!ticketCounts[ticket]) {
           const rawTeamPlant = row["TeamPlant"] || "ไม่ระบุ";
-          const cleanTeamPlant = rawTeamPlant.replace(/Stock\s*/gi, '').trim();
+          const cleanTeamPlant = getCleanTeamPlant(rawTeamPlant);
           const status = row["StatusCall"] || "ไม่ระบุ";
           pivotData[cleanTeamPlant][status]++;
           ticketCounts[ticket] = true;
@@ -1521,7 +1525,7 @@
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
       const totalCalls = uniqueTickets;
       const pivotData = {};
-      const teamPlants = [...new Set(filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ"))].sort();
+      const teamPlants = [...new Set(filteredData.map(row => getCleanTeamPlant(row["TeamPlant"] || "ไม่ระบุ")) )].sort();
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ"))].sort();
       const orderedPendingUnits = ["NEC_ยกเลิกผลิต"].filter(unit => pendingUnits.includes(unit));
@@ -1534,7 +1538,7 @@
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
         if (!ticketCounts[ticket]) {
-          const teamPlant = row["TeamPlant"] || "ไม่ระบุ";
+          const teamPlant = getCleanTeamPlant(row["TeamPlant"] || "ไม่ระบุ");
           const status = row["StatusCall"] || "ไม่ระบุ";
           const pending = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
           pivotData[teamPlant][status]++;
@@ -1806,7 +1810,7 @@
     printTableButton.addEventListener("click", printTable);
     function populateTeamPlantFilter(data) {
       if (!data || data.length === 0) return;
-      const teamPlants = [...new Set(data.map(row => row["TeamPlant"]).filter(Boolean))].sort();
+      const teamPlants = [...new Set(data.map(row => getCleanTeamPlant(row["TeamPlant"])).filter(Boolean))].sort();
       employeeFilter.innerHTML = '<option value="">ทั้งหมด</option>';
       teamPlants.forEach(teamPlant => {
         const option = document.createElement("option");
@@ -1818,7 +1822,7 @@
     function updatePendingFilter(data, selectedTeamPlant) {
       if (!data || data.length === 0) return;
       const currentPendingValue = pendingFilter.value;
-      const filteredData = selectedTeamPlant ? data.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant) : data;
+      const filteredData = selectedTeamPlant ? data.filter(row => getCleanTeamPlant(row["TeamPlant"] || "") === selectedTeamPlant) : data;
       const pendingUnits = [...new Set(filteredData.map(row => row["ค้างหน่วยงาน"]).filter(Boolean))].sort();
       pendingFilter.innerHTML = '<option value="">ทั้งหมด</option>';
       pendingUnits.forEach(pending => {
@@ -1836,7 +1840,7 @@
       if (!data || data.length === 0) return;
       const currentStockValue = stockFilter.value;
       let filteredData = data;
-      if (selectedTeamPlant) filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      if (selectedTeamPlant) filteredData = filteredData.filter(row => getCleanTeamPlant(row["TeamPlant"] || "") === selectedTeamPlant);
       if (selectedPending) filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
       const stockResponses = [...new Set(filteredData.map(row => row["คลังตอบ"]).filter(Boolean))].sort();
       stockFilter.innerHTML = '<option value="">ทั้งหมด</option>';
@@ -1853,7 +1857,7 @@
       if (!data || data.length === 0) return;
       const currentStatusCallValue = statusCallFilter.value;
       let filteredData = data;
-      if (selectedTeamPlant) filteredData = filteredData.filter(row => (row["TeamPlant"] || "") === selectedTeamPlant);
+      if (selectedTeamPlant) filteredData = filteredData.filter(row => getCleanTeamPlant(row["TeamPlant"] || "") === selectedTeamPlant);
       if (selectedPending) filteredData = filteredData.filter(row => (row["ค้างหน่วยงาน"] || "") === selectedPending);
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"]).filter(Boolean))].sort();
       statusCallFilter.innerHTML = '<option value="">ทั้งหมด</option>';
@@ -2007,6 +2011,9 @@
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
+          if (col === "TeamPlant") {
+            cellValue = getCleanTeamPlant(cellValue);
+          }
           let displayValue = cellValue;
           if (col === "DayRepair") {
             displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
@@ -2063,7 +2070,7 @@
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
             <div><span class="label">Brand:</span> <span class="value">${row["Brand"] || "-"}</span></div>
             <div><span class="label">Team:</span> <span class="value">${row["Team"] || "-"}</span></div>
-            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["TeamPlant"] || "-"}</span></div>
+            <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(row["TeamPlant"]) || "-"}</span></div>
             <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div><span class="label">Description:</span> <span class="value">${getDesc(row) || "-"}</span></div>
