@@ -1455,7 +1455,7 @@
       }
       const pivotData = {};
       const teamPlantsRaw = filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ");
-      const teamPlants = [...new Set(teamPlantsRaw.map(tp => getCleanTeamPlant(tp)) )].sort();
+      let teamPlants = [...new Set(teamPlantsRaw.map(tp => getCleanTeamPlant(tp)) )];
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
       teamPlants.forEach(teamPlant => {
         pivotData[teamPlant] = {};
@@ -1472,6 +1472,12 @@
           ticketCounts[ticket] = true;
         }
       });
+      // ✅ คำนวณผลรวมสำหรับแต่ละศูนย์พื้นที่และเรียงลำดับจากมากไปน้อย
+      const teamPlantTotals = {};
+      teamPlants.forEach(teamPlant => {
+        teamPlantTotals[teamPlant] = statusCalls.reduce((sum, status) => sum + (pivotData[teamPlant][status] || 0), 0);
+      });
+      teamPlants.sort((a, b) => teamPlantTotals[b] - teamPlantTotals[a]);
       const colors = {
         "รอของเข้า": '#e74c3c',
         "ระหว่างขนส่ง": '#27ae60',
@@ -1550,12 +1556,19 @@
                   return `ศูนย์พื้นที่: ${context[0].label}`;
                 },
                 label: function(context) {
-                  return `${context.dataset.label}: ${context.parsed.y} Call`;
+                  // ✅ แสดงเฉพาะสถานะที่มีข้อมูล (> 0) เท่านั้น
+                  if (context.parsed.y > 0) {
+                    return `${context.dataset.label}: ${context.parsed.y} Call`;
+                  }
+                  return null; // ข้ามการแสดงถ้า = 0
                 },
                 footer: function(context) {
+                  // ✅ คำนวณผลรวมเฉพาะสถานะที่มีข้อมูล (> 0)
                   let total = 0;
                   context.forEach(function(ctx) {
-                    total += ctx.parsed.y;
+                    if (ctx.parsed.y > 0) {
+                      total += ctx.parsed.y;
+                    }
                   });
                   return `รวม: ${total} Call`;
                 }
