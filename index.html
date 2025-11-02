@@ -42,7 +42,7 @@
       --warning-color: #ffca28;
       --info-color: #42a5f5;
       --button-bg: linear-gradient(135deg,#455a64,#546e7a);
-      --button-hover: linear-gradient(135deg,#546e7a,#455a64);
+      --button-hover: linear-gradient(135deb,#546e7a,#455a64);
       --shadow-color: rgba(0,0,0,.3);
       --modal-bg: rgba(0,0,0,.7);
       --call-count-bg: #263238;
@@ -64,6 +64,34 @@
       margin: 0;
       padding: 20px;
       transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .loading.show {
+      display: flex;
+    }
+    .spinner {
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--info-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     .report-title {
       font-size: 24px;
@@ -488,7 +516,7 @@
       text-align:center !important;
     }
     @media print{
-      .report-title,.close,.print-button,#printTableButton,#searchButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container{
+      .report-title,.close,.print-button,#printTableButton,#searchButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container,.loading{
         display:none;
       }
       .modal-content{
@@ -759,7 +787,6 @@
         font-size: 2em;
       }
     }
-
     /* ✅ เพิ่ม CSS สำหรับตารางสรุปอะไหล่ (กะทัดรัดและ Responsive) */
     .detail-table td:nth-child(2),
     .detail-table th:nth-child(2) {
@@ -772,7 +799,6 @@
       width: 25%; /* ลดสัดส่วน */
       text-align: left;
     }
-
     /* Responsive สำหรับหน้าจอเล็ก */
     @media (max-width: 768px) {
       .detail-table {
@@ -810,14 +836,13 @@
         padding: 10px;
       }
     }
-
     /* ✅ เพิ่ม CSS เฉพาะสำหรับตารางสรุปอะไหล่ เพื่อให้กะทัดรัดมากขึ้นและลดขนาดตัวอักษร */
     #spareSummaryModal .detail-table {
-      font-size: 10px; /* ลดขนาดฟอนต์ลงอีก */
+      font-size: 12px; /* เพิ่มขนาดฟอนต์จาก 10px เป็น 12px */
     }
     #spareSummaryModal .detail-table th,
     #spareSummaryModal .detail-table td {
-      padding: 2px 3px; /* ลด padding ลงอีก */
+      padding: 4px 6px; /* เพิ่ม padding เล็กน้อยจาก 2px 3px เพื่อความสบายตา */
       border: 0.5px solid var(--border-color); /* เส้นบางลง */
     }
     #spareSummaryModal .detail-table td:nth-child(2),
@@ -839,11 +864,11 @@
     }
     @media (max-width: 768px) {
       #spareSummaryModal .detail-table {
-        font-size: 9px; /* ลดลงอีกใน mobile */
+        font-size: 11px; /* เพิ่มจาก 9px เป็น 11px ใน mobile */
       }
       #spareSummaryModal .detail-table th,
       #spareSummaryModal .detail-table td {
-        padding: 1px 2px;
+        padding: 2px 4px; /* ปรับ padding ใน mobile */
       }
       #spareSummaryModal .detail-table td:nth-child(2),
       #spareSummaryModal .detail-table th:nth-child(2) {
@@ -851,7 +876,6 @@
         width: 25%;
       }
     }
-
     /* ✅ เพิ่ม CSS สำหรับตารางสรุปอะไหล่: เพิ่มความกว้าง Description และลด Material */
     #spareSummaryModal .detail-table th:nth-child(1),
     #spareSummaryModal .detail-table td:nth-child(1) {
@@ -864,27 +888,26 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     #spareSummaryModal .detail-table th:nth-child(2),
     #spareSummaryModal .detail-table td:nth-child(2) {
       /* เพิ่มความกว้าง Description เพื่อเห็นข้อมูลทั้งหมด */
-      width: 35%; /* เพิ่มสัดส่วน */
-      min-width: 150px; /* เพิ่ม min-width */
+      width: 40%; /* เพิ่มสัดส่วนจาก 35% เป็น 40% */
+      min-width: 180px; /* เพิ่ม min-width จาก 150px เป็น 180px */
       max-width: none; /* อนุญาตให้กว้างขึ้น */
       white-space: normal; /* อนุญาต wrap */
       overflow: visible;
       text-overflow: clip;
       text-align: left;
       word-wrap: break-word;
+      word-break: break-word; /* เพิ่มเพื่อ break คำยาว */
+      line-height: 1.3; /* ปรับ line-height เพื่ออ่านง่าย */
     }
-
     #spareSummaryModal .detail-table th:nth-child(3),
     #spareSummaryModal .detail-table td:nth-child(3) {
       /* จำนวนรวม: คงเดิมหรือปรับเล็กน้อย */
       width: 10%;
       min-width: 50px;
     }
-
     #spareSummaryModal .detail-table th:nth-child(n+4),
     #spareSummaryModal .detail-table td:nth-child(n+4) {
       /* คอลัมน์ pending units: ลดลงเพื่อชดเชย */
@@ -892,27 +915,23 @@
       min-width: 35px;
       max-width: 45px;
     }
-
     @media (max-width: 768px) {
       #spareSummaryModal .detail-table th:nth-child(1),
       #spareSummaryModal .detail-table td:nth-child(1) {
         width: 10%;
         min-width: 30px;
       }
-
       #spareSummaryModal .detail-table th:nth-child(2),
       #spareSummaryModal .detail-table td:nth-child(2) {
-        width: 40%; /* เพิ่มใน mobile */
-        min-width: 120px;
+        width: 45%; /* เพิ่มใน mobile จาก 40% เป็น 45% */
+        min-width: 140px; /* ปรับ min-width ใน mobile */
       }
-
       #spareSummaryModal .detail-table th:nth-child(n+4),
       #spareSummaryModal .detail-table td:nth-child(n+4) {
         width: 5%;
         min-width: 30px;
       }
     }
-
     /* สำหรับ print: รักษา ellipsis หรือ wrap ตามปกติ */
     @media print {
       .detail-table td:nth-child(2),
@@ -923,31 +942,36 @@
         max-width: none;
       }
       #spareSummaryModal .detail-table {
-        font-size: 11px; /* ขนาดที่เหมาะสมสำหรับพิมพ์ */
+        font-size: 12px; /* เพิ่มขนาดฟอนต์สำหรับ print จาก 11px เป็น 12px */
       }
       #spareSummaryModal .detail-table th,
       #spareSummaryModal .detail-table td {
-        padding: 3px 4px;
+        padding: 4px 6px; /* ปรับ padding สำหรับ print */
         border: 1px solid #ccc;
       }
-
       /* Print specific for spare summary */
       #spareSummaryModal .detail-table th:nth-child(1),
       #spareSummaryModal .detail-table td:nth-child(1) {
         width: 10%;
         min-width: 50px;
       }
-
       #spareSummaryModal .detail-table th:nth-child(2),
       #spareSummaryModal .detail-table td:nth-child(2) {
-        width: 30%;
-        min-width: 100px;
+        width: 35%; /* เพิ่มสัดส่วนสำหรับ print */
+        min-width: 120px;
         white-space: normal;
+        word-wrap: break-word;
+        word-break: break-word;
+        line-height: 1.3;
       }
     }
   </style>
 </head>
 <body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p>กำลังโหลดข้อมูล...</p>
+  </div>
   <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
   <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
   <!-- Dashboard Section -->
@@ -972,9 +996,9 @@
       <h3>Call (ขอซื้อขอซ่อม)</h3>
       <div class="value" id="callsRequest">0</div>
     </div>
-    <div id="newTodayCard" class="dashboard-card new-card">
-      <h3>Call ใหม่วันนี้</h3>
-      <div class="value" id="callsNewToday">0</div>
+    <div id="waitingResponseCard" class="dashboard-card new-card">
+      <h3>Call (รอตรวจสอบ)</h3>
+      <div class="value" id="callsWaitingResponse">0</div>
     </div>
     <div id="over7Card" class="dashboard-card over7-card">
       <h3>Call เกิน 7 วัน</h3>
@@ -1013,7 +1037,7 @@
       <select id="statusCallFilter"><option value="">ทั้งหมด</option></select>
     </div>
     <div class="search-row">
-      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้ตอบ, Nawa, คลังตอบ, StatusCall..." />
+      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้แจ้ง, Nawa, คลังตอบ, StatusCall, วันที่ตอบ..." />
       <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
       <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
       <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
@@ -1040,7 +1064,9 @@
           <th class="sortable" data-column="QtyPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
           <th class="sortable" data-column="StatusCall">Status <span class="arrow"></span></th>
-          <th class="sortable" data-column="AnswerX">ผู้ตอบ <span class="arrow"></span></th>
+          <th class="sortable" data-column="วันที่ตอบ">วันที่ตอบ <span class="arrow"></span></th>
+          <th class="sortable" data-column="UserAns">ผู้แจ้ง <span class="arrow"></span></th>
+          <th class="sortable" data-column="Answer1">แจ้งผล <span class="arrow"></span></th>
           <th>ดูรายละเอียด</th>
         </tr>
       </thead>
@@ -1158,11 +1184,12 @@
     const summaryContent = document.getElementById("summaryContent");
     const spareSummaryContent = document.getElementById("spareSummaryContent");
     const updateValueSpan = document.getElementById("updateValue");
+    const loadingDiv = document.getElementById("loading");
     // Dashboard cards
     const totalCard = document.getElementById("totalCard");
     const pendingCard = document.getElementById("pendingCard");
     const successCard = document.getElementById("successCard");
-    const newTodayCard = document.getElementById("newTodayCard");
+    const waitingResponseCard = document.getElementById("waitingResponseCard");
     const over7Card = document.getElementById("over7Card");
     const requestCard = document.getElementById("requestCard");
     const nawaCard = document.getElementById("nawaCard");
@@ -1178,6 +1205,12 @@
     // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
     let currentTicketNumber = null;
     let currentRowData = null;
+    function showLoading() {
+      loadingDiv.classList.add('show');
+    }
+    function hideLoading() {
+      loadingDiv.classList.remove('show');
+    }
     function getCleanTeamPlant(tp) {
       return (tp || "").replace(/Stock\s*/gi, '').trim();
     }
@@ -1251,7 +1284,8 @@
             (row["Request"] || "").toLowerCase().includes(keyword) ||
             (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
-            (row["AnswerX"] || "").toLowerCase().includes(keyword) ||
+            (row["UserAns"] || "").toLowerCase().includes(keyword) ||
+            (row["วันที่ตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["StatusCall"] || "").toLowerCase().includes(keyword)
           )
         );
@@ -1260,9 +1294,7 @@
     /** คำนวณเมตริก Dashboard */
     function calculateDashboardMetrics(data) {
       const ticketSet = new Set();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const newTodayTickets = new Set();
+      const waitingResponseTickets = new Set();
       const pendingTickets = new Set();
       const successTickets = new Set();
       const nawaVipaTickets = new Set();
@@ -1273,11 +1305,8 @@
         const ticket = row["Ticket Number"];
         if (!ticket || ticketSet.has(ticket)) return;
         ticketSet.add(ticket);
-        const dt = parseDate(row["DateTime"]);
-        if (dt && dt.getFullYear() === today.getFullYear() &&
-            dt.getMonth() === today.getMonth() &&
-            dt.getDate() === today.getDate()) {
-          newTodayTickets.add(ticket);
+        if ((row["คลังตอบ"] || "") === "รอตรวจสอบ") {
+          waitingResponseTickets.add(ticket);
         }
         const dayRepair = parseFloat(row["DayRepair"]) || 0;
         if (dayRepair > 7) {
@@ -1302,7 +1331,7 @@
       const callsPending = pendingTickets.size;
       const callsSuccess = successTickets.size;
       const callsNawaVipa = nawaVipaTickets.size;
-      const callsNewToday = newTodayTickets.size;
+      const callsWaitingResponse = waitingResponseTickets.size;
       const callsOver7 = over7Tickets.size;
       const callsRequest = requestTickets.size;
       const teamPlantCounts = Object.fromEntries(Object.entries(teamPlantTicketCounts).map(([teamPlant, set]) => [teamPlant, set.size]));
@@ -1313,7 +1342,7 @@
         callsPending,
         callsSuccess,
         callsNawaVipa,
-        callsNewToday,
+        callsWaitingResponse,
         callsOver7,
         callsRequest,
         maxTeamPlant
@@ -1354,15 +1383,8 @@
           case 'success':
             filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
             break;
-          case 'newToday':
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            filteredData = filteredData.filter(row => {
-              const dt = parseDate(row["DateTime"]);
-              return dt && dt.getFullYear() === today.getFullYear() &&
-                     dt.getMonth() === today.getMonth() &&
-                     dt.getDate() === today.getDate();
-            });
+          case 'waitingResponse':
+            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
             break;
           case 'over7':
             filteredData = filteredData.filter(row => {
@@ -1393,8 +1415,8 @@
         if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
-      const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description"];
-      const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"DateTime","Ticket Number":"Ticket Number","Brand":"Brand","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description" };
+      const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","วันที่ตอบ","UserAns"];
+      const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"DateTime","Ticket Number":"Ticket Number","Brand":"Brand","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description","วันที่ตอบ":"วันที่ตอบ","UserAns":"ผู้แจ้ง" };
       const csvRows = [];
       csvRows.push(columns.map(col => `"${displayColumns[col]}"`).join(','));
       filteredData.forEach(row => {
@@ -1430,6 +1452,9 @@
         <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${getCleanTeamPlant(modalData["TeamPlant"]) || "-"}</span></div>
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
         <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
+        <div><span class="label">วันที่ตอบ:</span> <span class="value">${modalData["วันที่ตอบ"] || "-"}</span></div>
+        <div><span class="label">ผู้แจ้ง:</span> <span class="value">${modalData["UserAns"] || "-"}</span></div>
+        <div><span class="label">แจ้งผล:</span> <span class="value">${modalData["Answer1"] || "-"}</span></div>
       `;
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
@@ -1473,15 +1498,8 @@
           case 'success':
             filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
             break;
-          case 'newToday':
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            filteredData = filteredData.filter(row => {
-              const dt = parseDate(row["DateTime"]);
-              return dt && dt.getFullYear() === today.getFullYear() &&
-                     dt.getMonth() === today.getMonth() &&
-                     dt.getDate() === today.getDate();
-            });
+          case 'waitingResponse':
+            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
             break;
           case 'over7':
             filteredData = filteredData.filter(row => {
@@ -1527,6 +1545,9 @@
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(row["TeamPlant"]) || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
+            <div><span class="label">วันที่ตอบ:</span> <span class="value">${row["วันที่ตอบ"] || "-"}</span></div>
+            <div><span class="label">ผู้แจ้ง:</span> <span class="value">${row["UserAns"] || "-"}</span></div>
+            <div><span class="label">แจ้งผล:</span> <span class="value">${row["Answer1"] || "-"}</span></div>
           </div>
         `;
       }).join('');
@@ -1604,15 +1625,8 @@
           case 'success':
             filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
             break;
-          case 'newToday':
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            filteredData = filteredData.filter(row => {
-              const dt = parseDate(row["DateTime"]);
-              return dt && dt.getFullYear() === today.getFullYear() &&
-                     dt.getMonth() === today.getMonth() &&
-                     dt.getDate() === today.getDate();
-            });
+          case 'waitingResponse':
+            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
             break;
           case 'over7':
             filteredData = filteredData.filter(row => {
@@ -1785,15 +1799,8 @@
           case 'success':
             filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
             break;
-          case 'newToday':
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            filteredData = filteredData.filter(row => {
-              const dt = parseDate(row["DateTime"]);
-              return dt && dt.getFullYear() === today.getFullYear() &&
-                     dt.getMonth() === today.getMonth() &&
-                     dt.getDate() === today.getDate();
-            });
+          case 'waitingResponse':
+            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
             break;
           case 'over7':
             filteredData = filteredData.filter(row => {
@@ -1900,15 +1907,8 @@
           case 'success':
             filteredData = [];
             break;
-          case 'newToday':
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            filteredData = filteredData.filter(row => {
-              const dt = parseDate(row["DateTime"]);
-              return dt && dt.getFullYear() === today.getFullYear() &&
-                     dt.getMonth() === today.getMonth() &&
-                     dt.getDate() === today.getDate();
-            });
+          case 'waitingResponse':
+            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
             break;
           case 'over7':
             filteredData = filteredData.filter(row => {
@@ -2055,9 +2055,9 @@
       updateActiveCard('successCard');
       filterAndRenderTable();
     });
-    newTodayCard.addEventListener('click', () => {
-      dashboardFilter = 'newToday';
-      updateActiveCard('newTodayCard');
+    waitingResponseCard.addEventListener('click', () => {
+      dashboardFilter = 'waitingResponse';
+      updateActiveCard('waitingResponseCard');
       filterAndRenderTable();
     });
     over7Card.addEventListener('click', () => {
@@ -2200,15 +2200,8 @@
           case 'success':
             filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
             break;
-          case 'newToday':
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            filteredData = filteredData.filter(row => {
-              const dt = parseDate(row["DateTime"]);
-              return dt && dt.getFullYear() === today.getFullYear() &&
-                     dt.getMonth() === today.getMonth() &&
-                     dt.getDate() === today.getDate();
-            });
+          case 'waitingResponse':
+            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
             break;
           case 'over7':
             filteredData = filteredData.filter(row => {
@@ -2240,7 +2233,7 @@
       document.getElementById("callsPending").textContent = metrics.callsPending;
       document.getElementById("callsSuccess").textContent = metrics.callsSuccess;
       document.getElementById("callsNawaVipa").textContent = metrics.callsNawaVipa;
-      document.getElementById("callsNewToday").textContent = metrics.callsNewToday;
+      document.getElementById("callsWaitingResponse").textContent = metrics.callsWaitingResponse;
       document.getElementById("callsOver7").textContent = metrics.callsOver7;
       document.getElementById("callsRequest").textContent = metrics.callsRequest;
       document.getElementById("maxTeamPlant").textContent = metrics.maxTeamPlant;
@@ -2286,7 +2279,7 @@
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="17">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="19">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
         return;
       }
       const startIdx = (currentPage - 1) * itemsPerPage;
@@ -2306,7 +2299,7 @@
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","AnswerX"];
+        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","วันที่ตอบ","UserAns","Answer1"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
@@ -2379,7 +2372,9 @@
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
             <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
             <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
-            <div><span class="label">ผู้ตอบ:</span> <span class="value">${row["AnswerX"] || "-"}</span></div>
+            <div><span class="label">วันที่ตอบ:</span> <span class="value">${row["วันที่ตอบ"] || "-"}</span></div>
+            <div><span class="label">ผู้แจ้ง:</span> <span class="value">${row["UserAns"] || "-"}</span></div>
+            <div><span class="label">แจ้งผล:</span> <span class="value">${row["Answer1"] || "-"}</span></div>
             <h3>ประวัติ Timeline</h3>
             ${timelineHtml}
           `;
@@ -2418,6 +2413,7 @@
       lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
     }
     // โหลดข้อมูลครั้งแรก
+    showLoading();
     fetch(url)
       .then(r => r.json())
       .then(data => {
@@ -2428,8 +2424,13 @@
         updateStatusCallFilter(data, employeeFilter.value, pendingFilter.value);
         filterAndRenderTable();
         addSortListeners();
+        hideLoading();
       })
-      .catch(err => console.error('Error fetching data:', err));
+      .catch(err => {
+        console.error('Error fetching data:', err);
+        hideLoading();
+        alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+      });
     fetchUpdateDate();
     // Initialize theme on load
     initTheme();
