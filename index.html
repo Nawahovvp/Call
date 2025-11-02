@@ -759,6 +759,192 @@
         font-size: 2em;
       }
     }
+
+    /* ✅ เพิ่ม CSS สำหรับตารางสรุปอะไหล่ (กะทัดรัดและ Responsive) */
+    .detail-table td:nth-child(2),
+    .detail-table th:nth-child(2) {
+      /* กะทัดรัด: ใช้ ellipsis สำหรับ desktop */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      min-width: 150px;
+      width: 25%; /* ลดสัดส่วน */
+      text-align: left;
+    }
+
+    /* Responsive สำหรับหน้าจอเล็ก */
+    @media (max-width: 768px) {
+      .detail-table {
+        font-size: 12px; /* ลดขนาดฟอนต์ */
+      }
+      .detail-table th,
+      .detail-table td {
+        padding: 4px 6px; /* ลด padding */
+      }
+      .detail-table td:nth-child(2),
+      .detail-table th:nth-child(2) {
+        /* ใน mobile: อนุญาต wrap เพื่อให้อ่านง่าย */
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: none;
+        min-width: 120px;
+        width: 35%; /* เพิ่มสัดส่วนใน mobile */
+      }
+      .detail-table th:not(:first-child),
+      .detail-table td:not(:first-child) {
+        /* ลดความกว้างคอลัมน์ตัวเลขใน mobile */
+        min-width: 60px;
+        max-width: 60px;
+        width: 8%;
+      }
+      .detail-table th:first-child,
+      .detail-table td:first-child {
+        min-width: 80px; /* ลด min-width สำหรับ Material */
+      }
+      /* ทำให้ modal-content scroll ได้ดีขึ้นใน mobile */
+      #spareSummaryModal .modal-content {
+        width: 98%;
+        margin: 5% auto;
+        padding: 10px;
+      }
+    }
+
+    /* ✅ เพิ่ม CSS เฉพาะสำหรับตารางสรุปอะไหล่ เพื่อให้กะทัดรัดมากขึ้นและลดขนาดตัวอักษร */
+    #spareSummaryModal .detail-table {
+      font-size: 10px; /* ลดขนาดฟอนต์ลงอีก */
+    }
+    #spareSummaryModal .detail-table th,
+    #spareSummaryModal .detail-table td {
+      padding: 2px 3px; /* ลด padding ลงอีก */
+      border: 0.5px solid var(--border-color); /* เส้นบางลง */
+    }
+    #spareSummaryModal .detail-table td:nth-child(2),
+    #spareSummaryModal .detail-table th:nth-child(2) {
+      /* กะทัดรัดมากขึ้น */
+      max-width: 120px;
+      min-width: 80px;
+      width: 18%; /* ลดสัดส่วนลงอีก */
+    }
+    #spareSummaryModal .detail-table th:not(:first-child),
+    #spareSummaryModal .detail-table td:not(:first-child) {
+      min-width: 40px;
+      max-width: 50px;
+      width: 7%;
+    }
+    #spareSummaryModal .detail-table th:first-child,
+    #spareSummaryModal .detail-table td:first-child {
+      min-width: 60px; /* ลด min-width สำหรับ Material */
+    }
+    @media (max-width: 768px) {
+      #spareSummaryModal .detail-table {
+        font-size: 9px; /* ลดลงอีกใน mobile */
+      }
+      #spareSummaryModal .detail-table th,
+      #spareSummaryModal .detail-table td {
+        padding: 1px 2px;
+      }
+      #spareSummaryModal .detail-table td:nth-child(2),
+      #spareSummaryModal .detail-table th:nth-child(2) {
+        min-width: 80px;
+        width: 25%;
+      }
+    }
+
+    /* ✅ เพิ่ม CSS สำหรับตารางสรุปอะไหล่: เพิ่มความกว้าง Description และลด Material */
+    #spareSummaryModal .detail-table th:nth-child(1),
+    #spareSummaryModal .detail-table td:nth-child(1) {
+      /* ลดขนาด Material */
+      width: 8%;
+      min-width: 40px;
+      max-width: 50px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #spareSummaryModal .detail-table th:nth-child(2),
+    #spareSummaryModal .detail-table td:nth-child(2) {
+      /* เพิ่มความกว้าง Description เพื่อเห็นข้อมูลทั้งหมด */
+      width: 35%; /* เพิ่มสัดส่วน */
+      min-width: 150px; /* เพิ่ม min-width */
+      max-width: none; /* อนุญาตให้กว้างขึ้น */
+      white-space: normal; /* อนุญาต wrap */
+      overflow: visible;
+      text-overflow: clip;
+      text-align: left;
+      word-wrap: break-word;
+    }
+
+    #spareSummaryModal .detail-table th:nth-child(3),
+    #spareSummaryModal .detail-table td:nth-child(3) {
+      /* จำนวนรวม: คงเดิมหรือปรับเล็กน้อย */
+      width: 10%;
+      min-width: 50px;
+    }
+
+    #spareSummaryModal .detail-table th:nth-child(n+4),
+    #spareSummaryModal .detail-table td:nth-child(n+4) {
+      /* คอลัมน์ pending units: ลดลงเพื่อชดเชย */
+      width: 6%;
+      min-width: 35px;
+      max-width: 45px;
+    }
+
+    @media (max-width: 768px) {
+      #spareSummaryModal .detail-table th:nth-child(1),
+      #spareSummaryModal .detail-table td:nth-child(1) {
+        width: 10%;
+        min-width: 30px;
+      }
+
+      #spareSummaryModal .detail-table th:nth-child(2),
+      #spareSummaryModal .detail-table td:nth-child(2) {
+        width: 40%; /* เพิ่มใน mobile */
+        min-width: 120px;
+      }
+
+      #spareSummaryModal .detail-table th:nth-child(n+4),
+      #spareSummaryModal .detail-table td:nth-child(n+4) {
+        width: 5%;
+        min-width: 30px;
+      }
+    }
+
+    /* สำหรับ print: รักษา ellipsis หรือ wrap ตามปกติ */
+    @media print {
+      .detail-table td:nth-child(2),
+      .detail-table th:nth-child(2) {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: none;
+      }
+      #spareSummaryModal .detail-table {
+        font-size: 11px; /* ขนาดที่เหมาะสมสำหรับพิมพ์ */
+      }
+      #spareSummaryModal .detail-table th,
+      #spareSummaryModal .detail-table td {
+        padding: 3px 4px;
+        border: 1px solid #ccc;
+      }
+
+      /* Print specific for spare summary */
+      #spareSummaryModal .detail-table th:nth-child(1),
+      #spareSummaryModal .detail-table td:nth-child(1) {
+        width: 10%;
+        min-width: 50px;
+      }
+
+      #spareSummaryModal .detail-table th:nth-child(2),
+      #spareSummaryModal .detail-table td:nth-child(2) {
+        width: 30%;
+        min-width: 100px;
+        white-space: normal;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1778,7 +1964,7 @@
               const data = pivotData[matDesc];
               return `
                 <tr>
-                  <td>${material}</td>
+                  <td title="${material}">${material}</td>
                   <td>${description}</td>
                   <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
                   ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
