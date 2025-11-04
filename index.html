@@ -42,7 +42,7 @@
       --warning-color: #ffca28;
       --info-color: #42a5f5;
       --button-bg: linear-gradient(135deg,#455a64,#546e7a);
-      --button-hover: linear-gradient(135deb,#546e7a,#455a64);
+      --button-hover: linear-gradient(135deg,#546e7a,#455a64);
       --shadow-color: rgba(0,0,0,.3);
       --modal-bg: rgba(0,0,0,.7);
       --call-count-bg: #263238;
@@ -965,6 +965,36 @@
         line-height: 1.3;
       }
     }
+
+    /* เพิ่ม CSS สำหรับ Progress Bar สไตล์ Canva (สวยงาม, ใช้ gradient, rounded) */
+    .progress-container {
+      margin-top: 10px;
+      background-color: rgba(255, 255, 255, 0.2); /* พื้นหลังโปร่งแสง */
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.5s ease-in-out;
+      background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%); /* Gradient สไตล์ Canva */
+    }
+    .progress-text {
+      font-size: 0.8em;
+      margin-top: 5px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .dark-theme .progress-container {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    .dark-theme .progress-bar {
+      background: linear-gradient(90deg, #e0e0e0 0%, rgba(224, 224, 224, 0.8) 100%);
+    }
+    .dark-theme .progress-text {
+      color: rgba(224, 224, 224, 0.9);
+    }
   </style>
 </head>
 <body>
@@ -979,30 +1009,44 @@
     <div id="totalCard" class="dashboard-card total-card">
       <h3>Call ทั้งหมด</h3>
       <div class="value" id="totalCalls">0</div>
+      <div class="progress-container"><div id="totalProgress" class="progress-bar" style="width: 100%;"></div></div>
+      <div class="progress-text" id="totalPercent">100%</div>
     </div>
     <div id="pendingCard" class="dashboard-card pending-card">
       <h3>Call ค้าง (รอของเข้า)</h3>
       <div class="value" id="callsPending">0</div>
+      <div class="progress-container"><div id="pendingProgress" class="progress-bar" style="width: 0%;"></div></div>
+      <div class="progress-text" id="pendingPercent">0%</div>
     </div>
     <div id="successCard" class="dashboard-card success-card">
       <h3>Call (ระหว่างขนส่ง)</h3>
       <div class="value" id="callsSuccess">0</div>
+      <div class="progress-container"><div id="successProgress" class="progress-bar" style="width: 0%;"></div></div>
+      <div class="progress-text" id="successPercent">0%</div>
     </div>
-            <div id="nawaCard" class="dashboard-card nawa-card">
+    <div id="nawaCard" class="dashboard-card nawa-card">
       <h3>Call (เบิกศูนย์อะไหล่)</h3>
       <div class="value" id="callsNawaVipa">0</div>
+      <div class="progress-container"><div id="nawaProgress" class="progress-bar" style="width: 0%;"></div></div>
+      <div class="progress-text" id="nawaPercent">0%</div>
     </div>
-            <div id="requestCard" class="dashboard-card request-card">
+    <div id="requestCard" class="dashboard-card request-card">
       <h3>Call (ขอซื้อขอซ่อม)</h3>
       <div class="value" id="callsRequest">0</div>
-    </div>
-    <div id="waitingResponseCard" class="dashboard-card new-card">
-      <h3>Call (รอตรวจสอบ)</h3>
-      <div class="value" id="callsWaitingResponse">0</div>
+      <div class="progress-container"><div id="requestProgress" class="progress-bar" style="width: 0%;"></div></div>
+      <div class="progress-text" id="requestPercent">0%</div>
     </div>
     <div id="over7Card" class="dashboard-card over7-card">
       <h3>Call เกิน 7 วัน</h3>
       <div class="value" id="callsOver7">0</div>
+      <div class="progress-container"><div id="over7Progress" class="progress-bar" style="width: 0%;"></div></div>
+      <div class="progress-text" id="over7Percent">0%</div>
+    </div>
+    <div id="waitingResponseCard" class="dashboard-card new-card">
+      <h3>Call (รอตรวจสอบ)</h3>
+      <div class="value" id="callsWaitingResponse">0</div>
+      <div class="progress-container"><div id="waitingResponseProgress" class="progress-bar" style="width: 0%;"></div></div>
+      <div class="progress-text" id="waitingResponsePercent">0%</div>
     </div>
     <div id="maxCard" class="dashboard-card max-card">
       <h3>Call ค้างสูงสุด</h3>
@@ -2237,6 +2281,25 @@
       document.getElementById("callsOver7").textContent = metrics.callsOver7;
       document.getElementById("callsRequest").textContent = metrics.callsRequest;
       document.getElementById("maxTeamPlant").textContent = metrics.maxTeamPlant;
+
+      // Update Progress Bars and Percent Texts
+      const total = metrics.totalCalls || 0;
+      const calculatePercent = (value) => total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+      document.getElementById("totalProgress").style.width = "100%";
+      document.getElementById("totalPercent").textContent = "100%";
+      document.getElementById("pendingProgress").style.width = `${calculatePercent(metrics.callsPending)}%`;
+      document.getElementById("pendingPercent").textContent = `${calculatePercent(metrics.callsPending)}%`;
+      document.getElementById("successProgress").style.width = `${calculatePercent(metrics.callsSuccess)}%`;
+      document.getElementById("successPercent").textContent = `${calculatePercent(metrics.callsSuccess)}%`;
+      document.getElementById("nawaProgress").style.width = `${calculatePercent(metrics.callsNawaVipa)}%`;
+      document.getElementById("nawaPercent").textContent = `${calculatePercent(metrics.callsNawaVipa)}%`;
+      document.getElementById("requestProgress").style.width = `${calculatePercent(metrics.callsRequest)}%`;
+      document.getElementById("requestPercent").textContent = `${calculatePercent(metrics.callsRequest)}%`;
+      document.getElementById("over7Progress").style.width = `${calculatePercent(metrics.callsOver7)}%`;
+      document.getElementById("over7Percent").textContent = `${calculatePercent(metrics.callsOver7)}%`;
+      document.getElementById("waitingResponseProgress").style.width = `${calculatePercent(metrics.callsWaitingResponse)}%`;
+      document.getElementById("waitingResponsePercent").textContent = `${calculatePercent(metrics.callsWaitingResponse)}%`;
+
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
       document.getElementById("ticketCountValue").textContent = uniqueTickets;
       if (sortConfig.column) {
