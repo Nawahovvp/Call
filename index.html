@@ -199,19 +199,24 @@
       box-shadow:0 4px 6px var(--shadow-color);
       border-radius:12px;
       overflow:hidden;
-      min-width:900px;
+      min-width:1000px;
       border: 1px solid var(--border-color);
     }
     th,td{
-      padding:8px 12px;
+      padding:6px 8px;
       text-align:left;
       border:1px solid var(--border-color);
       white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
       color: var(--text-primary);
     }
     th{
       background: var(--header-bg);
       color: var(--header-text);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     th.sortable{
       cursor:pointer;
@@ -399,20 +404,48 @@
         transform:scale(1);
       }
     }
-    th:nth-child(3),td:nth-child(3){
-      width:auto;
-      min-width:100px;
-      max-width:150px;
-      white-space:normal;
-    }
-    th:nth-child(7),td:nth-child(7){
-      min-width:150px;
-    }
+    th:nth-child(1), td:nth-child(1) { min-width: 60px; max-width: 60px; } /* DayRepair */
+    th:nth-child(2), td:nth-child(2) { min-width: 100px; max-width: 120px; } /* DateTime */
+    th:nth-child(3), td:nth-child(3) { min-width: 120px; max-width: 140px; } /* Ticket Number */
+    th:nth-child(4), td:nth-child(4) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Brand */
+    th:nth-child(5), td:nth-child(5) { min-width: 70px; max-width: 80px; } /* Call Type */
+    th:nth-child(6), td:nth-child(6) { min-width: 80px; max-width: 100px; } /* Team */
+    th:nth-child(7), td:nth-child(7) { min-width: 100px; max-width: 120px; } /* TeamPlant */
+    th:nth-child(8), td:nth-child(8) { min-width: 120px; max-width: 140px; } /* ค้างหน่วยงาน */
+    th:nth-child(9), td:nth-child(9) { min-width: 80px; max-width: 100px; } /* Material */
+    th:nth-child(10), td:nth-child(10) { min-width: 200px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Description */
+    th:nth-child(11), td:nth-child(11) { min-width: 50px; max-width: 50px; text-align: center; } /* Nawa */
+    th:nth-child(12), td:nth-child(12) { min-width: 50px; max-width: 50px; text-align: center; } /* Vipa */
+    th:nth-child(13), td:nth-child(13) { min-width: 50px; max-width: 50px; text-align: center; } /* Request */
+    th:nth-child(14), td:nth-child(14) { min-width: 50px; max-width: 50px; text-align: center; } /* QtyPlant */
+    th:nth-child(15), td:nth-child(15) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* คลังตอบ */
+    th:nth-child(16), td:nth-child(16) { min-width: 80px; max-width: 100px; } /* StatusCall */
+    th:nth-child(17), td:nth-child(17) { min-width: 100px; max-width: 120px; } /* วันที่ตอบ */
+    th:nth-child(18), td:nth-child(18) { min-width: 80px; max-width: 100px; } /* UserAns */
+    th:nth-child(19), td:nth-child(19) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Answer1 */
+    th:nth-child(20), td:nth-child(20) { min-width: 100px; max-width: 120px; text-align: center; } /* Detail Button */
     @media (max-width: 768px){
-      th:nth-child(3),td:nth-child(3){
-        min-width:80px;
-        font-size:14px;
-      }
+      th, td { padding: 4px 4px; font-size: 12px; }
+      th:nth-child(1), td:nth-child(1) { min-width: 50px; max-width: 50px; }
+      th:nth-child(2), td:nth-child(2) { min-width: 80px; max-width: 100px; }
+      th:nth-child(3), td:nth-child(3) { min-width: 100px; max-width: 120px; }
+      th:nth-child(4), td:nth-child(4) { min-width: 100px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Brand */
+      th:nth-child(5), td:nth-child(5) { min-width: 60px; max-width: 70px; }
+      th:nth-child(6), td:nth-child(6) { min-width: 70px; max-width: 80px; }
+      th:nth-child(7), td:nth-child(7) { min-width: 80px; max-width: 100px; }
+      th:nth-child(8), td:nth-child(8) { min-width: 100px; max-width: 120px; }
+      th:nth-child(9), td:nth-child(9) { min-width: 70px; max-width: 80px; }
+      th:nth-child(10), td:nth-child(10) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Description */
+      th:nth-child(11), td:nth-child(11) { min-width: 40px; max-width: 40px; }
+      th:nth-child(12), td:nth-child(12) { min-width: 40px; max-width: 40px; }
+      th:nth-child(13), td:nth-child(13) { min-width: 40px; max-width: 40px; }
+      th:nth-child(14), td:nth-child(14) { min-width: 40px; max-width: 40px; }
+      th:nth-child(15), td:nth-child(15) { min-width: 100px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* คลังตอบ */
+      th:nth-child(16), td:nth-child(16) { min-width: 70px; max-width: 80px; }
+      th:nth-child(17), td:nth-child(17) { min-width: 80px; max-width: 100px; }
+      th:nth-child(18), td:nth-child(18) { min-width: 70px; max-width: 80px; }
+      th:nth-child(19), td:nth-child(19) { min-width: 100px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Answer1 */
+      th:nth-child(20), td:nth-child(20) { min-width: 80px; max-width: 90px; }
       #searchInput{
         width:100%;
         max-width:300px;
@@ -505,10 +538,12 @@
     }
     /* คอลัมน์ 2 ในตารางทั่วไปเดิมเป็นชิดซ้าย */
     .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
-      width: 40%;
-      min-width: 200px;
-      max-width: 350px;
-      white-space: normal;
+      width: 50%;
+      min-width: 250px;
+      max-width: none;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
       text-align: left;
     }
     /* ✅ Center เฉพาะคอลัมน์ "รวม" ในตารางสรุป */
@@ -581,6 +616,13 @@
         width:auto;
         min-width:120px;
       }
+      .detail-table td:nth-child(2),
+      .detail-table th:nth-child(2) {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: none;
+      }
     }
     .green-text{
       color: var(--success-color);
@@ -632,15 +674,6 @@
       width:10%;
       min-width:80px;
       max-width:100px;
-      text-align:center;
-    }
-    th:nth-child(10),td:nth-child(10),
-    th:nth-child(11),td:nth-child(11),
-    th:nth-child(12),td:nth-child(12),
-    th:nth-child(13),td:nth-child(13){
-      min-width:50px;
-      width:50px;
-      max-width:60px;
       text-align:center;
     }
     th:nth-child(12),td:nth-child(12){
@@ -708,7 +741,6 @@
     .dashboard-card.active {
       border: 3px solid #fff;
       box-shadow: 0 8px 16px rgba(255,255,255,0.3);
-      transform: scale(1.02);
     }
     .dashboard-card h3 {
       margin-bottom: 10px;
@@ -748,6 +780,21 @@
     .spare-card {
       background: linear-gradient(135deg, #28a745, #20c09d);
     }
+    .calltype-p-card {
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+    }
+    .calltype-c-card {
+      background: linear-gradient(135deg, #f44336, #d32f2f);
+    }
+    .calltype-b-card {
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+    }
+    .calltype-u-card {
+      background: linear-gradient(135deg, #ffeb3b, #fbc02d);
+    }
+    .calltype-other-card {
+      background: linear-gradient(135deg, #9e9e9e, #757575);
+    }
     .dark-theme .total-card {
       background: linear-gradient(135deg, #42a5f5, #1976d2);
     }
@@ -778,6 +825,21 @@
     .dark-theme .spare-card {
       background: linear-gradient(135deg, #66bb6a, #4caf50);
     }
+    .dark-theme .calltype-p-card {
+      background: linear-gradient(135deg, #81c784, #66bb6a);
+    }
+    .dark-theme .calltype-c-card {
+      background: linear-gradient(135deg, #e57373, #ef5350);
+    }
+    .dark-theme .calltype-b-card {
+      background: linear-gradient(135deg, #64b5f6, #42a5f5);
+    }
+    .dark-theme .calltype-u-card {
+      background: linear-gradient(135deg, #fff176, #ffca28);
+    }
+    .dark-theme .calltype-other-card {
+      background: linear-gradient(135deg, #b0bec5, #90a4ae);
+    }
     @media (max-width: 768px) {
       .dashboard {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -786,6 +848,155 @@
       .dashboard-card .value {
         font-size: 2em;
       }
+    }
+    /* Call Type Dashboard Specific Styles (ปรับขนาดใหญ่ขึ้น 125% เพื่อความชัดเจน, ใช้ minmax(100px,1fr)) */
+    #callTypeDashboard {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* เพิ่มจาก 60px เป็น 100px */
+      gap: 8px; /* เพิ่มจาก 5px เป็น 8px */
+      margin-bottom: 8px; /* เพิ่มจาก 5px เป็น 8px */
+    }
+    #callTypeDashboard .dashboard-card {
+      padding: 8px; /* เพิ่มจาก 5px เป็น 8px */
+    }
+    #callTypeDashboard .dashboard-card h3 {
+      font-size: 1em; /* เพิ่มจาก 0.8em เป็น 1em */
+      margin-bottom: 4px; /* เพิ่มจาก 2px เป็น 4px */
+    }
+    #callTypeDashboard .dashboard-card .value {
+      font-size: 1.2em; /* เพิ่มจาก 0.8em เป็น 1.2em */
+      font-weight: bold;
+    }
+    /* Active State: เปลี่ยนเฉพาะสีพื้นหลังแบบนุ่มนวล ไม่ขยายขนาด */
+    #callTypeDashboard .dashboard-card.active {
+      transform: none; /* ไม่ขยายขนาด */
+      border: none; /* ลบขอบขาว */
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* เงาเบาๆ */
+      transition: background 0.3s ease; /* เปลี่ยนสีลื่นไหล */
+    }
+    /* สี Active สำหรับแต่ละ Call Type (ปรับให้สว่าง/เด่นขึ้น) */
+    #callTypeDashboard .calltype-p-card.active {
+      background: linear-gradient(135deg, #66bb6a, #4caf50); /* เขียวสว่างสำหรับ P */
+    }
+    #callTypeDashboard .calltype-c-card.active {
+      background: linear-gradient(135deg, #ef5350, #e53935); /* แดงสดสำหรับ C */
+    }
+    #callTypeDashboard .calltype-b-card.active {
+      background: linear-gradient(135deg, #42a5f5, #1e88e5); /* น้ำเงินเข้มสว่างสำหรับ B */
+    }
+    #callTypeDashboard .calltype-u-card.active {
+      background: linear-gradient(135deg, #ffca28, #ffc107); /* ส้มเหลืองสดสำหรับ U */
+    }
+    #callTypeDashboard .calltype-other-card.active {
+      background: linear-gradient(135deg, #90a4ae, #78909c); /* เทาเข้มสว่างสำหรับอื่นๆ */
+    }
+    .dark-theme #callTypeDashboard .calltype-p-card.active {
+      background: linear-gradient(135deg, #81c784, #66bb6a); /* ปรับสำหรับ dark mode */
+    }
+    .dark-theme #callTypeDashboard .calltype-c-card.active {
+      background: linear-gradient(135deg, #e57373, #ef5350); /* ปรับสำหรับ dark mode */
+    }
+    .dark-theme #callTypeDashboard .calltype-b-card.active {
+      background: linear-gradient(135deg, #64b5f6, #42a5f5); /* ปรับสำหรับ dark mode */
+    }
+    .dark-theme #callTypeDashboard .calltype-u-card.active {
+      background: linear-gradient(135deg, #fff176, #ffca28); /* ปรับสำหรับ dark mode */
+    }
+    .dark-theme #callTypeDashboard .calltype-other-card.active {
+      background: linear-gradient(135deg, #b0bec5, #90a4ae); /* ปรับสำหรับ dark mode */
+    }
+    /* Hover: ยังคง translateY เบาๆ เพื่อ feedback แต่ไม่ขยาย */
+    #callTypeDashboard .dashboard-card:hover {
+      transform: translateY(-2px);
+    }
+    /* ลบ Pulse animation ออก */
+    @media (max-width: 768px) {
+      #callTypeDashboard {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* เพิ่มจาก 50px เป็น 80px ใน mobile */
+        gap: 6px; /* เพิ่มจาก 3px เป็น 6px */
+      }
+      #callTypeDashboard .dashboard-card {
+        padding: 6px; /* เพิ่มจาก 3px เป็น 6px */
+      }
+      #callTypeDashboard .dashboard-card h3 {
+        font-size: 0.9em; /* เพิ่มจาก 0.7em เป็น 0.9em */
+      }
+      #callTypeDashboard .dashboard-card .value {
+        font-size: 1em; /* เพิ่มจาก 0.7em เป็น 1em */
+      }
+    }
+    /* ✅ ใหม่: CSS สำหรับ Container กรอบตาราง Call Type (แบบกลุ่ม) */
+    .call-type-table-container {
+      display: flex;
+      justify-content: flex-start; /* เปลี่ยนจาก center เป็น flex-start เพื่อชิดซ้าย */
+      margin-bottom: 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      padding: 15px;
+      border: 2px solid var(--border-color);
+      overflow: hidden;
+      position: relative; /* สำหรับ absolute positioning ของ ::before */
+    }
+    .call-type-table-container::before {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 1;
+    }
+    .dark-theme .call-type-table-container {
+      border-color: var(--border-color);
+      background: var(--card-bg);
+    }
+    /* ปรับ #callTypeDashboard ให้อยู่ใน container และดูเป็นตารางมากขึ้น */
+    #callTypeDashboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* คง 4 คอลัมน์เพื่อให้เป็นตารางสี่เหลี่ยม */
+      gap: 8px; /* เพิ่ม gap เล็กน้อย */
+      width: 100%;
+      max-width: 500px; /* เพิ่มจาก 400px เป็น 500px เพื่อความกว้างมากขึ้น */
+      margin: 0; /* ลบ margin: 0 auto; เพื่อชิดซ้าย */
+    }
+    #callTypeDashboard .dashboard-card {
+      border: 1px solid rgba(255, 255, 255, 0.2); /* เพิ่มกรอบบางรอบแต่ละการ์ด */
+      border-radius: 6px;
+      padding: 8px; /* เพิ่ม padding เล็กน้อย */
+      transition: all 0.3s ease;
+    }
+    #callTypeDashboard .dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    @media (max-width: 768px) {
+      .call-type-table-container {
+        padding: 10px;
+        margin-bottom: 15px;
+        justify-content: flex-start; /* ชิดซ้ายใน mobile ด้วย */
+      }
+      #callTypeDashboard {
+        grid-template-columns: repeat(2, 1fr); /* ใน mobile: 2 คอลัมน์เพื่อ responsive */
+        max-width: 100%; /* ใช้เต็มความกว้าง container */
+        gap: 6px;
+        margin: 0; /* คงชิดซ้าย */
+      }
+      #callTypeDashboard .dashboard-card {
+        padding: 6px;
+        border-width: 1px;
+      }
+      .call-type-table-container::before {
+        left: 10px;
+        font-size: 12px;
+        padding: 3px 10px;
+      }
+    }
+    /* ถ้ามีมากกว่า 4 Call Type จะ wrap แต่คง layout ตาราง */
+    #callTypeDashboard:has(.dashboard-card:nth-child(5)) {
+      grid-template-columns: repeat(5, 1fr);
     }
     /* ✅ เพิ่ม CSS สำหรับตารางสรุปอะไหล่ (กะทัดรัดและ Responsive) */
     .detail-table td:nth-child(2),
@@ -848,9 +1059,13 @@
     #spareSummaryModal .detail-table td:nth-child(2),
     #spareSummaryModal .detail-table th:nth-child(2) {
       /* กะทัดรัดมากขึ้น */
-      max-width: 120px;
-      min-width: 80px;
-      width: 18%; /* ลดสัดส่วนลงอีก */
+      max-width: none;
+      min-width: 250px;
+      width: 50%; /* เพิ่มสัดส่วน */
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      text-align: left;
     }
     #spareSummaryModal .detail-table th:not(:first-child),
     #spareSummaryModal .detail-table td:not(:first-child) {
@@ -872,8 +1087,8 @@
       }
       #spareSummaryModal .detail-table td:nth-child(2),
       #spareSummaryModal .detail-table th:nth-child(2) {
-        min-width: 80px;
-        width: 25%;
+        min-width: 180px;
+        width: 55%;
       }
     }
     /* ✅ เพิ่ม CSS สำหรับตารางสรุปอะไหล่: เพิ่มความกว้าง Description และลด Material */
@@ -891,15 +1106,14 @@
     #spareSummaryModal .detail-table th:nth-child(2),
     #spareSummaryModal .detail-table td:nth-child(2) {
       /* เพิ่มความกว้าง Description เพื่อเห็นข้อมูลทั้งหมด */
-      width: 40%; /* เพิ่มสัดส่วนจาก 35% เป็น 40% */
-      min-width: 180px; /* เพิ่ม min-width จาก 150px เป็น 180px */
+      width: 50%; /* เพิ่มสัดส่วนจาก 35% เป็น 50% */
+      min-width: 250px; /* เพิ่ม min-width จาก 150px เป็น 250px */
       max-width: none; /* อนุญาตให้กว้างขึ้น */
-      white-space: normal; /* อนุญาต wrap */
+      white-space: nowrap; /* เปลี่ยนเป็น nowrap เพื่ออยู่ในบรรทัดเดียว */
       overflow: visible;
       text-overflow: clip;
       text-align: left;
-      word-wrap: break-word;
-      word-break: break-word; /* เพิ่มเพื่อ break คำยาว */
+      /* ลบ word-wrap, word-break เพื่อไม่ให้ตัดบรรทัด */
       line-height: 1.3; /* ปรับ line-height เพื่ออ่านง่าย */
     }
     #spareSummaryModal .detail-table th:nth-child(3),
@@ -923,8 +1137,8 @@
       }
       #spareSummaryModal .detail-table th:nth-child(2),
       #spareSummaryModal .detail-table td:nth-child(2) {
-        width: 45%; /* เพิ่มใน mobile จาก 40% เป็น 45% */
-        min-width: 140px; /* ปรับ min-width ใน mobile */
+        width: 55%; /* เพิ่มใน mobile จาก 40% เป็น 55% */
+        min-width: 200px; /* ปรับ min-width ใน mobile */
       }
       #spareSummaryModal .detail-table th:nth-child(n+4),
       #spareSummaryModal .detail-table td:nth-child(n+4) {
@@ -965,7 +1179,6 @@
         line-height: 1.3;
       }
     }
-
     /* เพิ่ม CSS สำหรับ Progress Bar สไตล์ Canva (สวยงาม, ใช้ gradient, rounded) */
     .progress-container {
       margin-top: 10px;
@@ -994,6 +1207,53 @@
     }
     .dark-theme .progress-text {
       color: rgba(224, 224, 224, 0.9);
+    }
+    /* Adjusted progress for smaller Call Type cards */
+    #callTypeDashboard .progress-container {
+      height: 4px; /* เพิ่มจาก 3px เป็น 4px สำหรับการ์ดขนาดใหญ่ขึ้น */
+      margin-top: 3px; /* เพิ่มจาก 2px เป็น 3px */
+    }
+    #callTypeDashboard .progress-text {
+      font-size: 0.7em; /* เพิ่มจาก 0.6em เป็น 0.7em */
+      margin-top: 2px; /* เพิ่มจาก 1px เป็น 2px */
+    }
+    /* ✅ ปรับปรุง Container สำหรับข้อมูลสรุป (เพิ่ม padding, font-size, และ contrast เพื่อความชัดเจน) */
+    .call-type-table-container {
+      padding: 20px; /* เพิ่มจาก 15px เป็น 20px */
+      margin-bottom: 25px; /* เพิ่มจาก 20px เป็น 25px */
+    }
+    .call-type-table-container::before {
+      font-size: 16px; /* เพิ่มจาก 14px เป็น 16px */
+      padding: 8px 20px; /* เพิ่ม padding */
+      top: -12px; /* ปรับตำแหน่ง */
+      left: 25px; /* ปรับตำแหน่ง */
+    }
+    /* เพิ่ม contrast สำหรับข้อความใน Call Type Cards */
+    #callTypeDashboard .dashboard-card h3,
+    #callTypeDashboard .dashboard-card .value,
+    #callTypeDashboard .dashboard-card .progress-text {
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* เพิ่มเงาเพื่อความชัดเจน */
+      color: #fff !important; /* บังคับสีขาวสำหรับข้อความ */
+    }
+    .dark-theme #callTypeDashboard .dashboard-card h3,
+    .dark-theme #callTypeDashboard .dashboard-card .value,
+    .dark-theme #callTypeDashboard .dashboard-card .progress-text {
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* ปรับเงาสำหรับ dark mode */
+      color: #e0e0e0 !important; /* สีอ่อนสำหรับ dark mode */
+    }
+    /* ปรับขนาด max-width ของ container เพื่อให้กว้างขึ้นและชัดเจน */
+    #callTypeDashboard {
+      max-width: 600px; /* เพิ่มจาก 500px เป็น 600px */
+    }
+    @media (max-width: 768px) {
+      .call-type-table-container::before {
+        font-size: 14px; /* คงเดิมแต่เพิ่ม padding */
+        padding: 5px 15px;
+      }
+      #callTypeDashboard {
+        max-width: 100%;
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
@@ -1061,6 +1321,10 @@
       <div class="value"><i class="fas fa-list-alt"></i></div>
     </div>
   </div>
+  <!-- Call Type Dashboard Section (ห่อด้วย container ใหม่เพื่อกรอบตารางแบบกลุ่ม) -->
+  <div class="call-type-table-container">
+    <div id="callTypeDashboard" class="dashboard"></div>
+  </div>
   <div id="searchContainer">
     <div class="filter-row">
       <label id="employeeFilterLabel" for="employeeFilter" class="modern-label">ศูนย์พื้นที่</label>
@@ -1081,7 +1345,7 @@
       <select id="statusCallFilter"><option value="">ทั้งหมด</option></select>
     </div>
     <div class="search-row">
-      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, ค้างหน่วยงาน, ผู้แจ้ง, Nawa, คลังตอบ, StatusCall, วันที่ตอบ..." />
+      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, Call Type, ค้างหน่วยงาน, ผู้แจ้ง, Nawa, คลังตอบ, StatusCall, วันที่ตอบ..." />
       <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
       <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
       <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
@@ -1094,9 +1358,10 @@
       <thead>
         <tr>
           <th class="sortable" data-column="DayRepair">ผ่านมา <span class="arrow"></span></th>
-          <th class="sortable" data-column="DateTime">DateTime <span class="arrow"></span></th>
+          <th class="sortable" data-column="DateTime">วันที่แจ้ง <span class="arrow"></span></th>
           <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
           <th class="sortable" data-column="Brand">Brand <span class="arrow"></span></th>
+          <th class="sortable" data-column="Call Type">Call Type <span class="arrow"></span></th>
           <th class="sortable" data-column="Team">Team <span class="arrow"></span></th>
           <th class="sortable" data-column="TeamPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
           <th class="sortable" data-column="ค้างหน่วยงาน">ค้างหน่วยงาน <span class="arrow"></span></th>
@@ -1229,6 +1494,7 @@
     const spareSummaryContent = document.getElementById("spareSummaryContent");
     const updateValueSpan = document.getElementById("updateValue");
     const loadingDiv = document.getElementById("loading");
+    const callTypeDashboard = document.getElementById("callTypeDashboard");
     // Dashboard cards
     const totalCard = document.getElementById("totalCard");
     const pendingCard = document.getElementById("pendingCard");
@@ -1246,6 +1512,7 @@
     let sortConfig = { column: 'DayRepair', direction: 'desc' };
     let teamChart = null;
     let dashboardFilter = null;
+    let callTypeCards = {};
     // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
     let currentTicketNumber = null;
     let currentRowData = null;
@@ -1282,6 +1549,7 @@
       }
     });
     function updateActiveCard(cardId) {
+      // Clear active from all dashboard cards
       document.querySelectorAll('.dashboard-card').forEach(card => card.classList.remove('active'));
       if (cardId) {
         const card = document.getElementById(cardId);
@@ -1291,6 +1559,11 @@
     /** อ่าน Description รองรับสะกดหลายแบบ */
     function getDesc(row) {
       return (row["Description"] ?? row["Discription"] ?? row["Discrtiption"] ?? "-");
+    }
+    function extractDate(dateTimeStr) {
+      if (!dateTimeStr || typeof dateTimeStr !== 'string') return dateTimeStr || "-";
+      const match = dateTimeStr.match(/^(\d{2}\/\d{2}\/\d{4})/);
+      return match ? match[1] : dateTimeStr;
     }
     function parseDate(dateStr) {
       if (!dateStr || typeof dateStr !== 'string') return null;
@@ -1318,6 +1591,7 @@
             (row["DateTime"] || "").toLowerCase().includes(keyword) ||
             (row["Ticket Number"] || "").toLowerCase().includes(keyword) ||
             (row["Brand"] || "").toLowerCase().includes(keyword) ||
+            (row["Call Type"] || "").toLowerCase().includes(keyword) ||
             (row["Team"] || "").toLowerCase().includes(keyword) ||
             cleanRowTP.toLowerCase().includes(keyword) ||
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
@@ -1392,6 +1666,57 @@
         maxTeamPlant
       };
     }
+    function calculateCallTypeMetrics(data) {
+      const ticketSet = new Set();
+      const callTypeCounts = {};
+      data.forEach(row => {
+        const ticket = row["Ticket Number"];
+        if (!ticket || ticketSet.has(ticket)) return;
+        ticketSet.add(ticket);
+        const ct = row["Call Type"] || 'อื่นๆ';
+        if (!callTypeCounts[ct]) callTypeCounts[ct] = 0;
+        callTypeCounts[ct]++;
+      });
+      return { callTypeCounts, total: ticketSet.size };
+    }
+    function updateCallTypeDashboard(data) {
+      const metrics = calculateCallTypeMetrics(data);
+      const { callTypeCounts, total } = metrics;
+      callTypeDashboard.innerHTML = '';
+      callTypeCards = {};
+      Object.entries(callTypeCounts).forEach(([type, count]) => {
+        const card = document.createElement('div');
+        card.id = `calltype_${type}Card`;
+        card.className = 'dashboard-card';
+        let colorClass = 'calltype-other-card';
+        if (type === 'P') colorClass = 'calltype-p-card';
+        else if (type === 'C') colorClass = 'calltype-c-card';
+        else if (type === 'B') colorClass = 'calltype-b-card';
+        else if (type === 'U') colorClass = 'calltype-u-card';
+        card.classList.add(colorClass);
+        const percent = total > 0 ? (count / total * 100).toFixed(0) : 0;
+        card.innerHTML = `
+          <h3>${type}</h3>
+          <div class="value">${count}</div>
+          <div class="progress-container"><div class="progress-bar" style="width: ${percent}%;"></div></div>
+          <div class="progress-text">${percent}%</div>
+        `;
+        card.addEventListener('click', () => {
+          dashboardFilter = `calltype_${type}`;
+          filterAndRenderTable();
+        });
+        callTypeDashboard.appendChild(card);
+        callTypeCards[type] = card;
+      });
+      // Set active state for the current call type filter if applicable
+      if (dashboardFilter && dashboardFilter.startsWith('calltype_')) {
+        const activeType = dashboardFilter.split('_')[1];
+        const activeCard = callTypeCards[activeType];
+        if (activeCard) {
+          activeCard.classList.add('active');
+        }
+      }
+    }
     function fetchUpdateDate() {
       fetch(updateUrl)
         .then(r => r.json())
@@ -1420,34 +1745,39 @@
       const baseFilteredData = getBaseFilteredData();
       let filteredData = [...baseFilteredData];
       if (dashboardFilter) {
-        switch(dashboardFilter) {
-          case 'pending':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
-            break;
-          case 'success':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
-            break;
-          case 'waitingResponse':
-            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
-            break;
-          case 'over7':
-            filteredData = filteredData.filter(row => {
-              const day = parseFloat(row["DayRepair"] || 0);
-              return day > 7;
-            });
-            break;
-          case 'request':
-            filteredData = filteredData.filter(row => {
-              const mat = row["Material"] || "";
-              return mat === "" || mat === "-" || !mat.trim();
-            });
-            break;
-          case 'nawaVipa':
-            filteredData = filteredData.filter(row => {
-              const status = row["StatusCall"] || "";
-              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
-            });
-            break;
+        if (dashboardFilter.startsWith('calltype_')) {
+          const type = dashboardFilter.split('_')[1];
+          filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+        } else {
+          switch(dashboardFilter) {
+            case 'pending':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+              break;
+            case 'success':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+              break;
+            case 'waitingResponse':
+              filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+              break;
+            case 'over7':
+              filteredData = filteredData.filter(row => {
+                const day = parseFloat(row["DayRepair"] || 0);
+                return day > 7;
+              });
+              break;
+            case 'request':
+              filteredData = filteredData.filter(row => {
+                const mat = row["Material"] || "";
+                return mat === "" || mat === "-" || !mat.trim();
+              });
+              break;
+            case 'nawaVipa':
+              filteredData = filteredData.filter(row => {
+                const status = row["StatusCall"] || "";
+                return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+              });
+              break;
+          }
         }
       }
       if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรอง"); return; }
@@ -1459,14 +1789,15 @@
         if (dayA !== dayB) return dayB - dayA;
         return ticketA.localeCompare(ticketB);
       });
-      const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","วันที่ตอบ","UserAns"];
-      const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"DateTime","Ticket Number":"Ticket Number","Brand":"Brand","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description","วันที่ตอบ":"วันที่ตอบ","UserAns":"ผู้แจ้ง" };
+      const columns = ["DayRepair","DateTime","Ticket Number","Brand","Call Type","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","วันที่ตอบ","UserAns"];
+      const displayColumns = { "DayRepair":"ผ่านมา","DateTime":"วันที่แจ้ง","Ticket Number":"Ticket Number","Brand":"Brand","Call Type":"Call Type","Team":"Team","TeamPlant":"ศูนย์พื้นที่","ค้างหน่วยงาน":"ค้างหน่วยงาน","Material":"Material","Description":"Description","วันที่ตอบ":"วันที่ตอบ","UserAns":"ผู้แจ้ง" };
       const csvRows = [];
       csvRows.push(columns.map(col => `"${displayColumns[col]}"`).join(','));
       filteredData.forEach(row => {
         const rowData = columns.map(col => {
           let value;
           if (col === "Description") value = getDesc(row);
+          else if (col === "DateTime") value = extractDate(row[col] || "-");
           else value = row[col] || "-";
           if (col === "DayRepair") value = isNaN(parseFloat(value)) ? "-" : parseFloat(value).toFixed(0);
           return escapeCSVValue(value);
@@ -1491,7 +1822,8 @@
         <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
         <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
         <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
-        <div><span class="label">DateTime:</span> <span class="value">${modalData["DateTime"] || "-"}</span></div>
+        <div><span class="label">Call Type:</span> <span class="value">${modalData["Call Type"] || "-"}</span></div>
+        <div><span class="label">วันที่แจ้ง:</span> <span class="value">${extractDate(modalData["DateTime"] || "-")}</span></div>
         <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
         <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${getCleanTeamPlant(modalData["TeamPlant"]) || "-"}</span></div>
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
@@ -1535,34 +1867,39 @@
       const baseFilteredData = getBaseFilteredData();
       let filteredData = [...baseFilteredData];
       if (dashboardFilter) {
-        switch(dashboardFilter) {
-          case 'pending':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
-            break;
-          case 'success':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
-            break;
-          case 'waitingResponse':
-            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
-            break;
-          case 'over7':
-            filteredData = filteredData.filter(row => {
-              const day = parseFloat(row["DayRepair"] || 0);
-              return day > 7;
-            });
-            break;
-          case 'request':
-            filteredData = filteredData.filter(row => {
-              const mat = row["Material"] || "";
-              return mat === "" || mat === "-" || !mat.trim();
-            });
-            break;
-          case 'nawaVipa':
-            filteredData = filteredData.filter(row => {
-              const status = row["StatusCall"] || "";
-              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
-            });
-            break;
+        if (dashboardFilter.startsWith('calltype_')) {
+          const type = dashboardFilter.split('_')[1];
+          filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+        } else {
+          switch(dashboardFilter) {
+            case 'pending':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+              break;
+            case 'success':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+              break;
+            case 'waitingResponse':
+              filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+              break;
+            case 'over7':
+              filteredData = filteredData.filter(row => {
+                const day = parseFloat(row["DayRepair"] || 0);
+                return day > 7;
+              });
+              break;
+            case 'request':
+              filteredData = filteredData.filter(row => {
+                const mat = row["Material"] || "";
+                return mat === "" || mat === "-" || !mat.trim();
+              });
+              break;
+            case 'nawaVipa':
+              filteredData = filteredData.filter(row => {
+                const status = row["StatusCall"] || "";
+                return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+              });
+              break;
+          }
         }
       }
       if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา"); return; }
@@ -1584,7 +1921,8 @@
             <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
             <div><span class="label">Team:</span> <span class="value team-brand">${row["Team"] || "-"}</span></div>
             <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
-            <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
+            <div><span class="label">Call Type:</span> <span class="value">${row["Call Type"] || "-"}</span></div>
+            <div><span class="label">วันที่แจ้ง:</span> <span class="value">${extractDate(row["DateTime"] || "-")}</span></div>
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(row["TeamPlant"]) || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
@@ -1662,34 +2000,39 @@
       const baseFilteredData = getBaseFilteredData();
       let filteredData = [...baseFilteredData];
       if (dashboardFilter) {
-        switch(dashboardFilter) {
-          case 'pending':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
-            break;
-          case 'success':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
-            break;
-          case 'waitingResponse':
-            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
-            break;
-          case 'over7':
-            filteredData = filteredData.filter(row => {
-              const day = parseFloat(row["DayRepair"] || 0);
-              return day > 7;
-            });
-            break;
-          case 'request':
-            filteredData = filteredData.filter(row => {
-              const mat = row["Material"] || "";
-              return mat === "" || mat === "-" || !mat.trim();
-            });
-            break;
-          case 'nawaVipa':
-            filteredData = filteredData.filter(row => {
-              const status = row["StatusCall"] || "";
-              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
-            });
-            break;
+        if (dashboardFilter.startsWith('calltype_')) {
+          const type = dashboardFilter.split('_')[1];
+          filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+        } else {
+          switch(dashboardFilter) {
+            case 'pending':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+              break;
+            case 'success':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+              break;
+            case 'waitingResponse':
+              filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+              break;
+            case 'over7':
+              filteredData = filteredData.filter(row => {
+                const day = parseFloat(row["DayRepair"] || 0);
+                return day > 7;
+              });
+              break;
+            case 'request':
+              filteredData = filteredData.filter(row => {
+                const mat = row["Material"] || "";
+                return mat === "" || mat === "-" || !mat.trim();
+              });
+              break;
+            case 'nawaVipa':
+              filteredData = filteredData.filter(row => {
+                const status = row["StatusCall"] || "";
+                return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+              });
+              break;
+          }
         }
       }
       if (filteredData.length === 0) {
@@ -1836,34 +2179,39 @@
       const baseFilteredData = getBaseFilteredData();
       let filteredData = [...baseFilteredData];
       if (dashboardFilter) {
-        switch(dashboardFilter) {
-          case 'pending':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
-            break;
-          case 'success':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
-            break;
-          case 'waitingResponse':
-            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
-            break;
-          case 'over7':
-            filteredData = filteredData.filter(row => {
-              const day = parseFloat(row["DayRepair"] || 0);
-              return day > 7;
-            });
-            break;
-          case 'request':
-            filteredData = filteredData.filter(row => {
-              const mat = row["Material"] || "";
-              return mat === "" || mat === "-" || !mat.trim();
-            });
-            break;
-          case 'nawaVipa':
-            filteredData = filteredData.filter(row => {
-              const status = row["StatusCall"] || "";
-              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
-            });
-            break;
+        if (dashboardFilter.startsWith('calltype_')) {
+          const type = dashboardFilter.split('_')[1];
+          filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+        } else {
+          switch(dashboardFilter) {
+            case 'pending':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+              break;
+            case 'success':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+              break;
+            case 'waitingResponse':
+              filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+              break;
+            case 'over7':
+              filteredData = filteredData.filter(row => {
+                const day = parseFloat(row["DayRepair"] || 0);
+                return day > 7;
+              });
+              break;
+            case 'request':
+              filteredData = filteredData.filter(row => {
+                const mat = row["Material"] || "";
+                return mat === "" || mat === "-" || !mat.trim();
+              });
+              break;
+            case 'nawaVipa':
+              filteredData = filteredData.filter(row => {
+                const status = row["StatusCall"] || "";
+                return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+              });
+              break;
+          }
         }
       }
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
@@ -1944,31 +2292,36 @@
       const baseFilteredData = getBaseFilteredData();
       let filteredData = baseFilteredData.filter(row => (row["StatusCall"] || "").trim() === "รอของเข้า");
       if (dashboardFilter) {
-        switch(dashboardFilter) {
-          case 'pending':
-            // already filtered to pending
-            break;
-          case 'success':
-            filteredData = [];
-            break;
-          case 'waitingResponse':
-            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
-            break;
-          case 'over7':
-            filteredData = filteredData.filter(row => {
-              const day = parseFloat(row["DayRepair"] || 0);
-              return day > 7;
-            });
-            break;
-          case 'request':
-            filteredData = filteredData.filter(row => {
-              const mat = row["Material"] || "";
-              return mat === "" || mat === "-" || !mat.trim();
-            });
-            break;
-          case 'nawaVipa':
-            filteredData = [];
-            break;
+        if (dashboardFilter.startsWith('calltype_')) {
+          const type = dashboardFilter.split('_')[1];
+          filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+        } else {
+          switch(dashboardFilter) {
+            case 'pending':
+              // already filtered to pending
+              break;
+            case 'success':
+              filteredData = [];
+              break;
+            case 'waitingResponse':
+              filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+              break;
+            case 'over7':
+              filteredData = filteredData.filter(row => {
+                const day = parseFloat(row["DayRepair"] || 0);
+                return day > 7;
+              });
+              break;
+            case 'request':
+              filteredData = filteredData.filter(row => {
+                const mat = row["Material"] || "";
+                return mat === "" || mat === "-" || !mat.trim();
+              });
+              break;
+            case 'nawaVipa':
+              filteredData = [];
+              break;
+          }
         }
       }
       if (filteredData.length === 0) {
@@ -2009,7 +2362,7 @@
               return `
                 <tr>
                   <td title="${material}">${material}</td>
-                  <td>${description}</td>
+                  <td title="${description}">${description}</td>
                   <td class='fixed-width'>${data.total === 0 ? '-' : data.total}</td>
                   ${pendingUnits.map(pending => `<td class='fixed-width'>${data[pending] === 0 ? '-' : data[pending]}</td>`).join('')}
                 </tr>
@@ -2080,7 +2433,7 @@
     // Dashboard click events
     totalCard.addEventListener('click', () => {
       dashboardFilter = null;
-      updateActiveCard(null);
+      updateActiveCard('totalCard');
       // ✅ เพิ่ม: Reset filters กลับไปค่าตั้งต้นเพื่อแสดง Call ทั้งหมด
       employeeFilter.value = "";
       pendingFilter.value = "";
@@ -2237,34 +2590,39 @@
       const baseFilteredData = getBaseFilteredData();
       let filteredData = [...baseFilteredData];
       if (dashboardFilter) {
-        switch(dashboardFilter) {
-          case 'pending':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
-            break;
-          case 'success':
-            filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
-            break;
-          case 'waitingResponse':
-            filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
-            break;
-          case 'over7':
-            filteredData = filteredData.filter(row => {
-              const day = parseFloat(row["DayRepair"] || 0);
-              return day > 7;
-            });
-            break;
-          case 'request':
-            filteredData = filteredData.filter(row => {
-              const mat = row["Material"] || "";
-              return mat === "" || mat === "-" || !mat.trim();
-            });
-            break;
-          case 'nawaVipa':
-            filteredData = filteredData.filter(row => {
-              const status = row["StatusCall"] || "";
-              return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
-            });
-            break;
+        if (dashboardFilter.startsWith('calltype_')) {
+          const type = dashboardFilter.split('_')[1];
+          filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+        } else {
+          switch(dashboardFilter) {
+            case 'pending':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+              break;
+            case 'success':
+              filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+              break;
+            case 'waitingResponse':
+              filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+              break;
+            case 'over7':
+              filteredData = filteredData.filter(row => {
+                const day = parseFloat(row["DayRepair"] || 0);
+                return day > 7;
+              });
+              break;
+            case 'request':
+              filteredData = filteredData.filter(row => {
+                const mat = row["Material"] || "";
+                return mat === "" || mat === "-" || !mat.trim();
+              });
+              break;
+            case 'nawaVipa':
+              filteredData = filteredData.filter(row => {
+                const status = row["StatusCall"] || "";
+                return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+              });
+              break;
+          }
         }
       }
       const selectedTeamPlant = employeeFilter.value;
@@ -2281,7 +2639,6 @@
       document.getElementById("callsOver7").textContent = metrics.callsOver7;
       document.getElementById("callsRequest").textContent = metrics.callsRequest;
       document.getElementById("maxTeamPlant").textContent = metrics.maxTeamPlant;
-
       // Update Progress Bars and Percent Texts
       const total = metrics.totalCalls || 0;
       const calculatePercent = (value) => total > 0 ? ((value / total) * 100).toFixed(0) : 0;
@@ -2299,7 +2656,8 @@
       document.getElementById("over7Percent").textContent = `${calculatePercent(metrics.callsOver7)}%`;
       document.getElementById("waitingResponseProgress").style.width = `${calculatePercent(metrics.callsWaitingResponse)}%`;
       document.getElementById("waitingResponsePercent").textContent = `${calculatePercent(metrics.callsWaitingResponse)}%`;
-
+      // Update Call Type Dashboard (ใช้ baseFilteredData เพื่อแสดงการ์ดทั้งหมด ไม่หายเมื่อกรอง)
+      updateCallTypeDashboard(baseFilteredData);
       const uniqueTickets = [...new Set(filteredData.map(row => row["Ticket Number"]).filter(Boolean))].length;
       document.getElementById("ticketCountValue").textContent = uniqueTickets;
       if (sortConfig.column) {
@@ -2342,7 +2700,7 @@
     function renderTable(data) {
       tableBody.innerHTML = '';
       if (!data || data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="19">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="20">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
         return;
       }
       const startIdx = (currentPage - 1) * itemsPerPage;
@@ -2362,7 +2720,7 @@
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","วันที่ตอบ","UserAns","Answer1"];
+        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Call Type","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","วันที่ตอบ","UserAns","Answer1"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
@@ -2370,6 +2728,9 @@
             cellValue = getCleanTeamPlant(cellValue);
           }
           let displayValue = cellValue;
+          if (col === "DateTime") {
+            displayValue = extractDate(cellValue);
+          }
           if (col === "DayRepair") {
             displayValue = isNaN(parseFloat(displayValue)) ? "-" : parseFloat(displayValue).toFixed(0);
           } else if (col === "คลังตอบ") {
@@ -2421,9 +2782,10 @@
           timelineHtml += '</tbody></table>';
           modalContent.innerHTML = `
             <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
-            <div><span class="label">DateTime:</span> <span class="value">${row["DateTime"] || "-"}</span></div>
+            <div><span class="label">วันที่แจ้ง:</span> <span class="value">${extractDate(row["DateTime"] || "-")}</span></div>
             <div><span class="label">Ticket Number:</span> <span class="value">${row["Ticket Number"] || "-"}</span></div>
             <div><span class="label">Brand:</span> <span class="value">${row["Brand"] || "-"}</span></div>
+            <div><span class="label">Call Type:</span> <span class="value">${row["Call Type"] || "-"}</span></div>
             <div><span class="label">Team:</span> <span class="value">${row["Team"] || "-"}</span></div>
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(row["TeamPlant"]) || "-"}</span></div>
             <div><span class="label">ค้างหน่วยงาน:</span> <span class="value">${row["ค้างหน่วยงาน"] || "-"}</span></div>
