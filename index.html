@@ -2134,6 +2134,23 @@
               }
             }
           },
+          onClick: (event, elements, chart) => {
+            if (elements.length > 0) {
+              const element = elements[0];
+              const index = element.index;
+              const teamPlant = chart.data.labels[index];
+              employeeFilter.value = teamPlant;
+              // Reset other filters to show all data for this teamPlant
+              pendingFilter.value = "";
+              stockFilter.value = "";
+              statusCallFilter.value = "";
+              searchInput.value = "";
+              dashboardFilter = null;
+              updateActiveCard(null);
+              filterAndRenderTable();
+              // graphModal.style.display = "none";  // ลบการปิด modal เพื่อให้กราฟยังคงแสดงข้อมูลทั้งหมด
+            }
+          },
           plugins: {
             tooltip: {
               mode: 'index',
