@@ -1310,7 +1310,7 @@
     </div>
     <div id="maxCard" class="dashboard-card max-card">
       <h3>Call ค้างสูงสุด</h3>
-      <div class="value" id="maxTeamPlant">-</div>
+      <div class="value" id="maxPendingUnit">-</div>
     </div>
     <div id="graphCard" class="dashboard-card graph-card">
       <h3><i class="fas fa-chart-line"></i> กราฟสรุป</h3>
@@ -1397,7 +1397,7 @@
   <div id="graphModal" class="modal">
     <div class="graph-modal-content">
       <span class="close" id="closeGraphModal">×</span>
-      <h2>จำนวน Call ตามศูนย์พื้นที่และสถานะ</h2>
+      <h2>จำนวน Call ตามค้างหน่วยงานและสถานะ</h2>
       <canvas id="teamChart" style="max-height: 400px;"></canvas>
       <div id="graphWarning"></div>
     </div>
@@ -1609,7 +1609,7 @@
         );
       });
     }
-    /** คำนวณเมตริก Dashboard */
+    /** คำนวณเมตริก Dashboard - เปลี่ยนอ้างอิงเป็นค้างหน่วยงาน */
     function calculateDashboardMetrics(data) {
       const ticketSet = new Set();
       const waitingResponseTickets = new Set();
@@ -1618,7 +1618,7 @@
       const nawaVipaTickets = new Set();
       const over7Tickets = new Set();
       const requestTickets = new Set();
-      const teamPlantTicketCounts = {};
+      const pendingUnitTicketCounts = {};
       data.forEach(row => {
         const ticket = row["Ticket Number"];
         if (!ticket || ticketSet.has(ticket)) return;
@@ -1641,9 +1641,9 @@
         if (!row["Material"] || row["Material"] === "" || row["Material"] === "-") {
           requestTickets.add(ticket);
         }
-        const teamPlant = getCleanTeamPlant(row["TeamPlant"] || "ไม่ระบุ");
-        if (!teamPlantTicketCounts[teamPlant]) teamPlantTicketCounts[teamPlant] = new Set();
-        teamPlantTicketCounts[teamPlant].add(ticket);
+        const pendingUnit = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
+        if (!pendingUnitTicketCounts[pendingUnit]) pendingUnitTicketCounts[pendingUnit] = new Set();
+        pendingUnitTicketCounts[pendingUnit].add(ticket);
       });
       const totalCalls = ticketSet.size;
       const callsPending = pendingTickets.size;
@@ -1652,9 +1652,9 @@
       const callsWaitingResponse = waitingResponseTickets.size;
       const callsOver7 = over7Tickets.size;
       const callsRequest = requestTickets.size;
-      const teamPlantCounts = Object.fromEntries(Object.entries(teamPlantTicketCounts).map(([teamPlant, set]) => [teamPlant, set.size]));
-      const maxTeamPlantEntry = Object.entries(teamPlantCounts).length > 0 ? Object.entries(teamPlantCounts).reduce((a, b) => a[1] > b[1] ? a : b) : null;
-      const maxTeamPlant = maxTeamPlantEntry ? maxTeamPlantEntry[0] : '-';
+      const pendingUnitCounts = Object.fromEntries(Object.entries(pendingUnitTicketCounts).map(([pendingUnit, set]) => [pendingUnit, set.size]));
+      const maxPendingUnitEntry = Object.entries(pendingUnitCounts).length > 0 ? Object.entries(pendingUnitCounts).reduce((a, b) => a[1] > b[1] ? a : b) : null;
+      const maxPendingUnit = maxPendingUnitEntry ? maxPendingUnitEntry[0] : '-';
       return {
         totalCalls,
         callsPending,
@@ -1663,7 +1663,7 @@
         callsWaitingResponse,
         callsOver7,
         callsRequest,
-        maxTeamPlant
+        maxPendingUnit
       };
     }
     function calculateCallTypeMetrics(data) {
@@ -2041,30 +2041,29 @@
         return;
       }
       const pivotData = {};
-      const teamPlantsRaw = filteredData.map(row => row["TeamPlant"] || "ไม่ระบุ");
-      let teamPlants = [...new Set(teamPlantsRaw.map(tp => getCleanTeamPlant(tp)) )];
+      const pendingUnitsRaw = filteredData.map(row => row["ค้างหน่วยงาน"] || "ไม่ระบุ");
+      let pendingUnits = [...new Set(pendingUnitsRaw)].sort();
       const statusCalls = [...new Set(filteredData.map(row => row["StatusCall"] || "ไม่ระบุ"))].sort();
-      teamPlants.forEach(teamPlant => {
-        pivotData[teamPlant] = {};
-        statusCalls.forEach(status => { pivotData[teamPlant][status] = 0; });
+      pendingUnits.forEach(pendingUnit => {
+        pivotData[pendingUnit] = {};
+        statusCalls.forEach(status => { pivotData[pendingUnit][status] = 0; });
       });
       const ticketCounts = {};
       filteredData.forEach(row => {
         const ticket = row["Ticket Number"];
         if (!ticketCounts[ticket]) {
-          const rawTeamPlant = row["TeamPlant"] || "ไม่ระบุ";
-          const cleanTeamPlant = getCleanTeamPlant(rawTeamPlant);
+          const pendingUnit = row["ค้างหน่วยงาน"] || "ไม่ระบุ";
           const status = row["StatusCall"] || "ไม่ระบุ";
-          pivotData[cleanTeamPlant][status]++;
+          pivotData[pendingUnit][status]++;
           ticketCounts[ticket] = true;
         }
       });
-      // ✅ คำนวณผลรวมสำหรับแต่ละศูนย์พื้นที่และเรียงลำดับจากมากไปน้อย
-      const teamPlantTotals = {};
-      teamPlants.forEach(teamPlant => {
-        teamPlantTotals[teamPlant] = statusCalls.reduce((sum, status) => sum + (pivotData[teamPlant][status] || 0), 0);
+      // ✅ คำนวณผลรวมสำหรับแต่ละค้างหน่วยงานและเรียงลำดับจากมากไปน้อย
+      const pendingUnitTotals = {};
+      pendingUnits.forEach(pendingUnit => {
+        pendingUnitTotals[pendingUnit] = statusCalls.reduce((sum, status) => sum + (pivotData[pendingUnit][status] || 0), 0);
       });
-      teamPlants.sort((a, b) => teamPlantTotals[b] - teamPlantTotals[a]);
+      pendingUnits.sort((a, b) => pendingUnitTotals[b] - pendingUnitTotals[a]);
       const colors = {
         "รอของเข้า": '#e74c3c',
         "ระหว่างขนส่ง": '#27ae60',
@@ -2072,12 +2071,12 @@
         "เบิกวิภาวดี": '#f39c12',
         "ไม่ระบุ": '#95a5a6'
       };
-      const datasets = statusCalls.filter(status => status !== "ไม่ระบุ" && Object.values(pivotData).some(tp => tp[status] > 0)).map(status => {
+      const datasets = statusCalls.filter(status => status !== "ไม่ระบุ" && Object.values(pivotData).some(pu => pu[status] > 0)).map(status => {
         const colorKey = status === "สำเร็จ" ? "ระหว่างขนส่ง" : status;
         const rgb = hexToRgb(colors[colorKey] || '#6c757d');
         return {
           label: status === "สำเร็จ" ? "ระหว่างขนส่ง" : status,
-          data: teamPlants.map(teamPlant => pivotData[teamPlant][status] || 0),
+          data: pendingUnits.map(pendingUnit => pivotData[pendingUnit][status] || 0),
           borderColor: colors[colorKey] || '#6c757d',
           backgroundColor: rgb ? `rgba(${rgb}, 0.8)` : '#6c757d',
           borderWidth: 2,
@@ -2085,24 +2084,24 @@
           stack: 'CallStack'
         };
       });
-      let limitedTeams = teamPlants;
+      let limitedUnits = pendingUnits;
       let warningMessage = "";
-      if (teamPlants.length > 50) {
-        limitedTeams = teamPlants.slice(0, 50);
-        warningMessage = `แสดงเฉพาะ 50 ศูนย์พื้นที่แรกจากทั้งหมด ${teamPlants.length} เนื่องจากข้อจำกัดด้านการแสดงผล`;
+      if (pendingUnits.length > 50) {
+        limitedUnits = pendingUnits.slice(0, 50);
+        warningMessage = `แสดงเฉพาะ 50 ค้างหน่วยงานแรกจากทั้งหมด ${pendingUnits.length} เนื่องจากข้อจำกัดด้านการแสดงผล`;
       }
       const limitedDatasets = datasets.map(ds => ({
         ...ds,
-        data: limitedTeams.map(teamPlant => pivotData[teamPlant][ds.label === "ระหว่างขนส่ง" ? "สำเร็จ" : ds.label] || 0)
+        data: limitedUnits.map(pendingUnit => pivotData[pendingUnit][ds.label === "ระหว่างขนส่ง" ? "สำเร็จ" : ds.label] || 0)
       }));
       graphWarning.textContent = warningMessage;
-      if (limitedTeams.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
+      if (limitedUnits.length === 0) { graphWarning.textContent = "ไม่มีข้อมูลสำหรับแสดงกราฟ"; graphModal.style.display = "block"; return; }
       if (teamChart) teamChart.destroy();
       const ctx = document.getElementById('teamChart').getContext('2d');
       teamChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: limitedTeams,
+          labels: limitedUnits,
           datasets: limitedDatasets
         },
         options: {
@@ -2138,17 +2137,17 @@
             if (elements.length > 0) {
               const element = elements[0];
               const index = element.index;
-              const teamPlant = chart.data.labels[index];
-              employeeFilter.value = teamPlant;
-              // Reset other filters to show all data for this teamPlant
-              pendingFilter.value = "";
+              const pendingUnit = chart.data.labels[index];
+              pendingFilter.value = pendingUnit;
+              // Reset other filters to show all data for this pendingUnit
+              employeeFilter.value = "";
               stockFilter.value = "";
               statusCallFilter.value = "";
               searchInput.value = "";
               dashboardFilter = null;
               updateActiveCard(null);
               filterAndRenderTable();
-              // graphModal.style.display = "none";  // ลบการปิด modal เพื่อให้กราฟยังคงแสดงข้อมูลทั้งหมด
+              // graphModal.style.display = "none"; // ลบการปิด modal เพื่อให้กราฟยังคงแสดงข้อมูลทั้งหมด
             }
           },
           plugins: {
@@ -2157,7 +2156,7 @@
               intersect: false,
               callbacks: {
                 title: function(context) {
-                  return `ศูนย์พื้นที่: ${context[0].label}`;
+                  return `ค้างหน่วยงาน: ${context[0].label}`;
                 },
                 label: function(context) {
                   // ✅ แสดงเฉพาะสถานะที่มีข้อมูล (> 0) เท่านั้น
@@ -2493,9 +2492,9 @@
       const base = getBaseFilteredData();
       if (base.length === 0) return;
       const metrics = calculateDashboardMetrics(base);
-      const maxTP = metrics.maxTeamPlant;
-      if (maxTP !== '-') {
-        employeeFilter.value = maxTP;
+      const maxPU = metrics.maxPendingUnit;
+      if (maxPU !== '-') {
+        pendingFilter.value = maxPU;
         dashboardFilter = null;
         updateActiveCard('maxCard');
         filterAndRenderTable();
@@ -2655,7 +2654,7 @@
       document.getElementById("callsWaitingResponse").textContent = metrics.callsWaitingResponse;
       document.getElementById("callsOver7").textContent = metrics.callsOver7;
       document.getElementById("callsRequest").textContent = metrics.callsRequest;
-      document.getElementById("maxTeamPlant").textContent = metrics.maxTeamPlant;
+      document.getElementById("maxPendingUnit").textContent = metrics.maxPendingUnit;
       // Update Progress Bars and Percent Texts
       const total = metrics.totalCalls || 0;
       const calculatePercent = (value) => total > 0 ? ((value / total) * 100).toFixed(0) : 0;
