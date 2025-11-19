@@ -2,9 +2,20 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Security Headers (Client-side Meta) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://opensheet.elk.sh https://sweetalert2.github.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://sweetalert2.github.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
+  <meta http-equiv="Content-Security-Policy"
+  content="
+    default-src 'self' 'unsafe-inline' 'unsafe-eval'
+      https://cdnjs.cloudflare.com https://cdn.jsdelivr.net
+      https://opensheet.elk.sh https://sweetalert2.github.io;
+    connect-src 'self'
+      https://script.google.com
+      https://script.googleusercontent.com
+      https://opensheet.elk.sh;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://sweetalert2.github.io;
+    style-src 'self' 'unsafe-inline'
+      https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+  ">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <title>รายงานพนักงาน</title>
@@ -2320,12 +2331,18 @@
     });
     return;
   }
-      const modalData = currentRowData;
-      const desc = getDesc(modalData);
-      const userName = localStorage.getItem('userName') || 'ไม่ระบุ';
-      const userPlant = localStorage.getItem('userPlant') || '-';
-      const customer = `${modalData["Team"] || "-"} (${modalData["Brand"] || "-"})`;
-      const defaultPhone = "0909082850";
+
+  const modalData     = currentRowData;
+  const desc           = getDesc(modalData);
+  const userName       = localStorage.getItem('userName') || 'ไม่ระบุ';
+  const userPlant      = localStorage.getItem('userPlant') || '-';
+  const employeeCode   = localStorage.getItem('username') || '-'; // รหัสพนักงาน 7 หลัก
+  const customer       = `${modalData["Team"] || "-"} (${modalData["Brand"] || "-"})`;
+  const defaultPhone   = "0909082850";
+// ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+  // URL ของ Google Apps Script Web App (เปลี่ยนเป็นของคุณจริง ๆ)
+  const gasUrl = 'https://script.google.com/macros/s/AKfycbwVF2HAC8EYARt6Ku2ThUZWgeVxXWDhRQCQ0vCgGvilEMg8h5Hg3BlrcJJn2qMMqpGr/exec';
+  // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
       Swal.fire({
         title: 'สั่งซื้ออะไหล่',
         html: `
@@ -2371,54 +2388,74 @@
             <input type="number" id="quantity" value="1" min="1" style="width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.9); font-size: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
           </div>
         `,
-        showCancelButton: true,
-        confirmButtonText: 'ยืนยัน',
-        cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#dc3545',
-        customClass: {
-          popup: 'swal2-canva-popup',
-          title: 'swal2-canva-title',
-          confirmButton: 'swal2-canva-confirm',
-          cancelButton: 'swal2-canva-cancel'
-        },
-        preConfirm: () => {
-          const quantity = document.getElementById('quantity').value;
-          const phone = defaultPhone;
-          if (!quantity || parseInt(quantity) < 1) {
-            Swal.showValidationMessage('กรุณากรอกจำนวนที่ถูกต้อง (อย่างน้อย 1)');
-            return false;
-          }
-          return { quantity, phone };
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const { quantity, phone } = result.value;
-          const orderData = {
-            material: modalData["Material"] || "-",
-            description: desc || "-",
-            quantity: quantity,
-            user: userName,
-            plant: userPlant,
-            customer: customer,
-            phone: phone,
-            ticket: modalData["Ticket Number"] || "-",
-            callType: modalData["Call Type"] || "-"
-          };
-          console.log('Order Data:', orderData);
-          // อาจจะส่งไป API หรือบันทึกข้อมูลเพิ่มเติมได้ที่นี่
-          Swal.fire({
-            icon: 'success',
-            title: 'ยืนยันการสั่งซื้อสำเร็จ!',
-            html: '<div style="text-align: center; font-family: \'Prompt\', sans-serif;"><i class="fas fa-check-circle" style="font-size: 50px; color: #28a745; margin-bottom: 10px;"></i><p style="font-size: 16px; color: #333;">ข้อมูลสั่งซื้อถูกบันทึกแล้ว</p></div>',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            customClass: {
-              popup: 'swal2-canva-success'
-            }
-          });
-        }
-      });
+      showCancelButton: true,
+    confirmButtonText: 'ยืนยัน',
+    cancelButtonText: 'ยกเลิก',
+    confirmButtonColor: '#28a745',
+    cancelButtonColor: '#dc3545',
+    preConfirm: () => {
+      const quantity = document.getElementById('quantity').value.trim();
+      if (!quantity || parseInt(quantity) < 1) {
+        Swal.showValidationMessage('กรุณากรอกจำนวนที่ถูกต้อง (อย่างน้อย 1)');
+        return false;
+      }
+      return { quantity };
     }
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      const { quantity } = result.value;
+
+      // ข้อมูลที่จะส่งไป Google Sheet
+      const jsonPayload = {
+        material      : modalData["Material"] || "-",
+        description   : desc || "-",
+        quantity      : quantity,
+        contact       : defaultPhone,                 // เบอร์ติดต่อ
+        employeeCode  : employeeCode,                 // รหัสพนักงาน
+        team          : customer,                     // Team (Brand)
+        employeeName  : userName,                     // ชื่อผู้สั่ง
+        callNumber    : modalData["Ticket Number"] || "-", 
+        callType      : modalData["Call Type"] || "-",
+        remark        : "",                           // ถ้ามี remark เพิ่มเติมให้ใส่ตรงนี้
+        status        : "รอเบิก"                   // ค่าคงที่ตามที่คุณต้องการ
+      };
+
+      try {
+        // ส่งข้อมูลไป GAS
+        const response = await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `action=insertRequest&payload=${encodeURIComponent(JSON.stringify(jsonPayload))}`
+        });
+
+       const result = await response.json();
+console.log('GAS response:', result); // ไว้ debug ได้ จะลบทีหลังก็ได้
+
+if (result.status === "success") {
+  Swal.fire({
+    icon: 'success',
+    title: 'สั่งซื้อสำเร็จ!',
+    html: `<p>บันทึกข้อมูลเรียบร้อยแล้ว<br>Material: ${jsonPayload.material}<br>จำนวน: ${quantity}</p>`,
+    timer: 3000,
+    timerProgressBar: true
+  });
+} else {
+  // เผื่อ GAS ส่ง error กลับมาใน data หรือ error
+  throw new Error(result.data || result.error || 'บันทึกไม่สำเร็จ');
+}
+
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่หรือติดต่อผู้ดูแลระบบ'
+        });
+      }
+    }
+  });
+}
     /** พิมพ์สติ๊กเกอร์จากหน้าหลัก */
     function printTable() {
       const baseFilteredData = getBaseFilteredData();
