@@ -3,9 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Security Headers (Client-side Meta) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://opensheet.elk.sh https://sweetalert2.github.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://sweetalert2.github.io; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <title>รายงานพนักงาน</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
       --bg-color: #f0f4f8;
@@ -64,6 +70,106 @@
       margin: 0;
       padding: 20px;
       transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    /* Login Modal Styles */
+    #loginModal {
+      display: flex;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    #loginModal.hidden {
+      display: none;
+    }
+    .login-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 16px var(--shadow-color);
+      position: relative;
+      color: var(--text-primary);
+    }
+    .login-content h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--header-bg);
+    }
+    .login-group {
+      margin-bottom: 15px;
+      position: relative;
+    }
+    .login-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+    .login-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+    .login-group input:focus {
+      border-color: var(--info-color);
+      outline: none;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 45px;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .remember-me {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+    .remember-me input[type="checkbox"] {
+      width: auto;
+    }
+    #errorMessage {
+      color: var(--danger-color);
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 14px;
+      display: none;
+    }
+    .login-button {
+      width: 100%;
+      padding: 12px;
+      background: var(--button-bg);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .login-button:hover {
+      background: var(--button-hover);
+    }
+    .dark-theme .login-content {
+      background: var(--card-bg);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .loading {
       display: none;
@@ -188,6 +294,13 @@
     .action-button:active{
       transform:scale(.95);
     }
+    /* Logout Button Style */
+    .logout-button {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+    }
+    .logout-button:hover {
+      background: linear-gradient(135deg, #c82333, #b02a37);
+    }
     .table-container{
       overflow-x:auto;
       width:100%;
@@ -309,6 +422,27 @@
       align-items:center;
       gap:4px;
       font-size:16px;
+    }
+    .order-button {
+      float: right;
+      margin-right: 10px;
+      padding: 10px 16px;
+      background: var(--success-color);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 16px;
+    }
+    .order-button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px var(--shadow-color);
     }
     .print-button:hover{
       background: var(--warning-color);
@@ -551,7 +685,7 @@
       text-align:center !important;
     }
     @media print{
-      .report-title,.close,.print-button,#printTableButton,#searchButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container,.loading{
+      .report-title,.close,.print-button,.order-button,#printTableButton,#searchButton,#excelButton,#summaryButton,#spareSummaryButton,#searchInput,.pagination,#searchContainer,.modal,.table-container,.loading{
         display:none;
       }
       .modal-content{
@@ -1255,207 +1389,524 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
+    /* Hide app content until logged in */
+    .app-content {
+      display: none;
+      position: relative; /* สำหรับ positioning ของ hamburger menu */
+    }
+    .app-content.logged-in {
+      display: block;
+    }
+    /* Hamburger Menu Styles */
+    .hamburger-menu {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+    }
+    .hamburger-icon {
+      font-size: 24px;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      background: var(--card-bg);
+      box-shadow: 0 2px 4px var(--shadow-color);
+    }
+    .hamburger-icon:hover {
+      background: var(--hover-bg);
+      transform: scale(1.1);
+    }
+    .settings-dropdown {
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      padding: 15px;
+      display: none;
+      z-index: 1000;
+      min-width: 200px;
+      border: 1px solid var(--border-color);
+    }
+    .settings-dropdown.show {
+      display: block;
+    }
+    .user-info-in-menu {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .user-info-in-menu strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .theme-button, .logout-button-in-menu {
+      width: 100%;
+      margin-bottom: 8px;
+      justify-content: flex-start;
+    }
+    .dark-theme .settings-dropdown {
+      background: var(--card-bg);
+      border-color: var(--border-color);
+    }
+    /* User Info Display (removed original, now in dropdown) */
+        .header-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.report-title {
+  text-align: center;
+  margin: 0; /* ลบ margin ด้านล่างเพื่อให้ปุ่ม align ดี */
+  /* คง padding และ background ไว้ตามเดิม */
+}
+.setting-header-btn {
+  position: absolute;
+  top: 50%;
+  right: 20px; /* ปรับระยะห่างจากขอบขวา */
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 8px 12px; /* ลด padding เล็กน้อยให้กะทัดรัด */
+  font-size: 13px; /* ลดขนาดฟอนต์เล็กน้อย */
+  box-shadow: 0 2px 4px var(--shadow-color); /* เงาเบาๆ */
+  transition: all 0.3s ease;
+}
+.setting-header-btn:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+/* Responsive สำหรับมือถือ */
+@media (max-width: 768px) {
+  .setting-header-btn {
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
   </style>
 </head>
 <body>
-  <div id="loading" class="loading">
-    <div class="spinner"></div>
-    <p>กำลังโหลดข้อมูล...</p>
-  </div>
-  <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
-  <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
-  <!-- Dashboard Section -->
-  <div id="dashboard" class="dashboard">
-    <div id="totalCard" class="dashboard-card total-card">
-      <h3>Call ทั้งหมด</h3>
-      <div class="value" id="totalCalls">0</div>
-      <div class="progress-container"><div id="totalProgress" class="progress-bar" style="width: 100%;"></div></div>
-      <div class="progress-text" id="totalPercent">100%</div>
-    </div>
-    <div id="pendingCard" class="dashboard-card pending-card">
-      <h3>Call ค้าง (รอของเข้า)</h3>
-      <div class="value" id="callsPending">0</div>
-      <div class="progress-container"><div id="pendingProgress" class="progress-bar" style="width: 0%;"></div></div>
-      <div class="progress-text" id="pendingPercent">0%</div>
-    </div>
-    <div id="successCard" class="dashboard-card success-card">
-      <h3>Call (ระหว่างขนส่ง)</h3>
-      <div class="value" id="callsSuccess">0</div>
-      <div class="progress-container"><div id="successProgress" class="progress-bar" style="width: 0%;"></div></div>
-      <div class="progress-text" id="successPercent">0%</div>
-    </div>
-    <div id="nawaCard" class="dashboard-card nawa-card">
-      <h3>Call (เบิกศูนย์อะไหล่)</h3>
-      <div class="value" id="callsNawaVipa">0</div>
-      <div class="progress-container"><div id="nawaProgress" class="progress-bar" style="width: 0%;"></div></div>
-      <div class="progress-text" id="nawaPercent">0%</div>
-    </div>
-    <div id="requestCard" class="dashboard-card request-card">
-      <h3>Call (ขอซื้อขอซ่อม)</h3>
-      <div class="value" id="callsRequest">0</div>
-      <div class="progress-container"><div id="requestProgress" class="progress-bar" style="width: 0%;"></div></div>
-      <div class="progress-text" id="requestPercent">0%</div>
-    </div>
-    <div id="over7Card" class="dashboard-card over7-card">
-      <h3>Call เกิน 7 วัน</h3>
-      <div class="value" id="callsOver7">0</div>
-      <div class="progress-container"><div id="over7Progress" class="progress-bar" style="width: 0%;"></div></div>
-      <div class="progress-text" id="over7Percent">0%</div>
-    </div>
-    <div id="waitingResponseCard" class="dashboard-card new-card">
-      <h3>Call (รอตรวจสอบ)</h3>
-      <div class="value" id="callsWaitingResponse">0</div>
-      <div class="progress-container"><div id="waitingResponseProgress" class="progress-bar" style="width: 0%;"></div></div>
-      <div class="progress-text" id="waitingResponsePercent">0%</div>
-    </div>
-    <div id="maxCard" class="dashboard-card max-card">
-      <h3>Call ค้างสูงสุด</h3>
-      <div class="value" id="maxPendingUnit">-</div>
-    </div>
-    <div id="graphCard" class="dashboard-card graph-card">
-      <h3><i class="fas fa-chart-line"></i> กราฟสรุป</h3>
-      <div class="value"><i class="fas fa-chart-line"></i></div>
-    </div>
-    <div id="spareSummaryCard" class="dashboard-card spare-card">
-      <h3><i class="fas fa-list-alt"></i> สรุปอะไหล่</h3>
-      <div class="value"><i class="fas fa-list-alt"></i></div>
-    </div>
-  </div>
-  <!-- Call Type Dashboard Section (ห่อด้วย container ใหม่เพื่อกรอบตารางแบบกลุ่ม) -->
-  <div class="call-type-table-container">
-    <div id="callTypeDashboard" class="dashboard"></div>
-  </div>
-  <div id="searchContainer">
-    <div class="filter-row">
-      <label id="employeeFilterLabel" for="employeeFilter" class="modern-label">ศูนย์พื้นที่</label>
-      <select id="employeeFilter"><option value="">ทั้งหมด</option></select>
-      <div id="ticketCountInfo" class="call-count-box">จำนวน Call: <span id="ticketCountValue">0</span> Call</div>
-    </div>
-    <div class="filter-row">
-      <label id="pendingFilterLabel" for="pendingFilter" class="modern-label">ค้างหน่วยงาน</label>
-      <select id="pendingFilter"><option value="">ทั้งหมด</option></select>
-      <div id="callCountInfo" class="call-count-box">จำนวนรายการ <span id="callCountValue">0</span> รายการ</div>
-    </div>
-    <div class="filter-row">
-      <label id="stockFilterLabel" for="stockFilter" class="modern-label">คลังตอบ</label>
-      <select id="stockFilter"><option value="">ทั้งหมด</option></select>
-    </div>
-    <div class="filter-row">
-      <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">Status</label>
-      <select id="statusCallFilter"><option value="">ทั้งหมด</option></select>
-    </div>
-    <div class="search-row">
-      <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, Call Type, ค้างหน่วยงาน, ผู้แจ้ง, Nawa, คลังตอบ, StatusCall, วันที่ตอบ..." />
-      <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
-      <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
-      <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
-      <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
-      <button id="settingButton" class="action-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
-    </div>
-  </div>
-  <div class="table-container">
-    <table id="data-table">
-      <thead>
-        <tr>
-          <th class="sortable" data-column="DayRepair">ผ่านมา <span class="arrow"></span></th>
-          <th class="sortable" data-column="DateTime">วันที่แจ้ง <span class="arrow"></span></th>
-          <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
-          <th class="sortable" data-column="Brand">Brand <span class="arrow"></span></th>
-          <th class="sortable" data-column="Call Type">Call Type <span class="arrow"></span></th>
-          <th class="sortable" data-column="Team">Team <span class="arrow"></span></th>
-          <th class="sortable" data-column="TeamPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
-          <th class="sortable" data-column="ค้างหน่วยงาน">ค้างหน่วยงาน <span class="arrow"></span></th>
-          <th class="sortable" data-column="Material">Material <span class="arrow"></span></th>
-          <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
-          <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
-          <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
-          <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
-          <th class="sortable" data-column="QtyPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
-          <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
-          <th class="sortable" data-column="StatusCall">Status <span class="arrow"></span></th>
-          <th class="sortable" data-column="วันที่ตอบ">วันที่ตอบ <span class="arrow"></span></th>
-          <th class="sortable" data-column="UserAns">ผู้แจ้ง <span class="arrow"></span></th>
-          <th class="sortable" data-column="Answer1">แจ้งผล <span class="arrow"></span></th>
-          <th>ดูรายละเอียด</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <!-- Modals -->
-  <div id="detailModal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="closeModal">×</span>
-      <button class="print-button" onclick="printModalContent()">
-        <i class="fas fa-print"></i>
-        <span>พิมพ์</span>
-      </button>
-      <h2>รายละเอียด</h2>
-      <div id="modalContent"></div>
-    </div>
-  </div>
-  <div id="graphModal" class="modal">
-    <div class="graph-modal-content">
-      <span class="close" id="closeGraphModal">×</span>
-      <h2>จำนวน Call ตามค้างหน่วยงานและสถานะ</h2>
-      <canvas id="teamChart" style="max-height: 400px;"></canvas>
-      <div id="graphWarning"></div>
-    </div>
-  </div>
-  <div id="summaryModal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="closeSummaryModal">×</span>
-      <button class="print-button" onclick="printSummaryContent()">
-        <i class="fas fa-print"></i>
-        <span>พิมพ์สรุป</span>
-      </button>
-      <h2>สรุปข้อมูล Call ค้าง</h2>
-      <div id="summaryContent"></div>
-    </div>
-  </div>
-  <div id="spareSummaryModal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="closeSpareSummaryModal">×</span>
-      <button class="print-button" onclick="printSpareSummaryContent()">
-        <i class="fas fa-print"></i>
-        <span>พิมพ์สรุปอะไหล่</span>
-      </button>
-      <h2>สรุปอะไหล่ (รอของเข้า)</h2>
-      <div id="spareSummaryContent"></div>
-    </div>
-  </div>
-  <div id="settingModal" class="modal">
-    <div class="modal-content setting-modal-content">
-      <span class="close" id="closeSettingModal">×</span>
-      <h2>ตั้งค่า</h2>
-      <div>
-        <div class="theme-option">
-          <input type="radio" id="darkTheme" name="theme" value="dark">
-          <label for="darkTheme">ธีมมืด (สีซีด)</label>
+  <!-- Login Modal -->
+  <div id="loginModal">
+    <div class="login-content">
+      <h2><i class="fas fa-user-lock"></i> เข้าสู่ระบบ</h2>
+      <div id="errorMessage">กรุณาใส่ข้อมูลให้ถูกต้อง</div>
+      <form id="loginForm">
+        <div class="login-group">
+          <label for="username">รหัสพนักงาน (Username)</label>
+          <input type="text" id="username" placeholder="" maxlength="7" required>
         </div>
-        <div class="theme-option">
-          <input type="radio" id="lightTheme" name="theme" value="light" checked>
-          <label for="lightTheme">ธีมสว่าง</label>
+        <div class="login-group">
+          <label for="password">รหัสผ่าน (Password)</label>
+          <input type="password" id="password" placeholder="" maxlength="4" required>
+          <i class="fas fa-eye password-toggle" id="togglePassword" style="display: none;"></i>
+        </div>
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">จำฉันไว้</label>
+        </div>
+        <button type="submit" class="login-button"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+  <!-- App Content (Hidden until login) -->
+  <div id="appContent" class="app-content">
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <i class="fas fa-bars hamburger-icon" id="hamburgerIcon"></i>
+    </div>
+    <!-- Settings Dropdown -->
+    <div id="settingsDropdown" class="settings-dropdown">
+      <div id="userInfoInMenu" class="user-info-in-menu" style="display: none;">
+        <strong>ยินดีต้อนรับ:</strong> <span id="displayUserNameInMenu"></span>
+        <br>
+        <strong>หน่วยงาน:</strong> <span id="displayUnit">-</span>
+        <br>
+        <strong>Plant:</strong> <span id="displayPlant">-</span>
+        <button id="themeButton" class="action-button theme-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
+        <button id="logoutButtonInMenu" class="action-button logout-button logout-button-in-menu">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </div>
+    </div>
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูล...</p>
+    </div>
+    <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
+    <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="dashboard">
+      <div id="totalCard" class="dashboard-card total-card">
+        <h3>Call ทั้งหมด</h3>
+        <div class="value" id="totalCalls">0</div>
+        <div class="progress-container"><div id="totalProgress" class="progress-bar" style="width: 100%;"></div></div>
+        <div class="progress-text" id="totalPercent">100%</div>
+      </div>
+      <div id="pendingCard" class="dashboard-card pending-card">
+        <h3>Call ค้าง (รอของเข้า)</h3>
+        <div class="value" id="callsPending">0</div>
+        <div class="progress-container"><div id="pendingProgress" class="progress-bar" style="width: 0%;"></div></div>
+        <div class="progress-text" id="pendingPercent">0%</div>
+      </div>
+      <div id="successCard" class="dashboard-card success-card">
+        <h3>Call (ระหว่างขนส่ง)</h3>
+        <div class="value" id="callsSuccess">0</div>
+        <div class="progress-container"><div id="successProgress" class="progress-bar" style="width: 0%;"></div></div>
+        <div class="progress-text" id="successPercent">0%</div>
+      </div>
+      <div id="nawaCard" class="dashboard-card nawa-card">
+        <h3>Call (เบิกศูนย์อะไหล่)</h3>
+        <div class="value" id="callsNawaVipa">0</div>
+        <div class="progress-container"><div id="nawaProgress" class="progress-bar" style="width: 0%;"></div></div>
+        <div class="progress-text" id="nawaPercent">0%</div>
+      </div>
+      <div id="requestCard" class="dashboard-card request-card">
+        <h3>Call (ขอซื้อขอซ่อม)</h3>
+        <div class="value" id="callsRequest">0</div>
+        <div class="progress-container"><div id="requestProgress" class="progress-bar" style="width: 0%;"></div></div>
+        <div class="progress-text" id="requestPercent">0%</div>
+      </div>
+      <div id="over7Card" class="dashboard-card over7-card">
+        <h3>Call เกิน 7 วัน</h3>
+        <div class="value" id="callsOver7">0</div>
+        <div class="progress-container"><div id="over7Progress" class="progress-bar" style="width: 0%;"></div></div>
+        <div class="progress-text" id="over7Percent">0%</div>
+      </div>
+      <div id="waitingResponseCard" class="dashboard-card new-card">
+        <h3>Call (รอตรวจสอบ)</h3>
+        <div class="value" id="callsWaitingResponse">0</div>
+        <div class="progress-container"><div id="waitingResponseProgress" class="progress-bar" style="width: 0%;"></div></div>
+        <div class="progress-text" id="waitingResponsePercent">0%</div>
+      </div>
+      <div id="maxCard" class="dashboard-card max-card">
+        <h3>Call ค้างสูงสุด</h3>
+        <div class="value" id="maxPendingUnit">-</div>
+      </div>
+      <div id="graphCard" class="dashboard-card graph-card">
+        <h3><i class="fas fa-chart-line"></i> กราฟสรุป</h3>
+        <div class="value"><i class="fas fa-chart-line"></i></div>
+      </div>
+      <div id="spareSummaryCard" class="dashboard-card spare-card">
+        <h3><i class="fas fa-list-alt"></i> สรุปอะไหล่</h3>
+        <div class="value"><i class="fas fa-list-alt"></i></div>
+      </div>
+    </div>
+    <!-- Call Type Dashboard Section (ห่อด้วย container ใหม่เพื่อกรอบตารางแบบกลุ่ม) -->
+    <div class="call-type-table-container">
+      <div id="callTypeDashboard" class="dashboard"></div>
+    </div>
+    <div id="searchContainer">
+      <div class="filter-row">
+        <label id="employeeFilterLabel" for="employeeFilter" class="modern-label">ศูนย์พื้นที่</label>
+        <select id="employeeFilter"><option value="">ทั้งหมด</option></select>
+        <div id="ticketCountInfo" class="call-count-box">จำนวน Call: <span id="ticketCountValue">0</span> Call</div>
+      </div>
+      <div class="filter-row">
+        <label id="pendingFilterLabel" for="pendingFilter" class="modern-label">ค้างหน่วยงาน</label>
+        <select id="pendingFilter"><option value="">ทั้งหมด</option></select>
+        <div id="callCountInfo" class="call-count-box">จำนวนรายการ <span id="callCountValue">0</span> รายการ</div>
+      </div>
+      <div class="filter-row">
+        <label id="stockFilterLabel" for="stockFilter" class="modern-label">คลังตอบ</label>
+        <select id="stockFilter"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div class="filter-row">
+        <label id="statusCallFilterLabel" for="statusCallFilter" class="modern-label">Status</label>
+        <select id="statusCallFilter"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="ค้นหา Ticket Number, Team, Material, TeamPlant, Brand, Call Type, ค้างหน่วยงาน, ผู้แจ้ง, Nawa, คลังตอบ, StatusCall, วันที่ตอบ..." />
+        <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
+        <button id="printTableButton" class="action-button"><i class="fas fa-print"></i> พิมพ์</button>
+        <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
+        <button id="summaryButton" class="action-button"><i class="fas fa-list"></i> สรุปข้อมูล</button>
+        <button id="settingButton" class="action-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
+      </div>
+    </div>
+    <div class="table-container">
+      <table id="data-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-column="DayRepair">ผ่านมา <span class="arrow"></span></th>
+            <th class="sortable" data-column="DateTime">วันที่แจ้ง <span class="arrow"></span></th>
+            <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
+            <th class="sortable" data-column="Brand">Brand <span class="arrow"></span></th>
+            <th class="sortable" data-column="Call Type">Call Type <span class="arrow"></span></th>
+            <th class="sortable" data-column="Team">Team <span class="arrow"></span></th>
+            <th class="sortable" data-column="TeamPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
+            <th class="sortable" data-column="ค้างหน่วยงาน">ค้างหน่วยงาน <span class="arrow"></span></th>
+            <th class="sortable" data-column="Material">Material <span class="arrow"></span></th>
+            <th class="sortable" data-column="Description">Description <span class="arrow"></span></th>
+            <th class="sortable" data-column="Nawa">นวนคร <span class="arrow"></span></th>
+            <th class="sortable" data-column="Vipa">วิภาวดี <span class="arrow"></span></th>
+            <th class="sortable" data-column="Request">นอกรอบ <span class="arrow"></span></th>
+            <th class="sortable" data-column="QtyPlant">ศูนย์พื้นที่ <span class="arrow"></span></th>
+            <th class="sortable" data-column="คลังตอบ">คลังตอบ <span class="arrow"></span></th>
+            <th class="sortable" data-column="StatusCall">Status <span class="arrow"></span></th>
+            <th class="sortable" data-column="วันที่ตอบ">วันที่ตอบ <span class="arrow"></span></th>
+            <th class="sortable" data-column="UserAns">ผู้แจ้ง <span class="arrow"></span></th>
+            <th class="sortable" data-column="Answer1">แจ้งผล <span class="arrow"></span></th>
+            <th>ดูรายละเอียด</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <!-- Modals -->
+    <div id="detailModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal">×</span>
+        <button class="order-button" onclick="orderModalContent()">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Order</span>
+        </button>
+        <button class="print-button" onclick="printModalContent()">
+          <i class="fas fa-print"></i>
+          <span>พิมพ์</span>
+        </button>
+        <h2>รายละเอียด</h2>
+        <div id="modalContent"></div>
+      </div>
+    </div>
+    <div id="graphModal" class="modal">
+      <div class="graph-modal-content">
+        <span class="close" id="closeGraphModal">×</span>
+        <h2>จำนวน Call ตามค้างหน่วยงานและสถานะ</h2>
+        <canvas id="teamChart" style="max-height: 400px;"></canvas>
+        <div id="graphWarning"></div>
+      </div>
+    </div>
+    <div id="summaryModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeSummaryModal">×</span>
+        <button class="print-button" onclick="printSummaryContent()">
+          <i class="fas fa-print"></i>
+          <span>พิมพ์สรุป</span>
+        </button>
+        <h2>สรุปข้อมูล Call ค้าง</h2>
+        <div id="summaryContent"></div>
+      </div>
+    </div>
+    <div id="spareSummaryModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeSpareSummaryModal">×</span>
+        <button class="print-button" onclick="printSpareSummaryContent()">
+          <i class="fas fa-print"></i>
+          <span>พิมพ์สรุปอะไหล่</span>
+        </button>
+        <h2>สรุปอะไหล่ (รอของเข้า)</h2>
+        <div id="spareSummaryContent"></div>
+      </div>
+    </div>
+    <div id="settingModal" class="modal">
+      <div class="modal-content setting-modal-content">
+        <span class="close" id="closeSettingModal">×</span>
+        <h2>ตั้งค่า</h2>
+        <div>
+          <div class="theme-option">
+            <input type="radio" id="darkTheme" name="theme" value="dark">
+            <label for="darkTheme">ธีมมืด (สีซีด)</label>
+          </div>
+          <div class="theme-option">
+            <input type="radio" id="lightTheme" name="theme" value="light" checked>
+            <label for="lightTheme">ธีมสว่าง</label>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="pagination">
-    <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
-    <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
-    <div id="pageNumbers"></div>
-    <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
-    <button id="lastPage"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>
-    <div class="items-per-page">
-      <label for="itemsPerPage">รายการต่อหน้า:</label>
-      <select id="itemsPerPage">
-        <option value="10">10 รายการ</option>
-        <option value="20" selected>20 รายการ</option>
-        <option value="30">30 รายการ</option>
-      </select>
+    <div class="pagination">
+      <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
+      <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
+      <div id="pageNumbers"></div>
+      <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+      <button id="lastPage"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>
+      <div class="items-per-page">
+        <label for="itemsPerPage">รายการต่อหน้า:</label>
+        <select id="itemsPerPage">
+          <option value="10">10 รายการ</option>
+          <option value="20" selected>20 รายการ</option>
+          <option value="30">30 รายการ</option>
+        </select>
+      </div>
     </div>
   </div>
   <script>
+    // Login-related variables and functions
+    const loginModal = document.getElementById("loginModal");
+    const appContent = document.getElementById("appContent");
+    const loginForm = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const rememberMeInput = document.getElementById("rememberMe");
+    const errorMessage = document.getElementById("errorMessage");
+    const togglePassword = document.getElementById("togglePassword");
+    const userInfoInMenu = document.getElementById("userInfoInMenu");
+    const displayUserNameInMenu = document.getElementById("displayUserNameInMenu");
+    const displayUnit = document.getElementById("displayUnit");
+    const displayPlant = document.getElementById("displayPlant");
+    const logoutButtonInMenu = document.getElementById("logoutButtonInMenu");
+    const themeButton = document.getElementById("themeButton");
+    const hamburgerIcon = document.getElementById("hamburgerIcon");
+    const settingsDropdown = document.getElementById("settingsDropdown");
+    const employeeSheetID = '1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw';
+    const employeeSheetName = 'EmployeeWeb';
+    const employeeUrl = `https://opensheet.elk.sh/${employeeSheetID}/${employeeSheetName}`;
+    // Toggle password visibility
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePassword.classList.toggle('fa-eye');
+      togglePassword.classList.toggle('fa-eye-slash');
+    });
+    // Hamburger Menu Toggle
+    hamburgerIcon.addEventListener('click', () => {
+      settingsDropdown.classList.toggle('show');
+    });
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!settingsDropdown.contains(e.target) && !hamburgerIcon.contains(e.target)) {
+        settingsDropdown.classList.remove('show');
+      }
+    });
+    // Handle login form submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      errorMessage.style.display = 'none';
+      // Basic input validation
+      if (!username || username.length !== 7 || !username.startsWith('7')) {
+        showError('รหัสพนักงานต้องเป็น 7 หลักและเริ่มต้นด้วย 7');
+        return;
+      }
+      if (!password || password.length !== 4) {
+        showError('รหัสผ่านต้องเป็น 4 หลัก');
+        return;
+      }
+      const derivedPassword = username.slice(-4);
+      if (password !== derivedPassword) {
+        showError('รหัสผ่านไม่ถูกต้อง (ใช้ 4 หลักสุดท้ายของรหัสพนักงาน)');
+        return;
+      }
+      // Show loading in modal
+      showLoading();
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        const response = await fetch(employeeUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+          throw new Error(response.status === 403 ? 'CORS/Access Denied' : 'Fetch Failed');
+        }
+        const employees = await response.json();
+        // Find user
+        const user = employees.find(emp => emp.IDRec === username);
+        if (!user || !user.Name) {
+          throw new Error('User not found');
+        }
+        // Save session
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', username);
+        localStorage.setItem('userName', user.Name);
+        localStorage.setItem('userUnit', user.หน่วยงาน || '-');
+        localStorage.setItem('userPlant', user.Plant || '-');
+        if (rememberMeInput.checked) {
+          localStorage.setItem('rememberMe', 'true');
+          localStorage.setItem('savedUsername', username);
+        }
+        // Success
+        hideLoading();
+        loginModal.classList.add('hidden');
+        appContent.classList.add('logged-in');
+        displayUserNameInMenu.textContent = user.Name;
+        displayUnit.textContent = user.หน่วยงาน || '-';
+        displayPlant.textContent = user.Plant || '-';
+        userInfoInMenu.style.display = 'block';
+        document.getElementById('searchInput').focus(); // Auto-focus search
+        // Load app data
+        initApp();
+      } catch (error) {
+        hideLoading();
+        if (error.name === 'AbortError') {
+          Swal.fire('Timeout', 'การเชื่อมต่อช้าเกิน 30 วินาที กรุณาลองใหม่', 'error');
+        } else if (error.message.includes('403') || error.message.includes('CORS')) {
+          Swal.fire('Access Denied', 'ไม่สามารถเข้าถึงข้อมูลพนักงานได้ กรุณาติดต่อผู้ดูแล', 'error');
+        } else if (error.message === 'User not found') {
+          showError('ไม่พบข้อมูลพนักงานนี้');
+        } else {
+          Swal.fire('Network Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่', 'error');
+        }
+      }
+    });
+    // Show error in modal
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorMessage.style.display = 'block';
+    }
+    // Check login status on load
+    function checkLoginStatus() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      if (isLoggedIn) {
+        const username = localStorage.getItem('username');
+        const userName = localStorage.getItem('userName');
+        const userUnit = localStorage.getItem('userUnit');
+        const userPlant = localStorage.getItem('userPlant');
+        if (username && userName) {
+          // Validate with derived password (quick check)
+          const derivedPassword = username.slice(-4);
+          // Assume valid if stored; in production, re-validate with fetch if needed
+          loginModal.classList.add('hidden');
+          appContent.classList.add('logged-in');
+          displayUserNameInMenu.textContent = userName;
+          displayUnit.textContent = userUnit || '-';
+          displayPlant.textContent = userPlant || '-';
+          userInfoInMenu.style.display = 'block';
+          if (localStorage.getItem('rememberMe') === 'true') {
+            usernameInput.value = localStorage.getItem('savedUsername') || '';
+          }
+          document.getElementById('searchInput').focus();
+          initApp();
+          return true;
+        }
+      }
+      // Show login modal
+      loginModal.classList.remove('hidden');
+      usernameInput.focus();
+      return false;
+    }
+    // Handle logout
+    logoutButtonInMenu.addEventListener('click', handleLogout);
+    function handleLogout() {
+      localStorage.clear(); // Clear all keys
+      settingsDropdown.classList.remove('show');
+      location.reload(); // Reload to show login
+    }
+    // Theme button in menu
+    themeButton.addEventListener('click', () => {
+      settingModal.style.display = 'block';
+      settingsDropdown.classList.remove('show');
+    });
+    // Enter key support for login
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !appContent.classList.contains('logged-in')) {
+        loginForm.dispatchEvent(new Event('submit'));
+      }
+    });
+    // App Initialization (original code wrapped)
+    let allData = [];
+    let currentPage = 1;
+    let itemsPerPage = 20;
+    let sortConfig = { column: 'DayRepair', direction: 'desc' };
+    let teamChart = null;
+    let dashboardFilter = null;
+    let callTypeCards = {};
+    let currentTicketNumber = null;
+    let currentRowData = null;
     const sheetID = '1dzE4Xjc7H0OtNUmne62u0jFQT-CiGsG2eBo-1v6mrZk';
     const sheetName = 'Coll_Stock';
     const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
@@ -1506,16 +1957,6 @@
     const maxCard = document.getElementById("maxCard");
     const graphCard = document.getElementById("graphCard");
     const spareSummaryCard = document.getElementById("spareSummaryCard");
-    let allData = [];
-    let currentPage = 1;
-    let itemsPerPage = 20;
-    let sortConfig = { column: 'DayRepair', direction: 'desc' };
-    let teamChart = null;
-    let dashboardFilter = null;
-    let callTypeCards = {};
-    // ใช้ currentRowData แก้กรณีพิมพ์จากโมดัลให้ตรงกับแถวที่เปิด
-    let currentTicketNumber = null;
-    let currentRowData = null;
     function showLoading() {
       loadingDiv.classList.add('show');
     }
@@ -1861,6 +2302,122 @@
         </html>
       `);
       printWindow.document.close();
+    }
+    /** Order จากโมดัล: แสดง Popup ด้วย SweetAlert2 */
+    function orderModalContent() {
+  if (!currentRowData) {
+    Swal.fire('ผิดพลาด', 'ไม่พบข้อมูลสำหรับการ Order', 'error');
+    return;
+  }
+
+  // ตรวจสอบสิทธิ์
+  if (!canUserOrder()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'ไม่มีสิทธิ์ใช้งาน',
+      text: 'ฟังก์ชันสั่งซื้ออะไหล่สงวนไว้สำหรับ แผนกคลัง Spare part วิภาวดี 62 และ แผนกคลังวัตถุดิบ เท่านั้น',
+      confirmButtonText: 'ตกลง'
+    });
+    return;
+  }
+      const modalData = currentRowData;
+      const desc = getDesc(modalData);
+      const userName = localStorage.getItem('userName') || 'ไม่ระบุ';
+      const userPlant = localStorage.getItem('userPlant') || '-';
+      const customer = `${modalData["Team"] || "-"} (${modalData["Brand"] || "-"})`;
+      const defaultPhone = "0909082850";
+      Swal.fire({
+        title: 'สั่งซื้ออะไหล่',
+        html: `
+          <div style="text-align: left; font-family: 'Prompt', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+              <h3 style="margin: 0 0 10px 0; text-align: center; color: #fff; font-size: 18px;"><i class="fas fa-shopping-cart"></i> รายละเอียดสั่งซื้อ</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">Material:</strong>
+                  <span style="text-align: right; flex: 1;">${modalData["Material"] || "-"}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">Description:</strong>
+                  <span style="text-align: right; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${desc || "-"}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">Ticket Number:</strong>
+                  <span style="text-align: right; flex: 1;">${modalData["Ticket Number"] || "-"}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">Call Type:</strong>
+                  <span style="text-align: right; flex: 1;">${modalData["Call Type"] || "-"}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">User:</strong>
+                  <span style="text-align: right; flex: 1;">${userName}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">Plant:</strong>
+                  <span style="text-align: right; flex: 1;">${userPlant}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">Customer:</strong>
+                  <span style="text-align: right; flex: 1; font-weight: bold; color: #fff;">${customer}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                  <strong style="color: #ffd700;">เบอร์ติดต่อ:</strong>
+                  <span style="text-align: right; flex: 1; font-weight: bold; color: #fff;">${defaultPhone}</span>
+                </div>
+              </div>
+            </div>
+            <label for="quantity" style="display: block; margin-top: 10px; font-weight: bold; color: #fff; font-size: 14px;">จำนวน:</label>
+            <input type="number" id="quantity" value="1" min="1" style="width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.9); font-size: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545',
+        customClass: {
+          popup: 'swal2-canva-popup',
+          title: 'swal2-canva-title',
+          confirmButton: 'swal2-canva-confirm',
+          cancelButton: 'swal2-canva-cancel'
+        },
+        preConfirm: () => {
+          const quantity = document.getElementById('quantity').value;
+          const phone = defaultPhone;
+          if (!quantity || parseInt(quantity) < 1) {
+            Swal.showValidationMessage('กรุณากรอกจำนวนที่ถูกต้อง (อย่างน้อย 1)');
+            return false;
+          }
+          return { quantity, phone };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const { quantity, phone } = result.value;
+          const orderData = {
+            material: modalData["Material"] || "-",
+            description: desc || "-",
+            quantity: quantity,
+            user: userName,
+            plant: userPlant,
+            customer: customer,
+            phone: phone,
+            ticket: modalData["Ticket Number"] || "-",
+            callType: modalData["Call Type"] || "-"
+          };
+          console.log('Order Data:', orderData);
+          // อาจจะส่งไป API หรือบันทึกข้อมูลเพิ่มเติมได้ที่นี่
+          Swal.fire({
+            icon: 'success',
+            title: 'ยืนยันการสั่งซื้อสำเร็จ!',
+            html: '<div style="text-align: center; font-family: \'Prompt\', sans-serif;"><i class="fas fa-check-circle" style="font-size: 50px; color: #28a745; margin-bottom: 10px;"></i><p style="font-size: 16px; color: #333;">ข้อมูลสั่งซื้อถูกบันทึกแล้ว</p></div>',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            customClass: {
+              popup: 'swal2-canva-success'
+            }
+          });
+        }
+      });
     }
     /** พิมพ์สติ๊กเกอร์จากหน้าหลัก */
     function printTable() {
@@ -2853,28 +3410,39 @@
       nextPageButton.onclick = () => { if (currentPage < totalPages) { currentPage++; filterAndRenderTable(); } };
       lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
     }
-    // โหลดข้อมูลครั้งแรก
-    showLoading();
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        allData = data;
-        populateTeamPlantFilter(data);
-        updatePendingFilter(data, employeeFilter.value);
-        updateStockFilter(data, employeeFilter.value, pendingFilter.value);
-        updateStatusCallFilter(data, employeeFilter.value, pendingFilter.value);
-        filterAndRenderTable();
-        addSortListeners();
-        hideLoading();
-      })
-      .catch(err => {
-        console.error('Error fetching data:', err);
-        hideLoading();
-        alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      });
-    fetchUpdateDate();
-    // Initialize theme on load
-    initTheme();
+    // Initialize App (load data after login)
+    function initApp() {
+      showLoading();
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          allData = data;
+          populateTeamPlantFilter(data);
+          updatePendingFilter(data, employeeFilter.value);
+          updateStockFilter(data, employeeFilter.value, pendingFilter.value);
+          updateStatusCallFilter(data, employeeFilter.value, pendingFilter.value);
+          filterAndRenderTable();
+          addSortListeners();
+          hideLoading();
+        })
+        .catch(err => {
+          console.error('Error fetching data:', err);
+          hideLoading();
+          alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+        });
+      fetchUpdateDate();
+      initTheme();
+    }
+    // Initial check on page load
+    checkLoginStatus();
+   function canUserOrder() {
+  const userUnit = localStorage.getItem('userUnit') || '';
+  const allowedUnits = [
+    'แผนกคลัง Spare part วิภาวดี 62',
+    'แผนกคลังวัตถุดิบ'
+  ];
+  return allowedUnits.includes(userUnit.trim());
+}
   </script>
 </body>
 </html>
