@@ -338,20 +338,22 @@
       border: 1px solid var(--border-color);
     }
     th,td{
-      padding:6px 8px;
+      padding:4px 6px;
       text-align:left;
       border:1px solid var(--border-color);
       white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      overflow:visible;
+      text-overflow:unset;
       color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.1;
     }
     th{
       background: var(--header-bg);
       color: var(--header-text);
       white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      overflow:visible;
+      text-overflow:unset;
     }
     th.sortable{
       cursor:pointer;
@@ -406,7 +408,202 @@
       box-shadow: 0 8px 16px var(--shadow-color);
     }
     #spareSummaryModal .modal-content{
-      max-width:95%;
+      max-width:1200px;
+      background: linear-gradient(135deg, rgba(0,123,255,0.08), rgba(23,162,184,0.08));
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      padding: 0;
+    }
+    .spare-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.8);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(6px);
+    }
+    .spare-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spare-body {
+      padding: 16px 20px 20px 20px;
+      background: var(--card-bg);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,123,255,0.1);
+      color: var(--info-color);
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid rgba(0,123,255,0.2);
+    }
+    .spare-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 12px 0 18px 0;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 4px 10px var(--shadow-color);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0 0 4px 0;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .spare-table {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 6px 14px var(--shadow-color);
+    }
+    #spareSummaryModal .detail-table {
+      font-size: 13px;
+      background: var(--card-bg);
+    }
+    #spareSummaryModal .detail-table th,
+    #spareSummaryModal .detail-table td {
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+    }
+    #spareSummaryModal .detail-table th {
+      background: rgba(0,123,255,0.12);
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+    #spareSummaryModal .detail-table td:nth-child(2),
+    #spareSummaryModal .detail-table th:nth-child(2) {
+      max-width: none;
+      text-align: left;
+    }
+    #spareSummaryModal .detail-table th:not(:first-child),
+    #spareSummaryModal .detail-table td:not(:first-child) {
+      min-width: 40px;
+      max-width: 60px;
+      width: 8%;
+      text-align: center;
+    }
+    #spareSummaryModal .detail-table th:first-child,
+    #spareSummaryModal .detail-table td:first-child {
+      min-width: 80px;
+      width: 12%;
+    }
+    #spareSummaryModal .detail-table th:nth-child(2),
+    #spareSummaryModal .detail-table td:nth-child(2) {
+      width: 46%;
+    }
+    #spareSummaryModal .detail-table th:nth-child(3),
+    #spareSummaryModal .detail-table td:nth-child(3) {
+      width: 10%;
+      min-width: 70px;
+    }
+    @media (max-width: 768px) {
+      #spareSummaryModal .modal-content {
+        width: 98%;
+        margin: 5% auto;
+      }
+      #spareSummaryModal .detail-table {
+        font-size: 12px;
+      }
+      #spareSummaryModal .detail-table th,
+      #spareSummaryModal .detail-table td {
+        padding: 4px 6px;
+      }
+      #spareSummaryModal .detail-table th:not(:first-child),
+      #spareSummaryModal .detail-table td:not(:first-child) {
+        width: 7%;
+        min-width: 40px;
+      }
+      #spareSummaryModal .detail-table th:nth-child(2),
+      #spareSummaryModal .detail-table td:nth-child(2) {
+        width: 54%;
+      }
+    }
+    /* Summary Modal Styling */
+    #summaryModal .modal-content {
+      max-width: 1100px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 24px var(--shadow-color);
+    }
+    .summary-shell {
+      background: linear-gradient(120deg, rgba(0,123,255,0.08), rgba(40,167,69,0.06));
+    }
+    .summary-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(4px);
+    }
+    .summary-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .summary-badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--info-color);
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      box-shadow: 0 4px 10px var(--shadow-color);
+    }
+    .summary-body {
+      padding: 16px;
+      background: var(--card-bg);
+    }
+    .summary-body table.detail-table {
+      margin-top: 0;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .summary-body .detail-table th {
+      background: rgba(0,123,255,0.12);
+      color: var(--text-primary);
+    }
+    @media (max-width: 768px) {
+      #summaryModal .modal-content {
+        width: 98%;
+        margin: 5% auto;
+      }
+      .summary-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
     }
     .graph-modal-content{
       background: var(--card-bg);
@@ -560,48 +757,50 @@
         transform:scale(1);
       }
     }
-    th:nth-child(1), td:nth-child(1) { min-width: 60px; max-width: 60px; } /* DayRepair */
-    th:nth-child(2), td:nth-child(2) { min-width: 100px; max-width: 120px; } /* DateTime */
-    th:nth-child(3), td:nth-child(3) { min-width: 120px; max-width: 140px; } /* Ticket Number */
-    th:nth-child(4), td:nth-child(4) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Brand */
-    th:nth-child(5), td:nth-child(5) { min-width: 70px; max-width: 80px; } /* Call Type */
-    th:nth-child(6), td:nth-child(6) { min-width: 80px; max-width: 100px; } /* Team */
-    th:nth-child(7), td:nth-child(7) { min-width: 100px; max-width: 120px; } /* TeamPlant */
-    th:nth-child(8), td:nth-child(8) { min-width: 120px; max-width: 140px; } /* ค้างหน่วยงาน */
-    th:nth-child(9), td:nth-child(9) { min-width: 80px; max-width: 100px; } /* Material */
-    th:nth-child(10), td:nth-child(10) { min-width: 200px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Description */
-    th:nth-child(11), td:nth-child(11) { min-width: 50px; max-width: 50px; text-align: center; } /* Nawa */
-    th:nth-child(12), td:nth-child(12) { min-width: 50px; max-width: 50px; text-align: center; } /* Vipa */
-    th:nth-child(13), td:nth-child(13) { min-width: 50px; max-width: 50px; text-align: center; } /* Request */
-    th:nth-child(14), td:nth-child(14) { min-width: 50px; max-width: 50px; text-align: center; } /* QtyPlant */
-    th:nth-child(15), td:nth-child(15) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* คลังตอบ */
-    th:nth-child(16), td:nth-child(16) { min-width: 80px; max-width: 100px; } /* StatusCall */
-    th:nth-child(17), td:nth-child(17) { min-width: 100px; max-width: 120px; } /* วันที่ตอบ */
-    th:nth-child(18), td:nth-child(18) { min-width: 80px; max-width: 100px; } /* UserAns */
-    th:nth-child(19), td:nth-child(19) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Answer1 */
-    th:nth-child(20), td:nth-child(20) { min-width: 100px; max-width: 120px; text-align: center; } /* Detail Button */
+    th:nth-child(1), td:nth-child(1) { min-width: 60px; } /* Select */
+    th:nth-child(2), td:nth-child(2) { min-width: 70px; } /* DayRepair */
+    th:nth-child(3), td:nth-child(3) { min-width: 110px; } /* DateTime */
+    th:nth-child(4), td:nth-child(4) { min-width: 140px; } /* Ticket Number */
+    th:nth-child(5), td:nth-child(5) { min-width: 170px; } /* Brand */
+    th:nth-child(6), td:nth-child(6) { min-width: 70px; } /* Call Type */
+    th:nth-child(7), td:nth-child(7) { min-width: 100px; } /* Team */
+    th:nth-child(8), td:nth-child(8) { min-width: 110px; } /* TeamPlant */
+    th:nth-child(9), td:nth-child(9) { min-width: 110px; } /* ค้างหน่วยงาน */
+    th:nth-child(10), td:nth-child(10) { min-width: 110px; } /* Material */
+    th:nth-child(11), td:nth-child(11) { min-width: 320px; } /* Description */
+    th:nth-child(12), td:nth-child(12) { min-width: 70px; text-align: center; } /* Nawa */
+    th:nth-child(13), td:nth-child(13) { min-width: 70px; text-align: center; } /* Vipa */
+    th:nth-child(14), td:nth-child(14) { min-width: 70px; text-align: center; } /* Request */
+    th:nth-child(15), td:nth-child(15) { min-width: 70px; text-align: center; } /* QtyPlant */
+    th:nth-child(16), td:nth-child(16) { min-width: 150px; } /* คลังตอบ */
+    th:nth-child(17), td:nth-child(17) { min-width: 90px; } /* StatusCall */
+    th:nth-child(18), td:nth-child(18) { min-width: 100px; } /* วันที่ตอบ */
+    th:nth-child(19), td:nth-child(19) { min-width: 100px; } /* UserAns */
+    th:nth-child(20), td:nth-child(20) { min-width: 170px; } /* Answer1 */
+    th:nth-child(21), td:nth-child(21) { min-width: 110px; text-align: center; } /* Detail Button */
     @media (max-width: 768px){
       th, td { padding: 4px 4px; font-size: 12px; }
-      th:nth-child(1), td:nth-child(1) { min-width: 50px; max-width: 50px; }
-      th:nth-child(2), td:nth-child(2) { min-width: 80px; max-width: 100px; }
-      th:nth-child(3), td:nth-child(3) { min-width: 100px; max-width: 120px; }
-      th:nth-child(4), td:nth-child(4) { min-width: 100px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Brand */
-      th:nth-child(5), td:nth-child(5) { min-width: 60px; max-width: 70px; }
-      th:nth-child(6), td:nth-child(6) { min-width: 70px; max-width: 80px; }
-      th:nth-child(7), td:nth-child(7) { min-width: 80px; max-width: 100px; }
-      th:nth-child(8), td:nth-child(8) { min-width: 100px; max-width: 120px; }
-      th:nth-child(9), td:nth-child(9) { min-width: 70px; max-width: 80px; }
-      th:nth-child(10), td:nth-child(10) { min-width: 150px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Description */
-      th:nth-child(11), td:nth-child(11) { min-width: 40px; max-width: 40px; }
-      th:nth-child(12), td:nth-child(12) { min-width: 40px; max-width: 40px; }
-      th:nth-child(13), td:nth-child(13) { min-width: 40px; max-width: 40px; }
-      th:nth-child(14), td:nth-child(14) { min-width: 40px; max-width: 40px; }
-      th:nth-child(15), td:nth-child(15) { min-width: 100px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* คลังตอบ */
-      th:nth-child(16), td:nth-child(16) { min-width: 70px; max-width: 80px; }
-      th:nth-child(17), td:nth-child(17) { min-width: 80px; max-width: 100px; }
-      th:nth-child(18), td:nth-child(18) { min-width: 70px; max-width: 80px; }
-      th:nth-child(19), td:nth-child(19) { min-width: 100px; max-width: none; white-space: nowrap; overflow: visible; text-overflow: clip; } /* Answer1 */
-      th:nth-child(20), td:nth-child(20) { min-width: 80px; max-width: 90px; }
+      th:nth-child(1), td:nth-child(1) { min-width: 50px; }
+      th:nth-child(2), td:nth-child(2) { min-width: 50px; }
+      th:nth-child(3), td:nth-child(3) { min-width: 90px; }
+      th:nth-child(4), td:nth-child(4) { min-width: 110px; }
+      th:nth-child(5), td:nth-child(5) { min-width: 140px; }
+      th:nth-child(6), td:nth-child(6) { min-width: 55px; }
+      th:nth-child(7), td:nth-child(7) { min-width: 80px; }
+      th:nth-child(8), td:nth-child(8) { min-width: 90px; }
+      th:nth-child(9), td:nth-child(9) { min-width: 95px; }
+      th:nth-child(10), td:nth-child(10) { min-width: 95px; }
+      th:nth-child(11), td:nth-child(11) { min-width: 200px; }
+      th:nth-child(12), td:nth-child(12) { min-width: 45px; text-align:center; }
+      th:nth-child(13), td:nth-child(13) { min-width: 45px; text-align:center; }
+      th:nth-child(14), td:nth-child(14) { min-width: 45px; text-align:center; }
+      th:nth-child(15), td:nth-child(15) { min-width: 45px; text-align:center; }
+      th:nth-child(16), td:nth-child(16) { min-width: 110px; }
+      th:nth-child(17), td:nth-child(17) { min-width: 70px; }
+      th:nth-child(18), td:nth-child(18) { min-width: 80px; }
+      th:nth-child(19), td:nth-child(19) { min-width: 85px; }
+      th:nth-child(20), td:nth-child(20) { min-width: 110px; }
+      th:nth-child(21), td:nth-child(21) { min-width: 90px; text-align:center; }
       #searchInput{
         width:100%;
         max-width:300px;
@@ -1419,96 +1618,238 @@
     .app-content.logged-in {
       display: block;
     }
-    /* Hamburger Menu Styles */
-    .hamburger-menu {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 1001;
+    /* Header */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: linear-gradient(120deg, rgba(0,123,255,0.12), rgba(23,162,184,0.08));
+      box-shadow: 0 8px 16px var(--shadow-color);
+      margin-bottom: 18px;
+      position: relative;
     }
-    .hamburger-icon {
-      font-size: 24px;
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--header-bg);
+      color: var(--header-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 12px var(--shadow-color);
+      flex-shrink: 0;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
       color: var(--text-primary);
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-      background: var(--card-bg);
-      box-shadow: 0 2px 4px var(--shadow-color);
+      line-height: 1.3;
     }
-    .hamburger-icon:hover {
+    .brand-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-pill {
+      background: var(--card-bg);
+      padding: 4px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      font-weight: 600;
+      color: var(--info-color);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .quick-setting-popover {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      box-shadow: 0 10px 24px var(--shadow-color);
+      padding: 14px;
+      min-width: 260px;
+      z-index: 1100;
+      display: none;
+      animation: slideDown .2s ease;
+    }
+    .quick-setting-popover.show {
+      display: block;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .sheet-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
+    }
+    .sheet-close {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .sheet-user {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .sheet-user .name {
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .sheet-user .meta {
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .sheet-actions {
+      display: grid;
+      gap: 8px;
+    }
+    .sheet-actions .header-button {
+      justify-content: center;
+      width: 100%;
+    }
+    .header-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--button-bg);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      white-space: nowrap;
+    }
+    .header-button.ghost {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      box-shadow: none;
+    }
+    .header-button.danger {
+      background: linear-gradient(135deg,#dc3545,#b02a37);
+    }
+    .header-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px var(--shadow-color);
+      background: var(--button-hover);
+    }
+    .header-button.ghost:hover {
       background: var(--hover-bg);
-      transform: scale(1.1);
+    }
+    .header-button.danger:hover {
+      background: linear-gradient(135deg,#b02a37,#8f1f2a);
+    }
+    .user-chip {
+      display: grid;
+      grid-template-columns: auto;
+      gap: 2px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 6px var(--shadow-color);
+      min-width: 160px;
+    }
+    .user-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .user-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
     }
     .settings-dropdown {
       position: absolute;
-      top: 60px;
-      left: 20px;
+      top: calc(100% + 8px);
+      right: 0;
       background: var(--card-bg);
-      border-radius: 8px;
-      box-shadow: 0 4px 8px var(--shadow-color);
+      border-radius: 12px;
+      box-shadow: 0 10px 24px var(--shadow-color);
       padding: 15px;
       display: none;
       z-index: 1000;
-      min-width: 200px;
+      min-width: 220px;
       border: 1px solid var(--border-color);
     }
     .settings-dropdown.show {
       display: block;
     }
-    .user-info-in-menu {
-      font-size: 14px;
+    .settings-dropdown h4 {
+      margin: 0 0 8px 0;
       color: var(--text-primary);
-      margin-bottom: 10px;
     }
-    .user-info-in-menu strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-    .theme-button, .logout-button-in-menu {
-      width: 100%;
-      margin-bottom: 8px;
-      justify-content: flex-start;
+    .settings-dropdown .inline-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .dark-theme .settings-dropdown {
       background: var(--card-bg);
       border-color: var(--border-color);
     }
-    /* User Info Display (removed original, now in dropdown) */
-        .header-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 20px;
-}
-.report-title {
-  text-align: center;
-  margin: 0; /* ลบ margin ด้านล่างเพื่อให้ปุ่ม align ดี */
-  /* คง padding และ background ไว้ตามเดิม */
-}
-.setting-header-btn {
-  position: absolute;
-  top: 50%;
-  right: 20px; /* ปรับระยะห่างจากขอบขวา */
-  transform: translateY(-50%);
-  margin: 0;
-  padding: 8px 12px; /* ลด padding เล็กน้อยให้กะทัดรัด */
-  font-size: 13px; /* ลดขนาดฟอนต์เล็กน้อย */
-  box-shadow: 0 2px 4px var(--shadow-color); /* เงาเบาๆ */
-  transition: all 0.3s ease;
-}
-.setting-header-btn:hover {
-  transform: translateY(-50%) scale(1.05);
-  box-shadow: 0 4px 8px var(--shadow-color);
-}
-/* Responsive สำหรับมือถือ */
-@media (max-width: 768px) {
-  .setting-header-btn {
-    right: 10px;
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-}
+    @media (max-width: 768px) {
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .header-button {
+        padding: 9px 12px;
+        font-size: 13px;
+      }
+    }
 .spinner {
   border: 4px solid #ffffff50;
   border-top: 4px solid #fff;
@@ -1552,30 +1893,43 @@
   </div>
   <!-- App Content (Hidden until login) -->
   <div id="appContent" class="app-content">
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu">
-      <i class="fas fa-bars hamburger-icon" id="hamburgerIcon"></i>
-    </div>
-    <!-- Settings Dropdown -->
-    <div id="settingsDropdown" class="settings-dropdown">
-      <div id="userInfoInMenu" class="user-info-in-menu" style="display: none;">
-        <strong>ยินดีต้อนรับ:</strong> <span id="displayUserNameInMenu"></span>
-        <br>
-        <strong>หน่วยงาน:</strong> <span id="displayUnit">-</span>
-        <br>
-        <strong>Plant:</strong> <span id="displayPlant">-</span>
-        <button id="themeButton" class="action-button theme-button"><i class="fas fa-cog"></i> ตั้งค่า</button>
-        <button id="logoutButtonInMenu" class="action-button logout-button logout-button-in-menu">
-          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-        </button>
-      </div>
-    </div>
     <div id="loading" class="loading">
       <div class="spinner"></div>
       <p>กำลังโหลดข้อมูล...</p>
     </div>
-    <h1 class="report-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare </h1>
-    <div id="dateUpdate" class="date-update">Data Update: <span id="updateValue">-</span></div>
+    <header class="app-header">
+      <div class="brand-block">
+        <div class="brand-logo">SP</div>
+        <div class="brand-text">
+          <div class="brand-title">รายการอะไหล่ Call ค้างคลังสินค้า Sparepare</div>
+          <div class="brand-meta">Data Update: <span id="updateValue" class="brand-pill">-</span></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="quickSettingButton" class="header-button"><i class="fas fa-cog"></i><span>Setting</span></button>
+        <div id="quickSettingPopover" class="quick-setting-popover">
+          <div class="sheet-header">
+            <div class="sheet-title">โปรไฟล์</div>
+            <button class="sheet-close" id="quickSettingClose"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="sheet-user">
+            <div class="name" id="quickUserName">-</div>
+            <div class="meta"><span id="quickUnit">-</span> • <span id="quickPlant">-</span> • <span id="quickEmp">-</span></div>
+          </div>
+          <div class="sheet-actions">
+            <button class="header-button ghost" id="quickTheme"><i class="fas fa-adjust"></i><span>ธีม</span></button>
+            <button class="header-button danger" id="quickLogout"><i class="fas fa-sign-out-alt"></i><span>ออกจากระบบ</span></button>
+          </div>
+        </div>
+      </div>
+      <div id="settingsDropdown" class="settings-dropdown">
+        <h4>เมนูด่วน</h4>
+        <div class="inline-actions">
+          <button class="action-button" id="headerSettingButton" onclick="settingModal.style.display='block'; settingsDropdown.classList.remove('show');"><i class="fas fa-sliders-h"></i> ตั้งค่าแสดงผล</button>
+          <button class="action-button logout-button" onclick="handleLogout()"><i class="fas fa-door-open"></i> ออกจากระบบ</button>
+        </div>
+      </div>
+    </header>
     <!-- Dashboard Section -->
     <div id="dashboard" class="dashboard">
       <div id="totalCard" class="dashboard-card total-card">
@@ -1669,6 +2023,7 @@
       <table id="data-table">
         <thead>
           <tr>
+            <th style="min-width:40px;text-align:center;"><input type="checkbox" id="selectAllCheckbox"></th>
             <th class="sortable" data-column="DayRepair">ผ่านมา <span class="arrow"></span></th>
             <th class="sortable" data-column="DateTime">วันที่แจ้ง <span class="arrow"></span></th>
             <th class="sortable" data-column="Ticket Number">Ticket Number <span class="arrow"></span></th>
@@ -1720,13 +2075,24 @@
     </div>
     <div id="summaryModal" class="modal">
       <div class="modal-content">
-        <span class="close" id="closeSummaryModal">×</span>
-        <button class="print-button" onclick="printSummaryContent()">
-          <i class="fas fa-print"></i>
-          <span>พิมพ์สรุป</span>
-        </button>
-        <h2>สรุปข้อมูล Call ค้าง</h2>
-        <div id="summaryContent"></div>
+        <div class="summary-shell">
+          <div class="summary-topbar">
+            <div class="summary-title">
+              <span class="summary-badge">Summary</span>
+              <span>สรุปข้อมูล Call ค้าง</span>
+            </div>
+            <div>
+              <button class="print-button" onclick="printSummaryContent()">
+                <i class="fas fa-print"></i>
+                <span>พิมพ์สรุป</span>
+              </button>
+              <span class="close" id="closeSummaryModal">×</span>
+            </div>
+          </div>
+          <div class="summary-body">
+            <div id="summaryContent"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="spareSummaryModal" class="modal">
@@ -1786,6 +2152,15 @@
     const displayUserNameInMenu = document.getElementById("displayUserNameInMenu");
     const displayUnit = document.getElementById("displayUnit");
     const displayPlant = document.getElementById("displayPlant");
+    const quickSettingButton = document.getElementById("quickSettingButton");
+    const quickSettingPopover = document.getElementById("quickSettingPopover");
+    const quickSettingClose = document.getElementById("quickSettingClose");
+    const quickUserName = document.getElementById("quickUserName");
+    const quickUnit = document.getElementById("quickUnit");
+    const quickPlant = document.getElementById("quickPlant");
+    const quickEmp = document.getElementById("quickEmp");
+    const quickTheme = document.getElementById("quickTheme");
+    const quickLogout = document.getElementById("quickLogout");
     const logoutButtonInMenu = document.getElementById("logoutButtonInMenu");
     const themeButton = document.getElementById("themeButton");
     const hamburgerIcon = document.getElementById("hamburgerIcon");
@@ -1801,13 +2176,49 @@
       togglePassword.classList.toggle('fa-eye-slash');
     });
     // Hamburger Menu Toggle
-    hamburgerIcon.addEventListener('click', () => {
-      settingsDropdown.classList.toggle('show');
+    if (hamburgerIcon) {
+      hamburgerIcon.addEventListener('click', () => {
+        settingsDropdown.classList.toggle('show');
+      });
+    }
+    // Quick Setting sheet
+    function openQuickSetting() {
+      if (!quickSettingPopover) return;
+      if (quickSettingPopover.classList.contains('show')) { closeQuickSetting(); return; }
+      const username = localStorage.getItem('userName') || '-';
+      const unit = localStorage.getItem('userUnit') || '-';
+      const plant = localStorage.getItem('userPlant') || '-';
+      const emp = localStorage.getItem('username') || '-';
+      quickUserName.textContent = username;
+      quickUnit.textContent = unit;
+      quickPlant.textContent = plant;
+      quickEmp.textContent = emp;
+      quickSettingPopover.classList.add('show');
+    }
+    function closeQuickSetting() {
+      if (quickSettingPopover) quickSettingPopover.classList.remove('show');
+    }
+    quickSettingButton.addEventListener('click', openQuickSetting);
+    quickSettingClose.addEventListener('click', closeQuickSetting);
+    quickTheme.addEventListener('click', () => {
+      closeQuickSetting();
+      settingModal.style.display = 'block';
     });
-    // Close dropdown when clicking outside
+    quickLogout.addEventListener('click', () => {
+      closeQuickSetting();
+      handleLogout();
+    });
+    // Close dropdown / popover when clicking outside
     document.addEventListener('click', (e) => {
-      if (!settingsDropdown.contains(e.target) && !hamburgerIcon.contains(e.target)) {
-        settingsDropdown.classList.remove('show');
+      if (settingsDropdown && hamburgerIcon) {
+        if (!settingsDropdown.contains(e.target) && !hamburgerIcon.contains(e.target)) {
+          settingsDropdown.classList.remove('show');
+        }
+      }
+      if (quickSettingPopover && quickSettingButton) {
+        if (!quickSettingPopover.contains(e.target) && !quickSettingButton.contains(e.target)) {
+          closeQuickSetting();
+        }
       }
     });
     // Handle login form submission
@@ -1860,10 +2271,8 @@
         hideLoading();
         loginModal.classList.add('hidden');
         appContent.classList.add('logged-in');
-        displayUserNameInMenu.textContent = user.Name;
-        displayUnit.textContent = user.หน่วยงาน || '-';
-        displayPlant.textContent = user.Plant || '-';
-        userInfoInMenu.style.display = 'block';
+        setUserInfoDisplays(user.Name, user.หน่วยงาน || '-', user.Plant || '-', username);
+        if (userInfoInMenu) userInfoInMenu.style.display = 'block';
         document.getElementById('searchInput').focus(); // Auto-focus search
         // Load app data
         initApp();
@@ -1899,10 +2308,8 @@
           // Assume valid if stored; in production, re-validate with fetch if needed
           loginModal.classList.add('hidden');
           appContent.classList.add('logged-in');
-          displayUserNameInMenu.textContent = userName;
-          displayUnit.textContent = userUnit || '-';
-          displayPlant.textContent = userPlant || '-';
-          userInfoInMenu.style.display = 'block';
+          setUserInfoDisplays(userName, userUnit || '-', userPlant || '-', username);
+          if (userInfoInMenu) userInfoInMenu.style.display = 'block';
           if (localStorage.getItem('rememberMe') === 'true') {
             usernameInput.value = localStorage.getItem('savedUsername') || '';
           }
@@ -1917,17 +2324,19 @@
       return false;
     }
     // Handle logout
-    logoutButtonInMenu.addEventListener('click', handleLogout);
+    if (logoutButtonInMenu) logoutButtonInMenu.addEventListener('click', handleLogout);
     function handleLogout() {
       localStorage.clear(); // Clear all keys
       settingsDropdown.classList.remove('show');
       location.reload(); // Reload to show login
     }
     // Theme button in menu
-    themeButton.addEventListener('click', () => {
-      settingModal.style.display = 'block';
-      settingsDropdown.classList.remove('show');
-    });
+    if (themeButton) {
+      themeButton.addEventListener('click', () => {
+        settingModal.style.display = 'block';
+        settingsDropdown.classList.remove('show');
+      });
+    }
     // Enter key support for login
     document.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && !appContent.classList.contains('logged-in')) {
@@ -1936,6 +2345,8 @@
     });
     // App Initialization (original code wrapped)
     let allData = [];
+    const selectedTickets = new Set();
+    let requestQuantities = {};
     let currentPage = 1;
     let itemsPerPage = 20;
     let sortConfig = { column: 'DayRepair', direction: 'desc' };
@@ -1949,6 +2360,9 @@
     const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
     const updateSheetName = 'Update';
     const updateUrl = `https://opensheet.elk.sh/${sheetID}/${updateSheetName}`;
+    const requestSheetID = '1xyy70cq2vAxGv4gPIGiL_xA5czDXqS2i6YYqW4yEVbE';
+    const requestSheetName = 'Request';
+    const requestUrl = `https://opensheet.elk.sh/${requestSheetID}/${encodeURIComponent(requestSheetName)}`;
     const modal = document.getElementById("detailModal");
     const graphModal = document.getElementById("graphModal");
     const summaryModal = document.getElementById("summaryModal");
@@ -1970,6 +2384,7 @@
     const excelButton = document.getElementById("excelButton");
     const summaryButton = document.getElementById("summaryButton");
     const settingButton = document.getElementById("settingButton");
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
     const firstPageButton = document.getElementById("firstPage");
@@ -2002,6 +2417,64 @@
     }
     function getCleanTeamPlant(tp) {
       return (tp || "").replace(/Stock\s*/gi, '').trim();
+    }
+    function setUserInfoDisplays(name, unit, plant, emp) {
+      if (displayUserNameInMenu) displayUserNameInMenu.textContent = name;
+      if (displayUnit) displayUnit.textContent = unit || '-';
+      if (displayPlant) displayPlant.textContent = plant || '-';
+      if (quickUserName) quickUserName.textContent = name;
+      if (quickUnit) quickUnit.textContent = unit || '-';
+      if (quickPlant) quickPlant.textContent = plant || '-';
+      if (quickEmp) quickEmp.textContent = emp || '-';
+    }
+    function computeRequestQuantities(data) {
+      const result = {};
+      if (!Array.isArray(data)) return result;
+      data.forEach(row => {
+        const material = normalizeMaterial(
+          row?.Material ??
+          row?.material ??
+          row?.MaterialCode ??
+          row?.materialcode ??
+          row?.Material_Code ??
+          row?.Material_code ??
+          row?.Mat ??
+          row?.mat ??
+          row?.Item ??
+          row?.item ??
+          ""
+        );
+        if (!material) return;
+        const statusRaw = row?.Status ?? row?.status ?? row?.สถานะ ?? "";
+        const status = (statusRaw || "").toString().replace(/\s+/g, '').toLowerCase();
+        if (status !== "รอเบิก") return;
+        const qtyRaw = row?.quantity ?? row?.Quantity ?? row?.Qty ?? row?.qty ?? row?.จำนวน ?? row?.จำนวนเบิก;
+        const qty = parseFloat((qtyRaw ?? "").toString().replace(/,/g, ''));
+        if (Number.isNaN(qty)) return;
+        result[material] = (result[material] || 0) + qty;
+      });
+      return result;
+    }
+    function normalizeMaterial(mat) {
+      return (mat || "").toString().trim().replace(/\s+/g, '').toUpperCase();
+    }
+    function loadRequestQuantities() {
+      return fetch(requestUrl)
+        .then(r => {
+          if (!r.ok) throw new Error(`Request sheet fetch failed (${r.status})`);
+          return r.json();
+        })
+        .then(data => {
+          requestQuantities = computeRequestQuantities(data);
+          return requestQuantities;
+        });
+    }
+    function getRequestValue(material) {
+      const key = normalizeMaterial(material);
+      if (!key) return "-";
+      const qty = requestQuantities[key] ?? null;
+      if (qty == null) return "-";
+      return Number.isInteger(qty) ? qty.toString() : qty.toFixed(2);
     }
     /** ฟังก์ชันจัดการธีม */
     function setTheme(theme) {
@@ -2075,9 +2548,9 @@
             (row["ค้างหน่วยงาน"] || "").toLowerCase().includes(keyword) ||
             (row["Material"] || "").toLowerCase().includes(keyword) ||
             (getDesc(row) || "").toLowerCase().includes(keyword) ||
+            (getRequestValue(row["Material"]) || "").toString().toLowerCase().includes(keyword) ||
             (row["Nawa"] || "").toLowerCase().includes(keyword) ||
             (row["Vipa"] || "").toLowerCase().includes(keyword) ||
-            (row["Request"] || "").toLowerCase().includes(keyword) ||
             (row["QtyPlant"] || "").toLowerCase().includes(keyword) ||
             (row["คลังตอบ"] || "").toLowerCase().includes(keyword) ||
             (row["UserAns"] || "").toLowerCase().includes(keyword) ||
@@ -2297,18 +2770,14 @@
       const modalData = currentRowData;
       const desc = getDesc(modalData);
       const stickerContent = `
-        <div><span class="label">ผ่านมา:</span> <span class="value">${modalData["DayRepair"] || "-"}</span></div>
         <div><span class="label">Team:</span> <span class="value team-brand">${modalData["Team"] || "-"}</span></div>
         <div><span class="label">Brand:</span> <span class="value team-brand">${modalData["Brand"] || "-"}</span></div>
         <div><span class="label">Call Type:</span> <span class="value">${modalData["Call Type"] || "-"}</span></div>
         <div><span class="label">วันที่แจ้ง:</span> <span class="value">${extractDate(modalData["DateTime"] || "-")}</span></div>
         <div><span class="label">Ticket Number:</span> <span class="value">${modalData["Ticket Number"] || "-"}</span></div>
-        <div><span class="label">ทีมพื้่นที่:</span> <span class="value">${getCleanTeamPlant(modalData["TeamPlant"]) || "-"}</span></div>
+        <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(modalData["TeamPlant"]) || "-"}</span></div>
         <div><span class="label">Material:</span> <span class="value">${modalData["Material"] || "-"}</span></div>
         <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
-        <div><span class="label">วันที่ตอบ:</span> <span class="value">${modalData["วันที่ตอบ"] || "-"}</span></div>
-        <div><span class="label">ผู้แจ้ง:</span> <span class="value">${modalData["UserAns"] || "-"}</span></div>
-        <div><span class="label">แจ้งผล:</span> <span class="value">${modalData["Answer1"] || "-"}</span></div>
       `;
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
@@ -2532,6 +3001,10 @@ if (result.status === "success") {
           }
         }
       }
+      // If user selected tickets via checkbox, narrow to those
+      if (selectedTickets.size > 0) {
+        filteredData = filteredData.filter(row => selectedTickets.has(row["Ticket Number"]));
+      }
       if (filteredData.length === 0) { alert("ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา"); return; }
       filteredData.sort((a, b) => {
         let dayA = parseFloat(a["DayRepair"]) || 0;
@@ -2543,12 +3016,11 @@ if (result.status === "success") {
       });
       const startIdx = (currentPage - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
-      const paginatedData = filteredData.slice(startIdx, endIdx);
+      const paginatedData = selectedTickets.size > 0 ? filteredData : filteredData.slice(startIdx, endIdx);
       const stickersHtml = paginatedData.map(row => {
         const desc = getDesc(row);
         return `
           <div class="sticker">
-            <div><span class="label">ผ่านมา:</span> <span class="value">${row["DayRepair"] || "-"}</span></div>
             <div><span class="label">Team:</span> <span class="value team-brand">${row["Team"] || "-"}</span></div>
             <div><span class="label">Brand:</span> <span class="value team-brand">${row["Brand"] || "-"}</span></div>
             <div><span class="label">Call Type:</span> <span class="value">${row["Call Type"] || "-"}</span></div>
@@ -2557,9 +3029,6 @@ if (result.status === "success") {
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${getCleanTeamPlant(row["TeamPlant"]) || "-"}</span></div>
             <div><span class="label">Material:</span> <span class="value">${row["Material"] || "-"}</span></div>
             <div class="description"><span class="label">Description:</span> <span class="value">${desc || "-"}</span></div>
-            <div><span class="label">วันที่ตอบ:</span> <span class="value">${row["วันที่ตอบ"] || "-"}</span></div>
-            <div><span class="label">ผู้แจ้ง:</span> <span class="value">${row["UserAns"] || "-"}</span></div>
-            <div><span class="label">แจ้งผล:</span> <span class="value">${row["Answer1"] || "-"}</span></div>
           </div>
         `;
       }).join('');
@@ -3059,12 +3528,18 @@ if (result.status === "success") {
             <style>
               body { font-family: 'Prompt', sans-serif; margin: 10mm; padding: 0; }
               h2, h3 { color: #000; margin: 10px 0; }
-              .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-              .detail-table th, .detail-table td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+              .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: auto; }
+              .detail-table th, .detail-table td {
+                padding: 4px 6px;
+                border: 1px solid #ccc;
+                text-align: center;
+                font-size: 11px;
+                word-break: break-word;
+              }
               .detail-table th { background-color: #007bff; color: white; }
               .detail-table tr:nth-child(even) { background-color: #f9f9f9; }
-              .detail-table th:not(:first-child), .detail-table td:not(:first-child) { width: 80px; min-width: 80px; max-width: 80px; }
-              .detail-table th:first-child, .detail-table td:first-child { width: auto; min-width: 120px; }
+              .detail-table th:first-child, .detail-table td:first-child { min-width: 80px; text-align: left; }
+              .detail-table th:nth-child(2), .detail-table td:nth-child(2) { text-align: left; }
               @media print { body { margin: 0; } @page { margin: 10mm; } }
             </style>
           </head>
@@ -3315,6 +3790,11 @@ if (result.status === "success") {
             let ticketA = a["Ticket Number"] || "", ticketB = b["Ticket Number"] || "";
             if (dayA !== dayB) return sortConfig.direction === 'asc' ? dayA - dayB : dayB - dayA;
             return ticketA.localeCompare(ticketB);
+          } else if (sortConfig.column === 'Request') {
+            const reqA = parseFloat(getRequestValue(a["Material"])) || 0;
+            const reqB = parseFloat(getRequestValue(b["Material"])) || 0;
+            if (reqA !== reqB) return sortConfig.direction === 'asc' ? reqA - reqB : reqB - reqA;
+            return (a["Ticket Number"] || "").localeCompare(b["Ticket Number"] || "");
           } else {
             valueA = valueA.toString().toLowerCase(); valueB = valueB.toString().toLowerCase();
             return sortConfig.direction === 'asc'
@@ -3366,10 +3846,28 @@ if (result.status === "success") {
         tr.style.animationDelay = `${i * 0.05}s`;
         const ticket = row["Ticket Number"];
         tr.className = colorMap[ticket] || "yellow-light";
-        const columns = ["DayRepair","DateTime","Ticket Number","Brand","Call Type","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","วันที่ตอบ","UserAns","Answer1"];
+        const columns = ["Select","DayRepair","DateTime","Ticket Number","Brand","Call Type","Team","TeamPlant","ค้างหน่วยงาน","Material","Description","Nawa","Vipa","Request","QtyPlant","คลังตอบ","StatusCall","วันที่ตอบ","UserAns","Answer1"];
         columns.forEach(col => {
           const td = document.createElement("td");
-          let cellValue = (col === "Description") ? getDesc(row) : (row[col] || "-");
+          let cellValue;
+          if (col === "Select") {
+            td.style.textAlign = "center";
+            td.style.width = "40px";
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.checked = selectedTickets.has(ticket);
+            cb.addEventListener("change", () => {
+              if (cb.checked) selectedTickets.add(ticket);
+              else selectedTickets.delete(ticket);
+              updateSelectAllState(paginatedData);
+            });
+            td.appendChild(cb);
+            tr.appendChild(td);
+            return;
+          }
+          if (col === "Description") cellValue = getDesc(row);
+          else if (col === "Request") cellValue = getRequestValue(row["Material"]);
+          else cellValue = row[col] || "-";
           if (col === "TeamPlant") {
             cellValue = getCleanTeamPlant(cellValue);
           }
@@ -3439,7 +3937,7 @@ if (result.status === "success") {
             <div><span class="label">Description:</span> <span class="value">${getDesc(row) || "-"}</span></div>
             <div><span class="label">นวนคร:</span> <span class="value">${row["Nawa"] || "-"}</span></div>
             <div><span class="label">วิภาวดี:</span> <span class="value">${row["Vipa"] || "-"}</span></div>
-            <div><span class="label">นอกรอบ:</span> <span class="value">${row["Request"] || "-"}</span></div>
+            <div><span class="label">นอกรอบ:</span> <span class="value">${getRequestValue(row["Material"])}</span></div>
             <div><span class="label">ศูนย์พื้นที่:</span> <span class="value">${row["QtyPlant"] || "-"}</span></div>
             <div><span class="label">คลังตอบ:</span> <span class="value">${row["คลังตอบ"] || "-"}</span></div>
             <div><span class="label">สถานะ Call:</span> <span class="value">${row["StatusCall"] || "-"}</span></div>
@@ -3456,6 +3954,7 @@ if (result.status === "success") {
         tableBody.appendChild(tr);
       });
       updatePagination(data.length);
+      updateSelectAllState(paginatedData);
     }
     function updatePagination(totalItems) {
       const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -3483,12 +3982,97 @@ if (result.status === "success") {
       nextPageButton.onclick = () => { if (currentPage < totalPages) { currentPage++; filterAndRenderTable(); } };
       lastPageButton.onclick = () => { currentPage = totalPages; filterAndRenderTable(); };
     }
+    function updateSelectAllState(currentPageData) {
+      if (!selectAllCheckbox) return;
+      if (!currentPageData || currentPageData.length === 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+        return;
+      }
+      const tickets = currentPageData.map(r => r["Ticket Number"]);
+      const allSelected = tickets.every(t => selectedTickets.has(t));
+      const someSelected = tickets.some(t => selectedTickets.has(t));
+      selectAllCheckbox.checked = allSelected;
+      selectAllCheckbox.indeterminate = !allSelected && someSelected;
+    }
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", () => {
+        const baseFilteredData = getBaseFilteredData();
+        let filteredData = [...baseFilteredData];
+        if (dashboardFilter) {
+          if (dashboardFilter.startsWith('calltype_')) {
+            const type = dashboardFilter.split('_')[1];
+            filteredData = filteredData.filter(row => (row["Call Type"] || "") === type);
+          } else {
+            switch(dashboardFilter) {
+              case 'pending':
+                filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "รอของเข้า");
+                break;
+              case 'success':
+                filteredData = filteredData.filter(row => (row["StatusCall"] || "") === "สำเร็จ");
+                break;
+              case 'waitingResponse':
+                filteredData = filteredData.filter(row => (row["คลังตอบ"] || "") === "รอตรวจสอบ");
+                break;
+              case 'over7':
+                filteredData = filteredData.filter(row => {
+                  const day = parseFloat(row["DayRepair"] || 0);
+                  return day > 7;
+                });
+                break;
+              case 'request':
+                filteredData = filteredData.filter(row => {
+                  const mat = row["Material"] || "";
+                  return mat === "" || mat === "-" || !mat.trim();
+                });
+                break;
+              case 'nawaVipa':
+                filteredData = filteredData.filter(row => {
+                  const status = row["StatusCall"] || "";
+                  return status === "เบิกนวนคร" || status === "เบิกวิภาวดี";
+                });
+                break;
+            }
+          }
+        }
+        const startIdx = (currentPage - 1) * itemsPerPage;
+        const endIdx = startIdx + itemsPerPage;
+        const paginatedData = filteredData.slice(startIdx, endIdx);
+        paginatedData.forEach(row => {
+          const ticket = row["Ticket Number"];
+          if (!ticket) return;
+          if (selectAllCheckbox.checked) selectedTickets.add(ticket);
+          else selectedTickets.delete(ticket);
+        });
+        updateSelectAllState(paginatedData);
+        renderTable(filteredData);
+      });
+    }
     // Initialize App (load data after login)
     function initApp() {
       showLoading();
-      fetch(url)
-        .then(r => r.json())
-        .then(data => {
+      const mainDataPromise = fetch(url)
+        .then(r => {
+          if (!r.ok) throw new Error(`Main sheet fetch failed (${r.status})`);
+          return r.json();
+        });
+      const requestPromise = loadRequestQuantities();
+      Promise.allSettled([mainDataPromise, requestPromise])
+        .then(results => {
+          const [mainRes, reqRes] = results;
+          if (mainRes.status !== 'fulfilled') {
+            console.error('Error fetching main data:', mainRes.reason);
+            hideLoading();
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูลหลัก');
+            return;
+          }
+          if (reqRes.status !== 'fulfilled') {
+            console.warn('Request sheet load failed:', reqRes.reason);
+            requestQuantities = {};
+            // แจ้งผู้ใช้แบบไม่ขัดจังหวะ
+            Swal.fire('คำเตือน', 'ไม่สามารถโหลดข้อมูลนอกรอบได้ (Request sheet)', 'warning');
+          }
+          const data = mainRes.value;
           allData = data;
           populateTeamPlantFilter(data);
           updatePendingFilter(data, employeeFilter.value);
@@ -3499,7 +4083,7 @@ if (result.status === "success") {
           hideLoading();
         })
         .catch(err => {
-          console.error('Error fetching data:', err);
+          console.error('Unexpected error loading app:', err);
           hideLoading();
           alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
         });
