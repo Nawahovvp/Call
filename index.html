@@ -2993,27 +2993,62 @@ Swal.fire({
         // ส่งข้อมูลไป GAS
         const response = await fetch(gasUrl, {
           method: 'POST',
+          mode: 'no-cors',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: `action=insertRequest&payload=${encodeURIComponent(JSON.stringify(jsonPayload))}`
         });
 
-       const result = await response.json();
-console.log('GAS response:', result); // ไว้ debug ได้ จะลบทีหลังก็ได้
+        let responseText = '';
+        try {
+          responseText = await response.text();
+        } catch (readError) {
+          responseText = '';
+        }
 
-if (result.status === "success") {
-  Swal.fire({
-    icon: 'success',
-    title: 'สั่งซื้อสำเร็จ!',
-    html: `<p>บันทึกข้อมูลเรียบร้อยแล้ว<br>Material: ${jsonPayload.material}<br>จำนวน: ${quantity}</p>`,
-    timer: 3000,
-    timerProgressBar: true
-  });
-} else {
-  // เผื่อ GAS ส่ง error กลับมาใน data หรือ error
-  throw new Error(result.data || result.error || 'บันทึกไม่สำเร็จ');
-}
+        let result = null;
+        try {
+          result = responseText ? JSON.parse(responseText) : null;
+        } catch (parseError) {
+          result = null;
+        }
 
+        const statusValue = result && (result.status || result.result || result.ok || result.success);
+        const looksSuccess = typeof responseText === "string" && /success/i.test(responseText);
+        const looksError = typeof responseText === "string" && /error|ข้อผิดพลาด|ล้มเหลว/i.test(responseText);
 
+        const isExplicitError =
+          (result && result.status === "error") ||
+          (result && result.error) ||
+          looksError;
+
+        const isSuccess =
+          statusValue === true ||
+          statusValue === "success" ||
+          statusValue === "ok" ||
+          statusValue === "OK" ||
+          statusValue === "Success" ||
+          looksSuccess ||
+          responseText.trim() === "" ||
+          response.type === "opaque" ||
+          response.status === 0;
+
+        console.log('GAS response:', result || responseText);
+
+        if (!isExplicitError && isSuccess) {
+          Swal.fire({
+            icon: 'success',
+            title: 'สั่งซื้อสำเร็จ!',
+            html: `<p>บันทึกข้อมูลเรียบร้อยแล้ว<br>Material: ${jsonPayload.material}<br>จำนวน: ${quantity}</p>`,
+            timer: 3000,
+            timerProgressBar: true
+          });
+        } else {
+          const errorMessage =
+            (result && (result.data || result.error || result.message)) ||
+            responseText ||
+            `HTTP ${response.status}`;
+          throw new Error(errorMessage);
+        }
       } catch (err) {
         console.error(err);
         Swal.fire({
