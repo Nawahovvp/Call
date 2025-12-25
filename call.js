@@ -289,17 +289,20 @@
       if (quickEmp) quickEmp.textContent = emp || '-';
     }
     const normalizePendingUnit = (val) => (val || "").toString().toLowerCase().replace(/\s+/g, '');
-    const REQUEST_PENDING_TARGETS = [
-      "stockวิภาวดี62",
-      "stockvibhavadi62",
-      "สต๊อกวิภาวดี62",
-      "วิภาวดี62",
-      "vibhavadi62"
-    ];
-    function computeRequestQuantities(data) {
-      const result = {};
-      if (!Array.isArray(data)) return result;
-      data.forEach(row => {
+const REQUEST_PENDING_TARGETS = [
+  "stockวิภาวดี62",
+  "stockvibhavadi62",
+  "สต๊อกวิภาวดี62",
+  "วิภาวดี62",
+  "vibhavadi62"
+];
+const REQUEST_STATUS_TARGET = "รอเบิก";
+function computeRequestQuantities(data) {
+  const result = {};
+  if (!Array.isArray(data)) return result;
+  data.forEach(row => {
+    const status = (row?.status ?? row?.Status ?? row?.STATUS ?? row?.สถานะ ?? row?.["status"] ?? row?.["Status"] ?? "").toString().trim();
+    if (status && status !== REQUEST_STATUS_TARGET) return;
         const material = normalizeMaterial(
           row?.Material ??
           row?.material ??
